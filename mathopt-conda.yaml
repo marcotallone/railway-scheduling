@@ -12,6 +12,10 @@ dependencies:
   - pillow
   - pip
   - pip:
+    - gurobipy
     - tqdm
     - jupyter
-    - gurobipy
+    - holoviews
+    - hvplot
+    - bokeh
+    - jupiter_bokeh
