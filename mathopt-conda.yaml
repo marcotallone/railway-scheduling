@@ -1,0 +1,17 @@
+name: mathopt
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11.5
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - pillow
+  - pip
+  - pip:
+    - tqdm
+    - jupyter
+    - gurobipy
