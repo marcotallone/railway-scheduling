@@ -69,7 +69,10 @@ class Railway():
 		self.J = range(jobs)
 		self.pi = pi
 		self.Aj = Aj
-		self.Ja = {a: [j for j in self.J if a in self.Aj[j]] for a in self.A}
+		if Aj == {}:
+			self.Ja = {}
+		else:
+			self.Ja = {a: [j for j in self.J if a in self.Aj[j]] for a in self.A}
 		self.C = C
 		self.tau = tau
 		
@@ -78,8 +81,10 @@ class Railway():
 		self.phi = phi
 		self.beta = beta
 		self.Lambd = Lambd
-		sum_phi = sum(self.phi[(o, d, t)] for o in self.N for d in self.N for t in self.T if o != d)
-		self.M = sum_phi + (100 * self.passengers) # unlimited capacity upper bound
+		if phi == {}:
+			self.M = 100 * self.passengers
+		else:
+			self.__update_M()
   
 		# Events and alternative routes
 		self.E = E
@@ -97,17 +102,18 @@ class Railway():
 		self.w = self.model.addVars(self.A, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name='w')
 		self.v = self.model.addVars(self.N, self.N, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name='v')
   
-		# Objective Function
-		self.model.setObjective(
-			quicksum(
-				quicksum(
-					self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d]) for t in self.T
-				) for o in self.N for d in self.N if o != d
-			)
-		)
+		# XXX: both methods postponed
+		# # Objective Function
+		# self.model.setObjective(
+		# 	quicksum(
+		# 		quicksum(
+		# 			self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d]) for t in self.T
+		# 		) for o in self.N for d in self.N if o != d
+		# 	)
+		# )
   
-		# Constraints
-		self.__set_constraints()
+		# # Constraints
+		# self.set_constraints()
   
 
 	# Methods --------------------------------------
@@ -194,7 +200,6 @@ class Railway():
 		return nodes
 
 	# Yen's K-shortest paths algorithm
-	@staticmethod
 	def YenKSP(self, graph, source, sink, K):
 		
 		# Initialise lists
@@ -250,7 +255,7 @@ class Railway():
 		return A
 
 	# Constraints definition
-	def __set_constraints(self):
+	def set_constraints(self):
 	 
 		# Minimize total passenger delays (1)
 		self.model.setObjective(
@@ -350,19 +355,34 @@ class Railway():
 							self.model.addConstr(
 								self.v[o, d, t] <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i])
 							)
+
+	# Set objective function
+	def set_objective(self):
+		self.model.setObjective(
+			quicksum(
+				quicksum(
+					self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d]) for t in self.T
+				) for o in self.N for d in self.N if o != d
+			)
+		)
 	   
 	# Optimize
 	def optimize(self):
 		self.model.optimize()
-  
-	# Random geenrator method: pi (processing times)
-	def __generate_pi(self, min_time=1, max_time=None):
-		if max_time is None: max_time = (len(self.T) - 1) // len(self.J)
-		return {j: random.randint(min_time, max_time) for j in self.J}
 
 	# Update methdod: Ja (maintainance jobs on arcs)
 	def __update_Ja(self):
 		self.Ja = {a: [j for j in self.J if a in self.Aj[j]] for a in self.A}
+  
+	# Update method: M unlimited capacity upper bound
+	def __update_M(self):
+		self.M = sum(self.phi[(o, d, t)] for o in self.N for d in self.N for t in self.T if o != d) + (100 * self.passengers)
+  
+	# Random generator method: pi (processing times)
+	def __generate_pi(self, min_time=1, max_time=None):
+		if max_time is None: max_time = (len(self.T) - 1) // len(self.J)
+		# return {j: random.randint(min_time, max_time) for j in self.J}
+		self.pi = {j: random.randint(min_time, max_time) for j in self.J}
 
 	# Random generator method: Aj (arcs subject to jobs)
 	def __generate_Aj(self, min_length=1, max_length=None):
@@ -395,22 +415,26 @@ class Railway():
   
 	# Random generator method: tau (minimum maintainance time intervals)
 	def __generate_tau(self, min_interval=0, max_interval=0):
-		return {a: random.randint(min_interval, max_interval) for a in self.A}
+		# return {a: random.randint(min_interval, max_interval) for a in self.A}
+		self.tau = {a: random.randint(min_interval, max_interval) for a in self.A}
 
 	# Random generator method: phi (passenger demand)
 	def __generate_phi(self, min_demand=0, max_demand=None):
 		if max_demand is None: max_demand = self.passengers
-		return {(o, d, t): random.randint(min_demand, max_demand) for o in self.N for d in self.N for t in self.T if o != d}
+		# return {(o, d, t): random.randint(min_demand, max_demand) for o in self.N for d in self.N for t in self.T if o != d}
+		self.phi = {(o, d, t): random.randint(min_demand, max_demand) for o in self.N for d in self.N for t in self.T if o != d}
 
 	# Random generator method: beta (share of daily passenger demand)
 	def __generate_beta(self, min_share=0.5, max_share=0.7):
-		return {(o, d, t): random.uniform(min_share, max_share) for o in self.N for d in self.N for t in self.T if o != d}
+		# return {(o, d, t): random.uniform(min_share, max_share) for o in self.N for d in self.N for t in self.T if o != d}
+		self.beta = {(o, d, t): random.uniform(min_share, max_share) for o in self.N for d in self.N for t in self.T if o != d}
 
 	# Random generator method: Lambd (limited capacity of alternative services)
 	def __generate_Lambd(self, min_capacity=None, max_capacity=None):
 		if min_capacity is None: min_capacity = int(0.5 * self.passengers / self.n)
 		if max_capacity is None: max_capacity = int(0.7 * self.passengers / self.n)
-		return {(a, t): random.randint(min_capacity, max_capacity) for a in self.A for t in self.T}
+		# return {(a, t): random.randint(min_capacity, max_capacity) for a in self.A for t in self.T}
+		self.Lambd = {(a, t): random.randint(min_capacity, max_capacity) for a in self.A for t in self.T}
 
 	# Random generator method: E (set of event tracks at each time t)
 	def __generate_E(self, n_max_events = 0, min_length=1, max_length=None):
@@ -449,7 +473,7 @@ class Railway():
 		for o in self.N:
 			for d in self.N:
 				if o != d:
-					self.R[(o, d)] = self.YenKSP(self.graph, o, d, self.K)
+					self.R[(o, d)] = self.YenKSP(graph=self.graph, source=o, sink=d, K=self.K)
 
 	# Scheduling problem generator method
 	def generate_problem(
@@ -470,21 +494,21 @@ class Railway():
 			E_min_length=1,
 			E_max_length=None
 	):
-		self.pi = self.__generate_pi(pi_min_time, pi_max_time)
+		self.__generate_pi(pi_min_time, pi_max_time)
 		self.__generate_Aj(Aj_min_length, Aj_max_length)
-		self.tau = self.__generate_tau(tau_min_interval, tau_max_interval)
-		self.phi = self.__generate_phi(phi_min_demand, phi_max_demand)
-		self.beta = self.__generate_beta(beta_min_share, beta_max_share)
-		self.Lambd = self.__generate_Lambd(Lambd_min_capacity, Lambd_max_capacity)
+		self.__generate_tau(tau_min_interval, tau_max_interval)
+		self.__generate_phi(phi_min_demand, phi_max_demand)
+		self.__generate_beta(beta_min_share, beta_max_share)
+		self.__generate_Lambd(Lambd_min_capacity, Lambd_max_capacity)
 		self.__generate_E(n_max_events, E_min_length, E_max_length)
 		self.__generate_R()
 
-		# Update constraints
-		self.__set_constraints()
+		# XXX: let the user do this	manually
+		# # Update constraints
+		# self.__set_constraints()
   
    
   
 	# TODO: Add methods to display state of the model
  
 	# TODO: Add method to display the results of the optimization / solutions 
-  
