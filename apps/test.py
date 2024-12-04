@@ -2,8 +2,8 @@ from railway import *
 
 # Constant values
 n = 10
-periods = 30
-jobs = 6
+periods = 10
+jobs = 10
 passengers = 100
 K = 3
 
@@ -12,22 +12,30 @@ model = Railway(n, periods, jobs, passengers, K)
 
 # Generate problem parameters
 pi_min_time = 1
-pi_max_time = periods // jobs
+# pi_max_time = periods // jobs
+pi_max_time = 1
+
 Aj_min_length = 1
-Aj_max_length = n // 3
+# Aj_max_length = n // 3
+Aj_max_length = 1
+
 tau_min_interval = 0
 tau_max_interval = 0
+
 phi_min_demand = 0
-phi_max_demand = passengers
-beta_min_share = 0.5
-beta_max_share = 0.7
-Lambd_min_capacity = int(0.5 * passengers/n)
-Lambd_max_capacity = int(0.7 * passengers/n)
+phi_max_demand = passengers // 4
+
+beta_min_share = 0.1
+beta_max_share = 0.3
+
+Lambd_min_capacity = int(0.6 * passengers/n)
+Lambd_max_capacity = int(0.9 * passengers/n)
+
 n_max_events = 0
 E_min_length = 1
 E_max_length = None
 
-model.generate_problem(
+model.generate(
     pi_min_time,
     pi_max_time,
     Aj_min_length,
