@@ -13,7 +13,7 @@ class Railway():
 	----------
 	stations: int (also `n`)
 		number of stations
-	periods: int
+	periods: int (also `Tend`)
 		number of discrete time periods
 	jobs: int
 		number of maintenance jobs to be scheduled
@@ -32,6 +32,8 @@ class Railway():
 		set of nodes (stations)
 	A: list
 		set of arcs (direct train connections)
+    OD: list
+        set of all possible origin o - destination d pairs (where o != d)
 	T: list
 		set of discrete time periods
 	J: list
@@ -135,6 +137,7 @@ class Railway():
         # Attributes
         self.n = stations
         self.stations = stations
+        self.Tend = periods
         self.periods = periods
         self.jobs = jobs
         self.passengers = passengers
@@ -142,10 +145,11 @@ class Railway():
         self.routes = routes
 
         # Sets
-        self.N = range(self.n)
+        self.N = range(1, self.n + 1)
         self.A = [(i, j) for i in self.N for j in self.N if i < j]
-        self.T = range(self.periods)
-        self.J = range(self.jobs)
+        self.OD = [(o, d) for o in self.N for d in self.N if o != d]
+        self.T = range(1, self.periods + 1)
+        self.J = range(1, self.jobs + 1)
         self.Aj = kwargs.get('Aj', {})
         self.__set_Ja() # set the Ja set
         self.C = kwargs.get('C', [])
@@ -170,8 +174,8 @@ class Railway():
         self.delay_factor = 1.35
         self.omega_e = {
 			(i, j): np.sqrt(
-				(self.coords[i][0] - self.coords[j][0]) ** 2 +
-				(self.coords[i][1] - self.coords[j][1]) ** 2
+				(self.coords[i-1][0] - self.coords[j-1][0]) ** 2 +
+				(self.coords[i-1][1] - self.coords[j-1][1]) ** 2
 			) for i, j in self.A
 		}
         self.omega_j = {a: self.delay_factor * self.omega_e[a] for a in self.A}
@@ -183,10 +187,8 @@ class Railway():
                 elif j == node:
                     self.graph[node][i] = self.omega_e[(i, j)]
         self.Omega = {
-			(o, d): self.dijkstra(self.graph, o)[0][d]
-			for o in self.N
-			for d in self.N
-			if o != d
+			(o, d): self.dijkstra(self.graph, o)[0][d] # 0 because we want the distances (first element of the return tuple)
+            for o, d in self.OD
 		}
         self.__set_M()  # set the M upper bound
         self.model = Model()
@@ -196,7 +198,7 @@ class Railway():
         self.y = self.model.addVars(self.J, self.T, vtype=gb.GRB.BINARY, name="y")
         self.x = self.model.addVars(self.A, self.T, vtype=gb.GRB.BINARY, name="x")
         self.h = self.model.addVars(
-			self.N, self.N, self.T, range(self.K), vtype=gb.GRB.BINARY, name="h"
+			self.N, self.N, self.T, range(1, self.K + 1), vtype=gb.GRB.BINARY, name="h"
 		)
         self.w = self.model.addVars(
 			self.A, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name="w"
@@ -221,52 +223,81 @@ class Railway():
         else:
             self.M = sum(
 				self.phi[(o, d, t)]
-				for o in self.N
-				for d in self.N
-				for t in self.T
-				if o != d
+				for o, d in self.OD
+                for t in self.T
 			) + (100 * self.passengers)
 
     # Set constraints
     def set_constraints(self):
         """Set the constraints for the railway scheduling problem."""
 
-        # # Job started and completed within time horizon (2)
-        # for j in self.J:
-        #     self.model.addConstr(
-        # 		quicksum(self.y[j, t] for t in range(len(self.T) - self.pi[j] + 1)) == 1
-        # 	)
+        # Job started once and completed within time horizon                    (2)
+        self.model.addConstrs(
+            (
+                quicksum(self.y[j, t] for t in range(1, len(self.T) - self.pi[j] + 1))
+                == 1
+                for j in self.J
+            ),
+            name="2",
+        )
 
-        # Availability of arc a at time t (3)
-        # for a in self.A:
-        #     for t in self.T:
-        #         for j in self.Ja[a]:
-        #             self.model.addConstr(
-        # 				self.x[*a, t] + quicksum(self.y[j, tp] for tp in range(max(0, t - self.pi[j] + 1), t)) <= 1
-        # 			)
+        # Availability of arc a at time t                                       (3)
+        self.model.addConstrs(
+            (
+                self.x[*a, t]
+                + quicksum(
+                    self.y[j, tp]
+                    for tp in range(max(1, t - self.pi[j] + 1), min(t, self.Tend) + 1)
+                )
+                <= 1
+                for a in self.A
+                for t in self.T
+                for j in self.Ja[a]
+            ),
+            name="3",
+        )
 
-        # Increased travel time for service replacement (4)
-        # for a in self.A:
-        #     for t in self.T:
-        #         self.model.addConstr(
-        # 			self.w[*a, t] == self.x[*a, t] * self.omega_e[a] + (1 - self.x[*a, t]) * self.omega_j[a]
-        # 		)
+        # Increased travel time for service replacement                         (4)
+        self.model.addConstrs(
+            (
+                self.w[*a, t] == self.x[*a, t] * self.omega_e[a] + (1 - self.x[*a, t]) * self.omega_j[a]
+                for a in self.A
+                for t in self.T
+            ),
+            name="4",
+        )
 
-        # # Ensure correct arc travel times for free variables (5)
+        # Ensure correct arc travel times for free variables                    (5)
         # for a in self.A:
         #     self.model.addConstr(
         # 		quicksum(self.x[*a, t] for t in self.T) == len(self.T) - quicksum(self.pi[j] for j in self.Ja[a])
         # 	)
-
-        # # Arcs that cannt be unavailable simultaneously (6)
+        self.model.addConstrs(
+            (
+                quicksum(self.x[*a, t] for t in self.T) == self.Tend - quicksum(self.pi[j] for j in self.Ja[a])
+                for a in self.A
+            ),
+            name="5",
+        )
+        
+        # Arcs that cannt be unavailable simultaneously                         (6)
         # for t in self.T:
         #     for j in self.J:
         #         for c in self.C:
         #             self.model.addConstr(
         # 				quicksum(1 - self.x[*a, t] for a in c) <= 1
         # 			)
+        self.model.addConstrs(
+            (
+                quicksum(1 - self.x[*a, t] for a in c) <= 1
+                for t in self.T
+                for c in self.C
+                # for j in self.J # TODO: add this only if C depends on job j
+            ),
+            name="6",
+        )
 
-        # # Non overlapping jobs on same arc (7)
+        # Non overlapping jobs on same arc                                      (7)
         # for a in self.A:
         #     for t in self.T:
         #         self.model.addConstr(
@@ -276,8 +307,23 @@ class Railway():
         # 				) for j in self.Ja[a]
         # 			) <= 1
         # 		)
+        self.model.addConstrs(
+            (
+                quicksum(
+                    quicksum(
+                        self.y[j, tp]
+                        for tp in range(max(1, t - self.pi[j] - self.tau[a] + 1), t + 1)
+                    )
+                    for j in self.Ja[a]
+                )
+                <= 1
+                for a in self.A
+                for t in self.T
+            ),
+            name="7",
+        )
 
-        # # Each track segment in an event request has limited capacity (8)
+        # Each track segment in an event request has limited capacity           (8)
         # for t in self.T:
         #     for s in self.E[t]:
         #         self.model.addConstr(
@@ -289,8 +335,28 @@ class Railway():
         # 				) for a in s
         # 			) <= quicksum(self.Lambd[a, t] for a in s) + (self.M * quicksum(self.x[*a, t] for a in s))
         # 		)
+        self.model.addConstrs(
+            (
+                quicksum(
+                    quicksum(
+                        quicksum(
+                            self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t]
+                            for i in range(1, self.K + 1) if a in self.R[(o, d)][i-1]
+                        )
+                        for o, d in self.OD
+                    )
+                    for a in s
+                )
+                <= quicksum(self.Lambd[a, t] for a in s) 
+                + (self.M * quicksum(self.x[*a, t] for a in s))
+                for t in self.T
+                for s in self.E[t]
+            ),
+            name="8",
+        )
+                
 
-        # # Passeger flow from o to d is served by one of predefined routes (9)
+        # Passeger flow from o to d is served by one of predefined routes       (9)
         # for t in self.T:
         #     for o in self.N:
         #         for d in self.N:
@@ -300,8 +366,16 @@ class Railway():
         # 						self.h[o, d, t, i] for i in range(self.K)
         # 					) == 1
         # 				)
+        self.model.addConstrs(
+            (
+                quicksum(self.h[o, d, t, i] for i in range(1, self.K + 1)) == 1
+                for t in self.T
+                for o, d in self.OD
+            ),
+            name="9",
+        )
 
-        # # Lower bound for travel time from o to d (10)
+        # Lower bound for travel time from o to d                               (10)
         # for t in self.T:
         #     for o in self.N:
         #         for d in self.N:
@@ -310,8 +384,19 @@ class Railway():
         #                     self.model.addConstr(
         # 						self.v[o, d, t] >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i]) - self.M * (1 - self.h[o, d, t, i])
         # 					)
+        self.model.addConstrs(
+            (
+                self.v[o, d, t]
+                >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i-1])
+                - self.M * (1 - self.h[o, d, t, i])
+                for t in self.T
+                for o, d in self.OD
+                for i in range(1, self.K + 1)
+            ),
+            name="10",
+        )
 
-        # # Upper bound for travel time from o to d (11)
+        # Upper bound for travel time from o to d                               (11)
         # for t in self.T:
         #     for o in self.N:
         #         for d in self.N:
@@ -320,126 +405,158 @@ class Railway():
         #                     self.model.addConstr(
         # 						self.v[o, d, t] <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i])
         # 					)
+        self.model.addConstrs(
+            (
+                self.v[o, d, t]
+                <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i-1])
+                for t in self.T
+                for o, d in self.OD
+                for i in range(1, self.K + 1)
+            ),
+            name="11",
+        )
+        
+        # Arcs never included in any job are always available                   (12)
+        self.model.addConstrs(
+            (
+                self.x[*a, t] == 1
+                for a in self.A
+                for t in self.T
+                if not any(a in self.Aj[j] for j in self.J)
+            ),
+            name="12",
+        )
+        
+        # Travel times for arcs never included in any job are equal to omega_e   (13)
+        self.model.addConstrs(
+            (
+                self.w[*a, t] == self.omega_e[a]
+                for a in self.A
+                for t in self.T
+                if not any(a in self.Aj[j] for j in self.J)
+            ),
+            name="13",
+        )
+        
 
 
 
-        # TODO: improve constraints efficiency when setting...
+        # # TODO: improve constraints efficiency when setting...
 
-        # ---------------------------------------------------------------------- jobs loop
-        for j in self.J:
+        # # ---------------------------------------------------------------------- jobs loop
+        # for j in self.J:
 
-            # Job started and completed within time horizon                     (2)
-            self.model.addConstr(
-				quicksum(self.y[j, t] for t in range(len(self.T) - self.pi[j])) == 1
-			)
+        #     # Job started and completed within time horizon                     (2)
+        #     self.model.addConstr(
+    # 		quicksum(self.y[j, t] for t in range(len(self.T) - self.pi[j])) == 1
+    # 	)
 
-        # ---------------------------------------------------------------------- arcs loop
-        for a in self.A:
+    # # ---------------------------------------------------------------------- arcs loop
+    # for a in self.A:
 
-            # Ensure correct arc travel times for free variables                 (5)
-            self.model.addConstr(
-                quicksum(self.x[*a, t] for t in self.T) == len(self.T) - quicksum(self.pi[j] for j in self.Ja[a])
-            )
+    #     # Ensure correct arc travel times for free variables                 (5)
+    #     self.model.addConstr(
+    #         quicksum(self.x[*a, t] for t in self.T) == len(self.T) - quicksum(self.pi[j] for j in self.Ja[a])
+    #     )
 
-        # ---------------------------------------------------------------------- times loop
-        for t in self.T:
+    # # ---------------------------------------------------------------------- times loop
+    # for t in self.T:
 
-            for a in self.A:
+    #     for a in self.A:
 
-                for j in self.Ja[a]:
+    #         for j in self.Ja[a]:
 
-                    # Availability of arc a at time t                           (3)
-                    t_start = max(0, t - self.pi[j])
-                    self.model.addConstr(
-                        self.x[*a, t] + quicksum(self.y[j, tp] for tp in range(t_start, t)) <= 1
-                    )
+    #             # Availability of arc a at time t                           (3)
+    #             t_start = max(0, t - self.pi[j])
+    #             self.model.addConstr(
+    #                 self.x[*a, t] + quicksum(self.y[j, tp] for tp in range(t_start, t)) <= 1
+    #             )
 
-                # Increased travel time for service replacement                 (4)
-                self.model.addConstr(
-                    self.w[*a, t] == self.x[*a, t] * self.omega_e[a] + (1 - self.x[*a, t]) * self.omega_j[a]
-                )
+    #         # Increased travel time for service replacement                 (4)
+    #         self.model.addConstr(
+    #             self.w[*a, t] == self.x[*a, t] * self.omega_e[a] + (1 - self.x[*a, t]) * self.omega_j[a]
+    #         )
 
-                # Non overlapping jobs on same arc                              (7)
-                self.model.addConstr(
-                    quicksum(
-                        quicksum(
-                            self.y[j, tp] for tp in range( max(0, t - self.pi[j] - self.tau[a]), t)
-                        ) for j in self.Ja[a]
-                    )
-                    <= 1
-                )
+    #         # Non overlapping jobs on same arc                              (7)
+    #         self.model.addConstr(
+    #             quicksum(
+    #                 quicksum(
+    #                     self.y[j, tp] for tp in range( max(0, t - self.pi[j] - self.tau[a]), t)
+    #                 ) for j in self.Ja[a]
+    #             )
+    #             <= 1
+    #         )
 
-                # Arcs never included in any job are always available           (12)
-                if not any(a in self.Aj[j] for j in self.J):
-                    self.model.addConstr(self.x[*a, t] == 1)
-                    
-                # Travel times for arcs never included in any job               (13)
-                if not any(a in self.Aj[j] for j in self.J):
-                    self.model.addConstr(self.w[*a, t] == self.omega_e[a])
+    #         # Arcs never included in any job are always available           (12)
+    #         if not any(a in self.Aj[j] for j in self.J):
+    #             self.model.addConstr(self.x[*a, t] == 1)
 
-            # for j in self.J: <-- TODO: willingly C can depend on job j os this extenal loop is needed
-            # Arcs that cannot be unavailable simultaneously                    (6)
-            for c in self.C:
-                self.model.addConstr(
-                    quicksum(1 - self.x[*a, t] for a in c) <= 1
-                )
+    #         # Travel times for arcs never included in any job               (13)
+    #         if not any(a in self.Aj[j] for j in self.J):
+    #             self.model.addConstr(self.w[*a, t] == self.omega_e[a])
 
-            for s in self.E[t]:
+    #     # for j in self.J: <-- TODO: willingly C can depend on job j os this extenal loop is needed
+    #     # Arcs that cannot be unavailable simultaneously                    (6)
+    #     for c in self.C:
+    #         self.model.addConstr(
+    #             quicksum(1 - self.x[*a, t] for a in c) <= 1
+    #         )
 
-                # Each track segment in an event request has limited capacity   (8)
-                self.model.addConstr(
-                    quicksum(
-                        quicksum(
-                            quicksum(
-                                self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t] for i in range(self.K) if a in self.R[(o, d)][i]
-                            ) for o in self.N for d in self.N if o != d
-                        ) for a in s
-                    ) <= quicksum(self.Lambd[a, t] for a in s) + (self.M * quicksum(self.x[*a, t] for a in s))
-                )
+    #     for s in self.E[t]:
 
-                for a in s:
-                    for o in self.N:
-                        for d in self.N:
-                            if o != d:
-                                # Availability of arc included in all event paths (14)
-                                if all(a in self.R[(o, d)][i] for i in range(self.K)):
-                                    self.model.addConstr(self.x[*a, t] == 1)
+    #         # Each track segment in an event request has limited capacity   (8)
+    #         self.model.addConstr(
+    #             quicksum(
+    #                 quicksum(
+    #                     quicksum(
+    #                         self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t] for i in range(self.K) if a in self.R[(o, d)][i]
+    #                     ) for o in self.N for d in self.N if o != d
+    #                 ) for a in s
+    #             ) <= quicksum(self.Lambd[a, t] for a in s) + (self.M * quicksum(self.x[*a, t] for a in s))
+    #         )
 
-            for o in self.N:
-                for d in self.N:
-                    if o != d:
+    #         for a in s:
+    #             for o in self.N:
+    #                 for d in self.N:
+    #                     if o != d:
+    #                         # Availability of arc included in all event paths (14)
+    #                         if all(a in self.R[(o, d)][i] for i in range(self.K)):
+    #                             self.model.addConstr(self.x[*a, t] == 1)
 
-                        # Passenger flow o -> d served by one of the K routes   (9)
-                        self.model.addConstr(
-                            quicksum(self.h[o, d, t, i] for i in range(self.K)) == 1
-                        )
+    #     for o in self.N:
+    #         for d in self.N:
+    #             if o != d:
 
-                        for i in range(self.K):
-                            
-                            # Lower bound for travel time from o to d           (10)
-                            self.model.addConstr(
-                                self.v[o, d, t] >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i]) - self.M * (1 - self.h[o, d, t, i])
-                            )
+    #                 # Passenger flow o -> d served by one of the K routes   (9)
+    #                 self.model.addConstr(
+    #                     quicksum(self.h[o, d, t, i] for i in range(self.K)) == 1
+    #                 )
 
-                            # Upper bound for travel time from o to d           (11)
-                            self.model.addConstr(
-                                self.v[o, d, t] <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i])
-                            )
-                            
+    #                 for i in range(self.K):
 
-    # # Set fixed values
+    #                     # Lower bound for travel time from o to d           (10)
+    #                     self.model.addConstr(
+    #                         self.v[o, d, t] >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i]) - self.M * (1 - self.h[o, d, t, i])
+    #                     )
+
+    #                     # Upper bound for travel time from o to d           (11)
+    #                     self.model.addConstr(
+    #                         self.v[o, d, t] <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i])
+    #                     )
+
+    # # Set fixed values --------------
     # def set_fixed_values(self):
     #     """Set fixed values for decision variables for reduction of solution space."""
 
     #     # Arcs never included in any job are always available (i.e. x = 1)
     #     self.model.addConstrs(
-	# 		self.x[a, t] == 1 for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
-	# 	)
+    # 		self.x[a, t] == 1 for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
+    # 	)
 
     #     # Travel times for arcs never included in any job are equal to the average travel time (i.e. w = omega_e)
     #     self.model.addConstrs(
-	# 		self.w[a, t] == self.omega_e[a] for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
-	# 	)
+    # 		self.w[a, t] == self.omega_e[a] for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
+    # 	)
 
     #     # If an arc a is included in all the possible K paths at a certain event at time t then that arc must be available (i.e. x = 1)
     #     for t in self.T:
@@ -449,16 +566,18 @@ class Railway():
     #                     for d in self.N:
     #                         if o != d:
     #                             if all(a in self.R[(o, d)][i] for i in range(self.K)) and (self.beta[o, d, t]*self.phi[o, d, t] > self.Lambd[a, t]):
-    #                                 self.model.addConstr(self.x[a, t] == 1)					
+    #                                 self.model.addConstr(self.x[a, t] == 1)
 
     # Set objective function
     def set_objective(self):
         """Set the objective function for the railway scheduling problem."""
+
+        # Objective function                                                    (1)
         self.model.setObjective(
 			quicksum(
 				quicksum(
 					self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d]) for t in self.T
-				) for o in self.N for d in self.N if o != d
+				) for o, d in self.OD
 			)
 		)
 
@@ -720,15 +839,13 @@ class Railway():
 
     # Random generator method: pi (processing times)
     def __generate_pi(self, min_time=1, max_time=None):
-        if max_time is None:
-            max_time = (len(self.T) - 1) // len(self.J)
-        # return {j: random.randint(min_time, max_time) for j in self.J}
+        if max_time is None: max_time = self.Tend
         self.pi = {j: random.randint(min_time, max_time) for j in self.J}
 
     # Random generator method: Aj (arcs subject to jobs)
     def __generate_Aj(self, min_length=1, max_length=None):
         if max_length is None:
-            max_length = self.n // 3
+            max_length = self.n - 1
         self.Aj = {}
         for j in self.J:
             start_station = random.choice(self.N)  # start station
@@ -760,45 +877,35 @@ class Railway():
 
     # Random generator method: tau (minimum maintainance time intervals)
     def __generate_tau(self, min_interval=0, max_interval=0):
-        # return {a: random.randint(min_interval, max_interval) for a in self.A}
         self.tau = {a: random.randint(min_interval, max_interval) for a in self.A}
 
     # Random generator method: phi (passenger demand)
     def __generate_phi(self, min_demand=0, max_demand=None):
         if max_demand is None:
             max_demand = self.passengers
-        # return {(o, d, t): random.randint(min_demand, max_demand) for o in self.N for d in self.N for t in self.T if o != d}
         self.phi = {
             (o, d, t): random.randint(min_demand, max_demand)
-            for o in self.N
-            for d in self.N
+            for o, d in self.OD
             for t in self.T
-            if o != d
         }
-        
+
         # Update M upper bound
         self.__set_M()
 
     # Random generator method: beta (share of daily passenger demand)
-    def __generate_beta(self, min_share=0.5, max_share=0.7):
-        # return {(o, d, t): random.uniform(min_share, max_share) for o in self.N for d in self.N for t in self.T if o != d}
+    def __generate_beta(self, min_share=0, max_share=1):
         self.beta = {
             (o, d, t): random.uniform(min_share, max_share)
-            for o in self.N
-            for d in self.N
+            for o, d in self.OD
             for t in self.T
-            if o != d
         }
 
     # Random generator method: Lambd (limited capacity of alternative services)
-    def __generate_Lambd(self, min_capacity=None, max_capacity=None):
-        if min_capacity is None:
-            min_capacity = int(0.5 * self.passengers / self.n)
-        if max_capacity is None:
-            max_capacity = int(0.7 * self.passengers / self.n)
-        # return {(a, t): random.randint(min_capacity, max_capacity) for a in self.A for t in self.T}
+    def __generate_Lambd(self, min_capacity=0, max_capacity=1):
+        min_capacity_int = int(min_capacity * self.passengers / self.n)
+        max_capacity_int = int(max_capacity * self.passengers / self.n)
         self.Lambd = {
-            (a, t): random.randint(min_capacity, max_capacity)
+            (a, t): random.randint(min_capacity_int, max_capacity_int)
             for a in self.A
             for t in self.T
         }
@@ -806,7 +913,7 @@ class Railway():
     # Random generator method: E (set of event tracks at each time t)
     def __generate_E(self, n_max_events=0, min_length=1, max_length=None):
         if max_length is None:
-            max_length = (self.n - 1) // 3
+            max_length = self.n - 1
         self.E = {}
         for t in self.T:
             E_tmp = []
@@ -841,12 +948,10 @@ class Railway():
     # Random generator method: R (set of routes from o to d)
     def __generate_R(self):
         self.R = {}
-        for o in self.N:
-            for d in self.N:
-                if o != d:
-                    self.R[(o, d)] = self.YenKSP(
-                        graph=self.graph, source=o, sink=d, K=self.K
-                    )
+        for o, d in self.OD:
+            self.R[(o, d)] = self.YenKSP(
+                graph=self.graph, source=o, sink=d, K=self.K
+            )
 
     # Generate problem parameters
     def generate(
@@ -859,10 +964,10 @@ class Railway():
         pause_max_time=0,
         min_demand=0,
         max_demand=None,
-        min_share=0.5,
-        max_share=0.7,
-        min_capacity=None,
-        max_capacity=None,
+        min_share=0,
+        max_share=1,
+        min_capacity=0,
+        max_capacity=1,
         n_max_events=0,
         event_min_length=1,
         event_max_length=None,
@@ -899,13 +1004,13 @@ class Railway():
         max_demand : int, optional
                 Maximum passenger demand, by default None
         min_share : float, optional
-                Minimum share of daily passenger demand, by default 0.5
+                Minimum share of daily passenger demand, by default 0
         max_share : float, optional
-                Maximum share of daily passenger demand, by default 0.7
-        min_capacity : int, optional
-                Minimum capacity of alternative services, by default None
-        max_capacity : int, optional
-                Maximum capacity of alternative services, by default None
+                Maximum share of daily passenger demand, by default 1
+        min_capacity : float, optional
+                Minimum capacity % per arc of alternative services, by default 0
+        max_capacity : float, optional
+                Maximum capacity % per arc of alternative services, by default 1
         n_max_events : int, optional
                 Maximum number of events at each time t, by default 0
         event_min_length : int, optional
@@ -915,10 +1020,10 @@ class Railway():
 
         Notes
         -----
-        - If `job_max_time` is not provided, it is set to the number of periods divided by the number of jobs.
-        - If `job_max_length` is not provided, it is set to the number of stations divided by 3.
-        - If `max_demand` is not provided, it is set to the total number of passengers.
-        - If `event_max_length` is not provided, it is set to the number of stations minus 1
+        - If `job_max_time` is not provided, it is set to `Tend`
+        - If `job_max_length` is not provided, it is set to `n - 1`
+        - If `max_demand` is not provided, it is set to `passengers`
+        - If `event_max_length` is not provided, it is set to `n - 1`
         """
 
         self.__generate_pi(job_min_time, job_max_time)
