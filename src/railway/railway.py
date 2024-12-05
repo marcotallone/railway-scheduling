@@ -99,15 +99,13 @@ class Railway():
 	-------
 	set_constraints()
 		set the constraints for the railway scheduling problem
-	set_fixed_values()
-		set fixed values for decision variables for reduction of solution space
 	set_objective()
 		set the objective function for the railway scheduling problem
   
 	Optimize
 	--------
 	optimize()
-		optimize the railway scheduling problem
+		optimize and solve the railway scheduling problem
   
 	Static Methods
 	--------------
@@ -233,119 +231,225 @@ class Railway():
     def set_constraints(self):
         """Set the constraints for the railway scheduling problem."""
 
-        # Job started and completed within time horizon (2)
-        for j in self.J:
-            self.model.addConstr(
-				quicksum(self.y[j, t] for t in range(len(self.T) - self.pi[j] + 1)) == 1
-			)
+        # # Job started and completed within time horizon (2)
+        # for j in self.J:
+        #     self.model.addConstr(
+        # 		quicksum(self.y[j, t] for t in range(len(self.T) - self.pi[j] + 1)) == 1
+        # 	)
 
         # Availability of arc a at time t (3)
-        for a in self.A:
-            for t in self.T:
-                for j in self.Ja[a]:
-                    self.model.addConstr(
-						self.x[*a, t] + quicksum(self.y[j, tp] for tp in range(max(0, t - self.pi[j] + 1), t)) <= 1
-					)
+        # for a in self.A:
+        #     for t in self.T:
+        #         for j in self.Ja[a]:
+        #             self.model.addConstr(
+        # 				self.x[*a, t] + quicksum(self.y[j, tp] for tp in range(max(0, t - self.pi[j] + 1), t)) <= 1
+        # 			)
 
         # Increased travel time for service replacement (4)
-        for a in self.A:
-            for t in self.T:
-                self.model.addConstr(
-					self.w[*a, t] == self.x[*a, t] * self.omega_e[a] + (1 - self.x[*a, t]) * self.omega_j[a]
-				)
+        # for a in self.A:
+        #     for t in self.T:
+        #         self.model.addConstr(
+        # 			self.w[*a, t] == self.x[*a, t] * self.omega_e[a] + (1 - self.x[*a, t]) * self.omega_j[a]
+        # 		)
 
-        # Ensure correct arc travel times for free variables (5)
-        for a in self.A:
+        # # Ensure correct arc travel times for free variables (5)
+        # for a in self.A:
+        #     self.model.addConstr(
+        # 		quicksum(self.x[*a, t] for t in self.T) == len(self.T) - quicksum(self.pi[j] for j in self.Ja[a])
+        # 	)
+
+        # # Arcs that cannt be unavailable simultaneously (6)
+        # for t in self.T:
+        #     for j in self.J:
+        #         for c in self.C:
+        #             self.model.addConstr(
+        # 				quicksum(1 - self.x[*a, t] for a in c) <= 1
+        # 			)
+
+        # # Non overlapping jobs on same arc (7)
+        # for a in self.A:
+        #     for t in self.T:
+        #         self.model.addConstr(
+        # 			quicksum(
+        # 				quicksum(
+        # 					self.y[j, tp] for tp in range(max(0, t - self.pi[j] - self.tau[a]), len(self.T))
+        # 				) for j in self.Ja[a]
+        # 			) <= 1
+        # 		)
+
+        # # Each track segment in an event request has limited capacity (8)
+        # for t in self.T:
+        #     for s in self.E[t]:
+        #         self.model.addConstr(
+        # 			quicksum(
+        # 				quicksum(
+        # 					quicksum(
+        # 						self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t] for i in range(self.K) if a in self.R[(o, d)][i]
+        # 					) for o in self.N for d in self.N if o != d
+        # 				) for a in s
+        # 			) <= quicksum(self.Lambd[a, t] for a in s) + (self.M * quicksum(self.x[*a, t] for a in s))
+        # 		)
+
+        # # Passeger flow from o to d is served by one of predefined routes (9)
+        # for t in self.T:
+        #     for o in self.N:
+        #         for d in self.N:
+        #             if o != d:
+        #                 self.model.addConstr(
+        # 					quicksum(
+        # 						self.h[o, d, t, i] for i in range(self.K)
+        # 					) == 1
+        # 				)
+
+        # # Lower bound for travel time from o to d (10)
+        # for t in self.T:
+        #     for o in self.N:
+        #         for d in self.N:
+        #             if o != d:
+        #                 for i in range(self.K):
+        #                     self.model.addConstr(
+        # 						self.v[o, d, t] >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i]) - self.M * (1 - self.h[o, d, t, i])
+        # 					)
+
+        # # Upper bound for travel time from o to d (11)
+        # for t in self.T:
+        #     for o in self.N:
+        #         for d in self.N:
+        #             if o != d:
+        #                 for i in range(self.K):
+        #                     self.model.addConstr(
+        # 						self.v[o, d, t] <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i])
+        # 					)
+
+
+
+        # TODO: improve constraints efficiency when setting...
+
+        # ---------------------------------------------------------------------- jobs loop
+        for j in self.J:
+
+            # Job started and completed within time horizon                     (2)
             self.model.addConstr(
-				quicksum(self.x[*a, t] for t in self.T) == len(self.T) - quicksum(self.pi[j] for j in self.Ja[a])
+				quicksum(self.y[j, t] for t in range(len(self.T) - self.pi[j])) == 1
 			)
 
-        # Arcs that cannt be unavailable simultaneously (6)
-        for t in self.T:
-            for j in self.J:
-                for c in self.C:
-                    self.model.addConstr(
-						quicksum(1 - self.x[*a, t] for a in c) <= 1
-					)
-
-        # Non overlapping jobs on same arc (7)
+        # ---------------------------------------------------------------------- arcs loop
         for a in self.A:
-            for t in self.T:
+
+            # Ensure correct arc travel times for free variables                 (5)
+            self.model.addConstr(
+                quicksum(self.x[*a, t] for t in self.T) == len(self.T) - quicksum(self.pi[j] for j in self.Ja[a])
+            )
+
+        # ---------------------------------------------------------------------- times loop
+        for t in self.T:
+
+            for a in self.A:
+
+                for j in self.Ja[a]:
+
+                    # Availability of arc a at time t                           (3)
+                    t_start = max(0, t - self.pi[j])
+                    self.model.addConstr(
+                        self.x[*a, t] + quicksum(self.y[j, tp] for tp in range(t_start, t)) <= 1
+                    )
+
+                # Increased travel time for service replacement                 (4)
                 self.model.addConstr(
-					quicksum(
-						quicksum(
-							self.y[j, tp] for tp in range(max(0, t - self.pi[j] - self.tau[a]), len(self.T))
-						) for j in self.Ja[a]
-					) <= 1
-				)
+                    self.w[*a, t] == self.x[*a, t] * self.omega_e[a] + (1 - self.x[*a, t]) * self.omega_j[a]
+                )
 
-        # Each track segment in an event request has limited capacity (8)
-        for t in self.T:
-            for s in self.E[t]:
+                # Non overlapping jobs on same arc                              (7)
                 self.model.addConstr(
-					quicksum(
-						quicksum(
-							quicksum(
-								self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t] for i in range(self.K) if a in self.R[(o, d)][i]
-							) for o in self.N for d in self.N if o != d
-						) for a in s
-					) <= quicksum(self.Lambd[a, t] for a in s) + (self.M * quicksum(self.x[*a, t] for a in s))
-				)
+                    quicksum(
+                        quicksum(
+                            self.y[j, tp] for tp in range( max(0, t - self.pi[j] - self.tau[a]), t)
+                        ) for j in self.Ja[a]
+                    )
+                    <= 1
+                )
 
-        # Passeger flow from o to d is served by one of predefined routes (9)
-        for t in self.T:
-            for o in self.N:
-                for d in self.N:
-                    if o != d:
-                        self.model.addConstr(
-							quicksum(
-								self.h[o, d, t, i] for i in range(self.K)
-							) == 1
-						)
+                # Arcs never included in any job are always available           (12)
+                if not any(a in self.Aj[j] for j in self.J):
+                    self.model.addConstr(self.x[*a, t] == 1)
+                    
+                # Travel times for arcs never included in any job               (13)
+                if not any(a in self.Aj[j] for j in self.J):
+                    self.model.addConstr(self.w[*a, t] == self.omega_e[a])
 
-        # Lower bound for travel time from o to d (10)
-        for t in self.T:
-            for o in self.N:
-                for d in self.N:
-                    if o != d:
-                        for i in range(self.K):
-                            self.model.addConstr(
-								self.v[o, d, t] >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i]) - self.M * (1 - self.h[o, d, t, i])
-							)
+            # for j in self.J: <-- TODO: willingly C can depend on job j os this extenal loop is needed
+            # Arcs that cannot be unavailable simultaneously                    (6)
+            for c in self.C:
+                self.model.addConstr(
+                    quicksum(1 - self.x[*a, t] for a in c) <= 1
+                )
 
-        # Upper bound for travel time from o to d (11)
-        for t in self.T:
-            for o in self.N:
-                for d in self.N:
-                    if o != d:
-                        for i in range(self.K):
-                            self.model.addConstr(
-								self.v[o, d, t] <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i])
-							)
-
-    # Set fixed values
-    def set_fixed_values(self):
-        """Set fixed values for decision variables for reduction of solution space."""
-
-        # Arcs never included in any job are always available (i.e. x = 1)
-        self.model.addConstrs(
-			self.x[a, t] == 1 for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
-		)
-
-        # Travel times for arcs never included in any job are equal to the average travel time (i.e. w = omega_e)
-        self.model.addConstrs(
-			self.w[a, t] == self.omega_e[a] for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
-		)
-
-        # If an arc a is included in all the possible K paths at a certain event at time t then that arc must be available (i.e. x = 1)
-        for t in self.T:
             for s in self.E[t]:
+
+                # Each track segment in an event request has limited capacity   (8)
+                self.model.addConstr(
+                    quicksum(
+                        quicksum(
+                            quicksum(
+                                self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t] for i in range(self.K) if a in self.R[(o, d)][i]
+                            ) for o in self.N for d in self.N if o != d
+                        ) for a in s
+                    ) <= quicksum(self.Lambd[a, t] for a in s) + (self.M * quicksum(self.x[*a, t] for a in s))
+                )
+
                 for a in s:
                     for o in self.N:
                         for d in self.N:
                             if o != d:
-                                if all(a in self.R[(o, d)][i] for i in range(self.K)) and (self.beta[o, d, t]*self.phi[o, d, t] > self.Lambd[a, t]):
-                                    self.model.addConstr(self.x[a, t] == 1)					
+                                # Availability of arc included in all event paths (14)
+                                if all(a in self.R[(o, d)][i] for i in range(self.K)):
+                                    self.model.addConstr(self.x[*a, t] == 1)
+
+            for o in self.N:
+                for d in self.N:
+                    if o != d:
+
+                        # Passenger flow o -> d served by one of the K routes   (9)
+                        self.model.addConstr(
+                            quicksum(self.h[o, d, t, i] for i in range(self.K)) == 1
+                        )
+
+                        for i in range(self.K):
+                            
+                            # Lower bound for travel time from o to d           (10)
+                            self.model.addConstr(
+                                self.v[o, d, t] >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i]) - self.M * (1 - self.h[o, d, t, i])
+                            )
+
+                            # Upper bound for travel time from o to d           (11)
+                            self.model.addConstr(
+                                self.v[o, d, t] <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i])
+                            )
+                            
+
+    # # Set fixed values
+    # def set_fixed_values(self):
+    #     """Set fixed values for decision variables for reduction of solution space."""
+
+    #     # Arcs never included in any job are always available (i.e. x = 1)
+    #     self.model.addConstrs(
+	# 		self.x[a, t] == 1 for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
+	# 	)
+
+    #     # Travel times for arcs never included in any job are equal to the average travel time (i.e. w = omega_e)
+    #     self.model.addConstrs(
+	# 		self.w[a, t] == self.omega_e[a] for a in self.A for t in self.T if not any(a in self.Aj[j] for j in self.J)
+	# 	)
+
+    #     # If an arc a is included in all the possible K paths at a certain event at time t then that arc must be available (i.e. x = 1)
+    #     for t in self.T:
+    #         for s in self.E[t]:
+    #             for a in s:
+    #                 for o in self.N:
+    #                     for d in self.N:
+    #                         if o != d:
+    #                             if all(a in self.R[(o, d)][i] for i in range(self.K)) and (self.beta[o, d, t]*self.phi[o, d, t] > self.Lambd[a, t]):
+    #                                 self.model.addConstr(self.x[a, t] == 1)					
 
     # Set objective function
     def set_objective(self):
@@ -671,6 +775,9 @@ class Railway():
             for t in self.T
             if o != d
         }
+        
+        # Update M upper bound
+        self.__set_M()
 
     # Random generator method: beta (share of daily passenger demand)
     def __generate_beta(self, min_share=0.5, max_share=0.7):
