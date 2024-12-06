@@ -2,7 +2,7 @@
 import numpy as np
 import random
 import gurobipy as gb
-from gurobipy import Model, quicksum
+from gurobipy import Model, quicksum, GRB
 from collections import deque
 import json
 
@@ -102,6 +102,8 @@ class Railway():
 	------------
 	__init__(stations, periods, jobs, passengers, routes, **kwargs)
 		main constructor for the railway scheduling problem.
+	copy(other)
+		create a copy of a Railway object.
 	load(filename)
 		load the problem parameters from a json file with the necessary data
  
@@ -116,6 +118,8 @@ class Railway():
 	--------
 	optimize()
 		optimize and solve the railway scheduling problem
+	status()
+		return the status of the optimization model
   
 	Static Methods
 	--------------
@@ -211,6 +215,40 @@ class Railway():
 		self.v = self.model.addVars(
 			self.N, self.N, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name="v"
 		)
+
+	# Copy constructor
+	@classmethod
+	def copy(cls, other):
+		"""Create a copy of a Railway object.
+  
+		Parameters
+		----------
+		other : Railway
+			The Railway object to copy.
+   
+		Returns
+		-------
+		model : Railway
+			A separate copy of the Railway object.
+		"""
+  
+		return cls(
+			other.stations,
+			other.periods,
+			other.jobs,
+			other.passengers,
+			other.routes,
+			coords=other.coords,
+			Aj=other.Aj,
+			C=other.C,
+			E=other.E,
+			R=other.R,
+			pi=other.pi,
+			tau=other.tau,
+			phi=other.phi,
+			beta=other.beta,
+			Lambd=other.Lambd,
+		)
 		
 	# Alternative constructor
 	@classmethod
@@ -232,11 +270,6 @@ class Railway():
 		ValueError
 			If the file is missing some of the necessary data to create a Railway object.
 		"""
-		
-		def convert_keys_to_value(d):
-			"""Evaluate the keys of a dictionary from their string 
-   			   representation and return a new dictionary with the evaluated keys."""
-			return {eval(k): v for k, v in d.items()}
 		
 		# Open the json file and load the data
 		with open(filename, "r") as f:
@@ -265,23 +298,18 @@ class Railway():
 		):
 			raise ValueError("The file is missing some of the necessary data to create a Railway object.")
 			
-		# Convert keys back to their original values
-		data["pi"] = convert_keys_to_value(data["pi"])
-		data["Aj"] = convert_keys_to_value(data["Aj"])
-		data["tau"] = convert_keys_to_value(data["tau"])
-		data["phi"] = convert_keys_to_value(data["phi"])
-		data["beta"] = convert_keys_to_value(data["beta"])
-		data["Lambd"] = convert_keys_to_value(data["Lambd"])
-		data["E"] = convert_keys_to_value(data["E"])
-		data["R"] = convert_keys_to_value(data["R"])
-		# data["E"] = {eval(k): v for k, v in data["E"].items()}
-		# data["R"] = {eval(k): v for k, v in data["R"].items()}
-  
-		# Restore tuple values
+		# Convert string keys and values back to their original values
+		# since JSON format does not store tuples
 		data["coords"] = [tuple(coord) for coord in data["coords"]]
-		data["Aj"] = {k: [tuple(a) for a in v] for k, v in data["Aj"].items()}
-  		# TODO: will need also to convert E and C to tuples when not empty
-		data["R"] = {k: [[tuple(inner_tuple) for inner_tuple in inner_list] for inner_list in v] for k, v in data["R"].items()}
+		data["pi"] = {eval(k): v for k, v in data["pi"].items()}
+		data["Aj"] = {eval(k): [tuple(a) for a in v] for k, v in data["Aj"].items()}
+  		# TODO: data["C"] = ... todo the same for C when will be implemented
+		data["tau"] = {eval(k): v for k, v in data["tau"].items()}
+		data["phi"] = {eval(k): v for k, v in data["phi"].items()}
+		data["beta"] = {eval(k): v for k, v in data["beta"].items()}
+		data["Lambd"] = {eval(k): v for k, v in data["Lambd"].items()}
+		data["E"] = {eval(k1): {eval(k2): [tuple(a) for a in v2] for k2, v2 in v1.items()} for k1, v1 in data["E"].items()}
+		data["R"] = {eval(k): [[tuple(a) for a in l] for l in v] for k, v in data["R"].items()}
 		
 		# Create the model object with main constructor
 		model = cls(
@@ -302,6 +330,40 @@ class Railway():
 			Lambd=data["Lambd"],
 		)
 		return model
+
+	# Operators ----------------------------------------------------------------
+ 
+	# String representation
+	def __str__(self):
+		"""Return a string representation of the railway scheduling problem."""
+		return (
+			f"Railway scheduling problem with {self.n} stations, {self.periods} periods, "
+			f"{self.jobs} jobs, {self.passengers} passengers, and {self.routes} routes."
+		)
+  
+	# Equality operator
+	def __eq__(self, other):
+		"""Check if two railway scheduling problems are equal."""
+		if not isinstance(other, Railway):
+			return False
+		return (
+			self.n == other.n
+			and self.periods == other.periods
+			and self.jobs == other.jobs
+			and self.passengers == other.passengers
+			and self.routes == other.routes
+			and self.coords == other.coords
+			and self.pi == other.pi
+			and self.Aj == other.Aj
+			and self.Ja == other.Ja
+			and self.C == other.C
+			and self.tau == other.tau
+			and self.phi == other.phi
+			and self.beta == other.beta
+			and self.Lambd == other.Lambd
+			and self.E == other.E
+			and self.R == other.R
+		)
 
 	# Setters ------------------------------------------------------------------
 
@@ -382,6 +444,13 @@ class Railway():
 				for t in self.T
 				for c in self.C
 				# for j in self.J # TODO: add this only if C depends on job j
+				# NOTE: given how the constriant is written, C should be a list 
+				# of lists of arcs that cannot be unavailable simultaneously:
+				#
+				# e.g. C = [ [(1, 2), (2, 3)], 
+				# 			 [(3, 4), (4, 5), (5, 6)] ]
+				# XXX: when creating C ensure that no job needs a combination of arcs
+				# that are in the same list of C otherwise the problem is infeasible...
 			),
 			name="6",
 		)
@@ -414,10 +483,10 @@ class Railway():
 						)
 						for o, d in self.OD
 					)
-					for a in s
+					for a in self.E[t][s]
 				)
-				<= quicksum(self.Lambd[a, t] for a in s) 
-				+ (self.M * quicksum(self.x[*a, t] for a in s))
+				<= quicksum(self.Lambd[a, t] for a in self.E[t][s])
+				+ (self.M * quicksum(self.x[*a, t] for a in self.E[t][s]))
 				for t in self.T
 				for s in self.E[t]
 			),
@@ -500,6 +569,72 @@ class Railway():
 	def optimize(self):
 		"""Optimize the railway scheduling problem."""
 		self.model.optimize()
+  
+	def status(self):
+		"""Return the status of the optimization model.
+  
+		Returns
+		-------
+		status : str
+			The status of the optimization model, which can be one of the
+			following according to Gurobi's documentation:
+			- LOADED (1): Model loaded; no solution available.
+			- OPTIMAL (2): Solved to optimality; solution available.
+			- INFEASIBLE (3): Model proven infeasible.
+			- INF_OR_UNBD (4): Model infeasible or unbounded (set DualReductions=0 for clarity).
+			- UNBOUNDED (5): Model proven unbounded; feasibility not guaranteed.
+			- CUTOFF (6): Objective worse than specified Cutoff; no solution.
+			- ITERATION_LIMIT (7): Exceeded iteration limits (simplex/barrier).
+			- NODE_LIMIT (8): Exceeded branch-and-cut node limit.
+			- TIME_LIMIT (9): Exceeded time limit.
+			- SOLUTION_LIMIT (10): Reached solution limit.
+			- INTERRUPTED (11): Optimization terminated by user.
+			- NUMERIC (12): Terminated due to numerical issues.
+			- SUBOPTIMAL (13): Sub-optimal solution available (optimality tolerances not met).
+			- INPROGRESS (14): Optimization run not yet complete (asynchronous).
+			- USER_OBJ_LIMIT (15): User-defined objective limit reached.
+			- WORK_LIMIT (16): Exceeded work limit.
+			- MEM_LIMIT (17): Exceeded memory allocation limit. 
+		"""
+
+		# Check the optimization status
+		if self.model.status == GRB.Status.LOADED:
+			return "LOADED"
+		elif self.model.status == GRB.Status.OPTIMAL:
+			return "OPTIMAL"
+		elif self.model.status == GRB.Status.INFEASIBLE:
+			return "INFEASIBLE"
+		elif self.model.status == GRB.Status.INF_OR_UNBD:
+			return "INF_OR_UNBD"
+		elif self.model.status == GRB.Status.UNBOUNDED:
+			return "UNBOUNDED"
+		elif self.model.status == GRB.Status.CUTOFF:
+			return "CUTOFF"
+		elif self.model.status == GRB.Status.ITERATION_LIMIT:
+			return "ITERATION_LIMIT"
+		elif self.model.status == GRB.Status.NODE_LIMIT:
+			return "NODE_LIMIT"
+		elif self.model.status == GRB.Status.TIME_LIMIT:
+			return "TIME_LIMIT"
+		elif self.model.status == GRB.Status.SOLUTION_LIMIT:
+			return "SOLUTION_LIMIT"
+		elif self.model.status == GRB.Status.INTERRUPTED:
+			return "INTERRUPTED"
+		elif self.model.status == GRB.Status.NUMERIC:
+			return "NUMERIC"
+		elif self.model.status == GRB.Status.SUBOPTIMAL:
+			return "SUBOPTIMAL"
+		elif self.model.status == GRB.Status.INPROGRESS:
+			return "INPROGRESS"
+		elif self.model.status == GRB.Status.USER_OBJ_LIMIT:
+			return "USER_OBJ_LIMIT"
+		elif self.model.status == GRB.Status.WORK_LIMIT:
+			return "WORK_LIMIT"
+		elif self.model.status == GRB.Status.MEM_LIMIT:
+			return "MEM_LIMIT"
+		else:
+			return "UNKNOWN"
+
 
 	# Static methods -----------------------------------------------------------
 
@@ -839,6 +974,9 @@ class Railway():
 			for a in self.A
 			for t in self.T
 		}
+  
+	# Random generator method: C (set of arcs that cannot be unavailable simultaneously)
+	# TODO: def __generate_C(self): ... (maybe taking in account Aj or Ja sets to avoid infeasibility)
 
 	# Random generator method: E (set of event tracks at each time t)
 	def __generate_E(self, n_max_events=0, min_length=1, max_length=None):
@@ -846,7 +984,7 @@ class Railway():
 			max_length = self.n - 1
 		self.E = {}
 		for t in self.T:
-			E_tmp = []
+			E_tmp = {}
 			n_events = random.randint(0, n_max_events)
 			for _ in range(n_events):
 				start_station = random.choice(self.N)  # start station
@@ -866,12 +1004,15 @@ class Railway():
 					next_arc = random.choice(current_arcs)
 					# Add the arc to the path
 					path.append(next_arc)
-					# Update the current station
+					# Update the current station and the next station
 					current_station = (
 						next_arc[1] if next_arc[0] == current_station else next_arc[0]
 					)
 
-				E_tmp.append(path)  # add the path to the set of arcs for job j
+				final_station = current_station
+				s = (start_station, final_station)
+				E_tmp[s] = path  # add the path to the set of arcs for job j
+				# E_tmp.append(path)  # add the path to the set of arcs for job j
 
 			self.E[t] = E_tmp
 
@@ -974,10 +1115,6 @@ class Railway():
 			The name (or path including the name) of the json file to save the problem parameters to.
 		"""
 		
-		def convert_keys_to_str(d):
-			"""Convert dictionary keys to strings."""
-			return {str(k): v for k, v in d.items()}
-		
 		with open(filename, "w") as f:
 			json.dump(
 				{
@@ -987,21 +1124,26 @@ class Railway():
 					"passengers": self.passengers,
 					"routes": self.routes,
 					"coords": self.coords,
-					"pi": convert_keys_to_str(self.pi),
-					"Aj": convert_keys_to_str(self.Aj),
+					"pi": {str(k): v for k, v in self.pi.items()},
+					"Aj": {str(k): v for k, v in self.Aj.items()},
 					"C": self.C,
-					"tau": convert_keys_to_str(self.tau),
-					"phi": convert_keys_to_str(self.phi),
-					"beta": convert_keys_to_str(self.beta),
-					"Lambd": convert_keys_to_str(self.Lambd),
-					"E": convert_keys_to_str(self.E),
-					"R": convert_keys_to_str(self.R),
-					# "E": {str(k): v for k, v in self.E.items()},
-					# "R": {str(k): v for k, v in self.R.items()},
+					"tau": {str(k): v for k, v in self.tau.items()},
+					"phi": {str(k): v for k, v in self.phi.items()},
+					"beta": {str(k): v for k, v in self.beta.items()},
+					"Lambd": {str(k): v for k, v in self.Lambd.items()},
+					"E": {
+						str(k): {str(s): [a for a in v] for s, v in d.items()}
+						for k, d in self.E.items()
+					},
+					"R": {str(k): v for k, v in self.R.items()},
 				},
 				f,
 			)
-		print("Problem parameters saved successfully.") 
+		print(f"Problem parameters saved successfully to {filename}")
+
+  
+  
+
 
 	# TODO: Add methods to display state of the model
 
