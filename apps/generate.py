@@ -69,11 +69,11 @@ for stations in N_range:
 				rail.set_objective()
 				rail.model.optimize()
     
-				if (rail.status() != "INFEASIBLE"
-					and rail.status() != "UNBOUNDED"
-					and rail.status() != "INF_OR_UNBD"
-					and rail.status() != "CUTOFF"
-					and rail.status() != "NUMERIC"):
+				if (rail.get_status() != "INFEASIBLE"
+					and rail.get_status() != "UNBOUNDED"
+					and rail.get_status() != "INF_OR_UNBD"
+					and rail.get_status() != "CUTOFF"
+					and rail.get_status() != "NUMERIC"):
 					created = True
 					FILENAME = os.path.join(DATASET_DIR, f"railway_N{stations}_T{periods}_J{jobs}_P{passengers}_K{K}.json")
 					rail.save(FILENAME)	

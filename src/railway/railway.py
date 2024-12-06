@@ -558,19 +558,16 @@ class Railway():
 		self.model.setObjective(
 			quicksum(
 				quicksum(
-					self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d]) for t in self.T
+					self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d])
+	 				for t in self.T
 				) for o, d in self.OD
 			)
 		)
-
-	# Optimize -----------------------------------------------------------------
-
-	# Optimize
-	def optimize(self):
-		"""Optimize the railway scheduling problem."""
-		self.model.optimize()
   
-	def status(self):
+	# Getters ------------------------------------------------------------------
+ 
+	# Get the status of the optimization model
+	def get_status(self):
 		"""Return the status of the optimization model.
   
 		Returns
@@ -634,6 +631,257 @@ class Railway():
 			return "MEM_LIMIT"
 		else:
 			return "UNKNOWN"
+
+	# Get decision variables values from set of starting times S for jobs
+	def get_vars_from_times(self, S):
+		"""Get the decision variables values from a set S of starting times
+		for each job in J.
+  
+		Parameters
+		----------
+		S : dict
+			Dictionary of starting times for jobs in J
+
+		Returns
+		-------
+		y : dict
+			Dictionary of binary variables for job j in J started at time t in T
+		x : dict
+			Dictionary of binary variables for arc a in A available at time t in T
+		h : dict
+			Dictionary of binary variables for route i in R from origin o to destination d selected at time t in T
+		w : dict
+			Dictionary of continuous variables for travel time on arc a in A at time t in T
+		v : dict
+			Dictionary of continuous variables for travel time from origin o to destination d at time t in T
+		"""
+  
+		# Initialize decision variables ``as if no job was started''
+		y = {(j, t): 0 for j in self.J for t in self.T}
+		x = {(a, t): 1 for a in self.A for t in self.T}
+		h = {(o, d, t, i): 0 for o, d in self.OD for t in self.T for i in range(1, self.K + 1)}
+		w = {(a, t): self.omega_e[a] for a in self.A for t in self.T}
+		v = {(o, d, t): 0 for o, d in self.OD for t in self.T}
+  
+		# Set job starting times y
+		for j, t in S.items():
+			y[j, t] = 1
+   
+		# Set arc availability x
+		for a in self.A:
+			for t in self.T:
+				if any(S[j] <= t < S[j] + self.pi[j] for j in self.Ja[a]):
+					x[a, t] = 0
+	 
+		# Set the arcs travel times w (constraint 4)
+		for a in self.A:
+			for t in self.T:
+				w[a, t] = x[a, t] * self.omega_e[a] + (1 - x[a, t]) * self.omega_j[a]
+	
+		# Set route selection h and od pairs travel times v
+		for t in self.T:
+			for o, d in self.OD:
+				# Computes times for each route by summing arcs travel times
+				routes_times = [
+					sum(w[a, t] for a in self.R[(o, d)][i-1]) 
+	 				for i in range(1, self.K + 1)
+				]
+
+				# v[o, d, t] is the quickest route travel time
+				v[o, d, t] = min(routes_times)
+
+				# Select the route with the minimum travel time
+				i = routes_times.index(min(routes_times)) + 1
+	
+				# Set the route selection h
+				h[o, d, t, i] = 1 # (others already set to 0 in initialization)
+
+		return y, x, h, w, v
+
+	# Get the value of the objective function
+	def get_objective_value(self, v):
+		"""Evaluate the objective function for the railway scheduling problem.
+  
+		Parameters
+		----------
+		v : dict
+			Dictionary of continuous variables for travel time from origin o to destination d at time t in T
+  
+		Returns
+		-------
+		objective : float
+			The value of the objective function for the railway scheduling problem
+		"""
+
+		# Evaluate the objective function
+		objective_value = sum(
+			sum(
+				self.phi[o, d, t] * (v[o, d, t] - self.Omega[o, d])
+				for t in self.T
+			) for o, d in self.OD
+		)
+		return objective_value
+ 
+
+	# Optimize -----------------------------------------------------------------
+
+	# Optimize
+	def optimize(self):
+		"""Optimize the railway scheduling problem."""
+		self.model.optimize()
+  
+	# Check feasibility of a given solution
+	def check_feasibility(self, y, x, h, w, v):
+		"""Check the feasibility of a given solution for the railway scheduling problem.
+
+		Parameters
+		----------
+		y : dict, optional
+			Dictionary of binary variables for job j in J started at time t in T, by default None
+		x : dict, optional
+			Dictionary of binary variables for arc a in A available at time t in T, by default None
+		h : dict, optional
+			Dictionary of binary variables for route i in R from origin o to destination d selected at time t in T, by default None
+		w : dict, optional
+			Dictionary of continuous variables for travel time on arc a in A at time t in T, by default None
+		v : dict
+			Dictionary of continuous variables for travel time from origin o to destination d at time t in T
+
+		Returns
+		-------
+		bool
+			True if the solution is feasible, False otherwise
+		"""
+  
+		# Check constraints one by one
+		feasible = [False] * 12
+  
+		# Job started once and completed within time horizon (2)
+		feasible[0] = all(
+			sum(y[j, t] for t in range(1, len(self.T) - self.pi[j] + 1)) == 1
+			for j in self.J
+		)
+  
+		# Availability of arc a at time t (3)
+		feasible[1] = all(
+			x[a, t]
+			+ sum(
+				y[j, tp]
+				for tp in range(max(1, t - self.pi[j] + 1), min(t, self.Tend) + 1)
+			)
+			<= 1
+			for a in self.A
+			for t in self.T
+			for j in self.Ja[a]
+		)
+  
+		# Increased travel time for service replacement (4)
+		feasible[2] = all(
+			w[a, t] == x[a, t] * self.omega_e[a] + (1 - x[a, t]) * self.omega_j[a]
+			for a in self.A
+			for t in self.T
+		)
+  
+		# Ensure correct arc travel times for free variables (5)
+		feasible[3] = all(
+			sum(x[a, t] for t in self.T) == self.Tend - sum(self.pi[j] for j in self.Ja[a])
+			for a in self.A
+		)
+  
+		# Arcs that cannt be unavailable simultaneously (6)
+		feasible[4] = all(
+			sum(1 - x[a, t] for a in c) <= 1
+			for t in self.T
+			for c in self.C
+		)
+  
+		# Non overlapping jobs on same arc (7)
+		feasible[5] = all(
+			sum(
+				sum(
+					y[j, tp]
+					for tp in range(max(1, t - self.pi[j] - self.tau[a] + 1), t + 1)
+				)
+				for j in self.Ja[a]
+			)
+			<= 1
+			for a in self.A
+			for t in self.T
+		)
+  
+		# Each track segment in an event request has limited capacity (8)
+		feasible[6] = all(
+			sum(
+				sum(
+					sum(
+						h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t]
+						for i in range(1, self.K + 1) if a in self.R[(o, d)][i-1]
+					)
+					for o, d in self.OD
+				)
+				for a in self.E[t][s]
+			)
+			<= sum(self.Lambd[a, t] for a in self.E[t][s]) + (self.M * sum(x[a, t] for a in self.E[t][s]))
+			for t in self.T
+			for s in self.E[t]
+		)
+  
+		# Passeger flow from o to d is served by one of predefined routes (9)
+		feasible[7] = all(
+			sum(h[o, d, t, i] for i in range(1, self.K + 1)) == 1
+			for t in self.T
+			for o, d in self.OD
+		)
+  
+		# Lower bound for travel time from o to d (10)
+		feasible[8] = all(
+			v[o, d, t] 
+   			>= sum(w[a, t] for a in self.R[(o, d)][i-1]) 
+      		- self.M * (1 - h[o, d, t, i])
+			for t in self.T
+			for o, d in self.OD
+			for i in range(1, self.K + 1)
+		)
+  
+		# Upper bound for travel time from o to d (11)
+		feasible[9] = all(
+			v[o, d, t] <= sum(w[a, t] for a in self.R[(o, d)][i-1])
+			for t in self.T
+			for o, d in self.OD
+			for i in range(1, self.K + 1)
+		)
+  
+		# Arcs never included in any job are always available (12)
+		feasible[10] = all(
+			x[a, t] == 1
+			for a in self.A
+			for t in self.T
+			if not any(a in self.Aj[j] for j in self.J)
+		)
+  
+  		# Travel times for arcs never included in any job are equal to omega_e (13)
+		feasible[11] = all(
+			w[a, t] == self.omega_e[a]
+			for a in self.A
+			for t in self.T
+			if not any(a in self.Aj[j] for j in self.J)
+		)
+  
+		# Return True if all constraints are satisfied
+		if all(feasible):
+			return True
+		else:
+			for i, f in enumerate(feasible):
+				if not f:
+					print(f"Constraint ({i+2}) is not satisfied.")
+			return False  
+  
+	# Simulated annealing (SA) optimization
+	def simulated_annealing(self):
+		"""Simulated annealing algorithm to find an initial good
+		solution for the railway scheduling problem.
+		"""
+		pass
 
 
 	# Static methods -----------------------------------------------------------
@@ -775,6 +1023,7 @@ class Railway():
 		ValueError
 			If the arcs in the input list are not connected
 		"""
+
 		nodes = []
 		if not arcs:
 			return nodes
@@ -1012,7 +1261,6 @@ class Railway():
 				final_station = current_station
 				s = (start_station, final_station)
 				E_tmp[s] = path  # add the path to the set of arcs for job j
-				# E_tmp.append(path)  # add the path to the set of arcs for job j
 
 			self.E[t] = E_tmp
 
@@ -1105,7 +1353,45 @@ class Railway():
 		self.__generate_E(n_max_events, event_min_length, event_max_length)
 		self.__generate_R()
 		print("Problem generated successfully. Remember to set constraints and objective (again).")
+ 
+	# Generate an initial feasible solution
+	def generate_initial_solution(self):
+		"""Generate an initial feasible solution for the railway scheduling problem."""
 		
+		# Initialize the set of starting times for jobs and free times for the arcs
+		S = {j: 1 for j in self.J}
+		when_free = {a: 1 for a in self.A} 
+  
+		# Build a list of jobs sorted by how many arcs they have in common with other jobs
+		sorted_jobs = sorted(self.J, key=lambda j: len(self.Aj[j]), reverse=True)
+  
+		# Schedule jobs from the one with most arcs in common to the one with least
+		for j in sorted_jobs:
+			# Find the first available time for the job
+			start_time = 1
+			for a in self.Aj[j]:
+				if when_free[a] > start_time:
+					start_time = when_free[a]
+	 
+			# Schedule the job
+			S[j] = start_time
+   
+			# Update the free times for the arcs
+			for a in self.Aj[j]:
+				when_free[a] = start_time + self.pi[j] + self.tau[a]
+   
+		# Get the decision variables values from the set of starting times S
+		y, x, h, w, v = self.get_vars_from_times(S)
+  
+		# Check the feasibility of the solution and return
+		if self.check_feasibility(y, x, h, w, v):
+			return S
+		else:
+			raise ValueError("Initial solution is not feasible")
+
+		# return S
+ 
+	# Save problem parameters to a json file	
 	def save(self, filename):
 		"""Save the problem parameters to a json file.
 		
