@@ -603,6 +603,88 @@ class Railway:
             )
         )
 
+    # Set variables starting values
+    def set_start(self, y_start, x_start, h_start, w_start, v_start):
+        """
+        Set the starting values for the decision variables.
+
+        Parameters
+        ----------
+        y_start: dict
+            Starting values for y variables.
+        x_start: dict
+            Starting values for x variables.
+        h_start: dict
+            Starting values for h variables.
+        w_start: dict
+            Starting values for w variables.
+        """
+
+        # Set the starting values for the decision variables
+
+        for j in self.J:
+            for t in self.T:
+                if (j, t) in y_start:
+                    self.y[j, t].start = y_start[(j, t)]
+
+        for a in self.A:
+            for t in self.T:
+                if (a, t) in x_start:
+                    self.x[*a, t].start = x_start[(a, t)]
+
+        for o, d in self.OD:
+                for t in self.T:
+                    for k in range(1, self.K + 1):
+                        if (o, d, t, k) in h_start:
+                            self.h[o, d, t, k].start = h_start[(o, d, t, k)]
+
+        for a in self.A:
+            for t in self.T:
+                if (a, t) in w_start:
+                    self.w[*a, t].start = w_start[(a, t)]
+
+        for o, d in self.OD:
+            for t in self.T:
+                if (o, d, t) in v_start:
+                    self.v[o, d, t].start = v_start[(o, d, t)]
+
+        # Update the model for changes to take effect
+        self.model.update()
+
+    # Set solution
+    def set_solution(self, S=None):
+        """Set the initial solution for the railway scheduling problem
+        that will be optimized by the Gurobi solver.
+
+        Parameters
+        ----------
+        S : dict, optional
+                Dictionary of starting times for jobs in J, by default None
+                If no input solution is provided the model will check if one
+                is stored in the S attribute.
+
+        Raises
+        ------
+        ValueError
+                If no solution S is provided for the railway scheduling problem.
+        """
+
+        # Set the solution
+        if S is not None:
+            y, x, h, w, v = self.get_vars_from_times(S)
+            self.set_start(y, x, h, w, v)
+
+        # Check if a solution is available
+        elif self.S:
+            y, x, h, w, v = self.get_vars_from_times(self.S)
+            self.set_start(y, x, h, w, v)
+
+        else:
+            raise ValueError(
+                """No solution provided for the railway scheduling problem. 
+                Please provide a solution or generate one"""
+            )            
+
     # Getters ------------------------------------------------------------------
 
     # Get the status of the optimization model
