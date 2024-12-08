@@ -123,6 +123,27 @@ class Railway:
             set the initial solution for the railway scheduling problem
     set_valid_inequalities()
             set valid inequalities for the railway scheduling problem
+            
+    Getters
+    -------
+    get_status()
+            return the status of the optimization model
+    get_y()
+            get the decision variables values for job j in J started at time t in T
+    get_x()
+            get the decision variables values for arc a in A available at time t in T
+    get_h()
+            get the decision variables values for route selection i in R from origin o to destination d selected at time t in T
+    get_w()
+            get the decision variables values for travel time on arc a in A at time t in T
+    get_v()
+            get the decision variables values for travel time from origin o to destination d at time t in T
+    get_vars_from_times(S)
+            get the decision variables values from a set S of starting times for each job in J
+    get_times_from_vars(y)
+            get the starting times S for each job in J from the decision variables values
+    get_objective_value(v)
+            evaluate the objective function for the railway scheduling problem
 
     Optimize
     --------
@@ -154,12 +175,14 @@ class Railway:
     generate()
             generate problem parameters for the railway scheduling problem
     generate_initial_solution()
-            generate an initial solution for the railway scheduling problem
-    generate_neighbor_solution()
-            generate a neighbor solution for the railway scheduling problem
+            generate an initial solution S for the railway scheduling problem
+    generate_neighbor_solution(S)
+            generate a neighbor solution N(S) to a given one S for the railway scheduling problem
 
     Other Methods
     -------------
+    save(filename)
+            save the problem parameters to a json file
 
     """
 
@@ -220,8 +243,8 @@ class Railway:
         self.Omega = {
             (o, d): self.dijkstra(self.graph, o)[0][
                 d
-            ]  # 0 because we want the distances
-            for o, d in self.OD  # (first element of the return tuple)
+            ]  # 0 because we want the distances (1st element)
+            for o, d in self.OD
         }
         self.__set_M()  # set the M upper bound
         self.model = Model()
@@ -388,11 +411,6 @@ class Railway:
             f"Status:      {self.get_status()}\n"
         )
 
-        # return (
-        #     f"Railway scheduling problem with {self.n} stations, {self.periods} periods, "
-        #     f"{self.jobs} jobs, {self.passengers} passengers, and {self.routes} routes."
-        # )
-
     # Equality operator
     def __eq__(self, other):
         """Check if two railway scheduling problems are equal."""
@@ -497,13 +515,6 @@ class Railway:
                 for t in self.T
                 for c in self.C
                 # for j in self.J # TODO: add this only if C depends on job j
-                # NOTE: given how the constriant is written, C should be a list
-                # of lists of arcs that cannot be unavailable simultaneously:
-                #
-                # e.g. C = [ [(1, 2), (2, 3)],
-                # 			 [(3, 4), (4, 5), (5, 6)] ]
-                # XXX: when creating C ensure that no job needs a combination of arcs
-                # that are in the same list of C otherwise the problem is infeasible...
             ),
             name="6",
         )
@@ -821,16 +832,80 @@ class Railway:
             return "MEM_LIMIT"
         else:
             return "UNKNOWN"
+        
+    # Get y decision variables
+    def get_y(self):
+        """Get the decision variables values for job j in J started at time t in T.
+
+        Returns
+        -------
+        y : dict
+                Dictionary of binary variables for job j in J started at time t in T
+        """
+
+        return {(j, t): int(self.y[j, t].x) for j in self.J for t in self.T}
+    
+    # Get x decision variables
+    def get_x(self):
+        """Get the decision variables values for arc a in A available at time t in T.
+
+        Returns
+        -------
+        x : dict
+                Dictionary of binary variables for arc a in A available at time t in T
+        """
+
+        return {(a, t): int(self.x[*a, t].x) for a in self.A for t in self.T}
+    
+    # Get h decision variables
+    def get_h(self):
+        """Get the decision variables values for route selection i in R 
+        from origin o to destination d selected at time t in T.
+
+        Returns
+        -------
+        h : dict
+                Dictionary of binary variables for route i in R 
+                from origin o to destination d selected at time t in T
+        """
+
+        return {(o, d, t, i): int(self.h[o, d, t, i].x) for o, d in self.OD for t in self.T for i in range(1, self.K + 1)}
+    
+    # Get w decision variables
+    def get_w(self):
+        """Get the decision variables values for travel time on arc a in A at time t in T.
+
+        Returns
+        -------
+        w : dict
+                Dictionary of continuous variables for travel time on arc a in A at time t in T
+        """
+
+        return {(a, t): self.w[*a, t].x for a in self.A for t in self.T}
+    
+    # Get v decision variables
+    def get_v(self):
+        """Get the decision variables values for travel time from origin o to destination d at time t in T.
+
+        Returns
+        -------
+        v : dict
+                Dictionary of continuous variables for travel time from origin o to destination d at time t in T
+        """
+
+        return {(o, d, t): self.v[o, d, t].x for o, d in self.OD for t in self.T}    
 
     # Get decision variables values from set of starting times S for jobs
-    def get_vars_from_times(self, S):
+    def get_vars_from_times(self, S=None):
         """Get the decision variables values from a set S of starting times
         for each job in J.
 
         Parameters
         ----------
-        S : dict
-                Dictionary of starting times for jobs in J
+        S : dict, optional
+                Dictionary of starting times for jobs in J, by default None
+                If no input S is provided the model will check if one is stored
+                in the S attribute.
 
         Returns
         -------
@@ -892,6 +967,38 @@ class Railway:
                 h[o, d, t, i] = 1  # (others already set to 0 in initialization)
 
         return y, x, h, w, v
+    
+    # Get set of starting times for jobs in J from decision variables values
+    def get_times_from_vars(self, y=None):
+        """Get the set of starting times S for jobs in J from the decision
+        variables values.
+
+        Parameters
+        ----------
+        y : dict, optional
+                Dictionary of binary variables for job j in J started at time t in T, by default None
+                If no input y is provided the model will check if one
+                is stored in the y attribute.
+
+        Returns
+        -------
+        S : dict
+                Dictionary of starting times for jobs in J
+        """
+        
+        if y is None:
+            y = self.get_y()
+
+        # Initialize the set of starting times for jobs in J
+        S = {j: 0 for j in self.J}
+
+        # Get the starting times for jobs in J
+        for j in self.J:
+            for t in self.T:
+                if y[j, t] == 1:
+                    S[j] = t
+
+        return S
 
     # Get the value of the objective function
     def get_objective_value(self, v):
@@ -920,7 +1027,12 @@ class Railway:
     # Optimize
     def optimize(self):
         """Optimize the railway scheduling problem."""
+        
+        # Solve the problem with Gurobi
         self.model.optimize()
+        
+        # Update starting times
+        self.S = self.get_times_from_vars()
 
     # Check feasibility of a given solution
     def check_feasibility(self, y, x, h, w, v):
@@ -1473,6 +1585,13 @@ class Railway:
 
     # Random generator method: C (set of arcs that cannot be unavailable simultaneously)
     # TODO: def __generate_C(self): ... (maybe taking in account Aj or Ja sets to avoid infeasibility)
+    # NOTE: given how the constriant (6) is written, C should be a list
+    # of lists of arcs that cannot be unavailable simultaneously:
+    #
+    # e.g. C = [ [(1, 2), (2, 3)],
+    # 			 [(3, 4), (4, 5), (5, 6)] ]
+    # XXX: when creating C ensure that no job needs a combination of arcs
+    # that are in the same list of C otherwise the problem is infeasible...
 
     # Random generator method: E (set of event tracks at each time t)
     def __generate_E(self, n_max_events=0, min_length=1, max_length=None):
@@ -1714,6 +1833,5 @@ class Railway:
             )
         print(f"Problem parameters saved successfully to {filename}")
 
-    # TODO: Add methods to display state of the model
-
-    # TODO: Add method to display the results of the optimization / solutions
+    # TODO: PLOTTING: Add method to display the results of the optimization / solutions 
+    # or other stuff like arcs vs jobs, adjacency matrix, histogram counts of jobs on arcs...
