@@ -117,6 +117,12 @@ class Railway:
             set the constraints for the railway scheduling problem
     set_objective()
             set the objective function for the railway scheduling problem
+    set_start(y_start, x_start, h_start, w_start, v_start)
+            set the starting values for the decision variables
+    set_solution(S=None)
+            set the initial solution for the railway scheduling problem
+    set_valid_inequalities()
+            set valid inequalities for the railway scheduling problem
 
     Optimize
     --------
@@ -124,6 +130,9 @@ class Railway:
             optimize and solve the railway scheduling problem
     status()
             return the status of the optimization model
+    check_feasibility(y, x, h, w, v)
+            check the feasibility of a given solution for the railway scheduling
+            problem by checking the constraints one by one
 
     Static Methods
     --------------
@@ -144,6 +153,13 @@ class Railway:
     ----------
     generate()
             generate problem parameters for the railway scheduling problem
+    generate_initial_solution()
+            generate an initial solution for the railway scheduling problem
+    generate_neighbor_solution()
+            generate a neighbor solution for the railway scheduling problem
+
+    Other Methods
+    -------------
 
     """
 
@@ -683,7 +699,60 @@ class Railway:
             raise ValueError(
                 """No solution provided for the railway scheduling problem. 
                 Please provide a solution or generate one"""
-            )            
+            )             
+
+    # Set valid inequalities
+    def set_valid_inequalities(self):
+        """Set valid inequalities for the railway scheduling problem.
+        The valid inequalities are the Sousa and Wolsey single machine
+        scheduling inequalities (B1) and the non overlapping jobs on
+        the same arc inequalities (B2).
+        """
+
+        # Define the Delta set for (B1)
+        def Delta(self, j, a):
+            p_times = [ self.pi[jp] + self.tau[a] for jp in self.Ja[a] if jp != j ]
+            delta_max = max(2, *p_times) if p_times else 2
+            delta_set = range(2, delta_max + 1)
+            return delta_set
+        
+        # Sousa and Wolsey single machine scheduling valid inequalities     (B1)
+        self.model.addConstrs(
+            (
+                quicksum(
+                    self.y[j,tp] 
+                    for tp in range(t - self.pi[j] + 1, t + delta - 1)  # Qj
+                )
+                + quicksum(
+                    quicksum(
+                        self.y[jp,tp]
+                        for tp in range(t - self.pi[jp] + delta, t + 1)  # Q'l
+                    ) for jp in self.Ja[a] if jp != j
+                )
+                <= 1
+                for a in self.A
+                for j in self.Ja[a]
+                for t in self.T
+                for delta in Delta(self, j, a)
+            ),
+            name="B1",
+        )
+
+        # Non overlapping jobs on same arc                                  (B2)
+        self.model.addConstrs(
+            (
+                self.y[j, t] + self.y[jp, tp] <= 1
+                for a in self.A
+                for j in self.Ja[a]
+                for jp in self.Ja[a] if jp != j
+                for t in self.T
+                for tp in range(
+                        max(1, t - self.pi[jp] - self.tau[a] + 1), 
+                        min(t + self.pi[j] + self.tau[a], self.Tend + 1)
+                )
+            ),
+            name="B2",
+        )
 
     # Getters ------------------------------------------------------------------
 
