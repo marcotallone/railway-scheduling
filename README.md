@@ -69,7 +69,8 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
 | Marco | Tallone | SM3600002 | <marco.tallone@studenti.units.it> | <marcotallone85@gmail.com> | **SDIC** |
 
 
->[!WARNING] Copyright Notice
+>[!WARNING] 
+>**Copyright Notice**:\
 > This project is based on the work published in the referenced paper by *Y.R. de Weert et al.* [<a href="#ref1">1</a>] and aims to reproduce the results and implement the models originally presented by the authors in the context of a university exam project.\
 > The main **contribution** proposed in this repository is **limited to the personal implementation of the models** and the **development of the new datasets to assess their performance** *(which might slightly differ from the ones proposed by the original authors)*.
 
