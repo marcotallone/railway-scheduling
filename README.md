@@ -257,6 +257,7 @@ The decision variables of the model are the following:
 ### Objective and Constraints
 
 The goal of the model is to **minimize the total passenger delay** in the network. The **delay** is defined as the **increase in the travel time compared to the average travel time** between an origin and a destination. According to this, the following objective function is defined:
+
 $$
 \underset{v}{\min}
   \sum_{(o,d) \in N \times N} \sum_{t \in T}
