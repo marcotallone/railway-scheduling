@@ -123,6 +123,8 @@ class Railway:
             set the initial solution for the railway scheduling problem
     set_valid_inequalities()
             set valid inequalities for the railway scheduling problem
+    set_cutting_planes()
+            set cutting planes for the optimization model
             
     Getters
     -------
@@ -764,6 +766,51 @@ class Railway:
             ),
             name="B2",
         )
+
+    # Set cutting planes
+    def set_cutting_planes(self):
+        """Set cutting planes for the optimization model. The following cutting
+        planes are set for the railway scheduling problem:
+        
+            - Boolean quadratic polytope cuts
+            - Clique cuts
+            - Cover cuts
+            - Flow cover cuts
+            - Flow path cuts
+            - Gomori cuts
+            - GUB cover cuts
+            - Implied bound cuts
+            - Lift-and-project cuts
+            - MIR cuts
+            - Mod-k cuts
+            - Network cuts
+            - Relax-and-lift cuts
+            - Strong-CG cuts
+            - {0, 1/2} cuts
+        """
+        
+        # Set cutting planes for optimization 
+        self.model.params.presolve = 1
+        self.model.params.cuts = 0
+        self.model.params.BQPCuts = -1
+        self.model.params.CliqueCuts = -1
+        self.model.params.CoverCuts = -1
+        self.model.params.FlowCoverCuts = -1
+        self.model.params.FlowPathCuts = -1
+        self.model.params.GomoryPasses = -1
+        self.model.params.GUBCoverCuts = -1
+        self.model.params.ImpliedCuts = -1
+        self.model.params.LiftProjectCuts = -1
+        self.model.params.MIRCuts = -1
+        self.model.params.ModKCuts = -1
+        self.model.params.NetworkCuts = -1
+        self.model.params.RelaxLiftCuts = -1
+        self.model.params.StrongCGCuts = -1
+        self.model.params.ZeroHalfCuts = -1
+        self.model.params.cutpasses = 0
+        # self.model.params.threads = 1
+        self.model.params.heuristics = 0
+        self.model.params.symmetry = 0
 
     # Getters ------------------------------------------------------------------
 
