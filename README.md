@@ -36,7 +36,8 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary><h3 style="color: #4078c0;">📑 Table of Contents</h3></summary>
+  <!-- <summary><h3 style="color: #4078c0;">📑 Table of Contents</h3></summary> -->
+  <summary>📑 Table of Contents</summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
@@ -87,7 +88,7 @@ The implemented models are developed in the [Python `railway` module](./src/rail
 
 ```python
 import railway
-help(Railway)
+help(railway.Railway)
 ```
 
 Each model has been tested on small istances of the problem and a scalability analysis has also been performed to assess the performance of the models on larger instances as well. The datasets used for these tests have been randomly generated following the description provided in the original paper.\
