@@ -41,8 +41,8 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
       <tr><td style="text-align: left;">
         <h2>Table of Contents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
         <div style="display: inline-block; text-align: left;">
-          <ol style="text-align: left;">
-            <li><a href="#author-info">Author Info</a></li>
+          <!-- <ol style="text-align: left;"> -->
+            <!-- <li><a href="#author-info">Author Info</a></li>
             <li><a href="#about-the-project">About The Project</a></li>
             <ul>
               <li><a href="#quick-overview">Quick Overview</a></li>
@@ -67,15 +67,28 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
             <li><a href="#contributing">Contributing</a></li>
             <li><a href="#license">License</a></li>
             <li><a href="#references">References</a></li>
-            <li><a href="#acknowledgments">Acknowledgments</a></li>
-            <!-- <pre>
-            <b>1</b>. <a href="#author-info">Author Info</a>
-            <b>2</b>. <a href="#about-the-project">About The Project</a>
-              <b>-</b> <a href="#quick-overview">Quick Overview</a>
-              <b>-</b> <a href="#built-with">Built With</a>
-              <b>-</b> <a href="#project-structure">Project Structure</a>
-            </pre> -->
-          </ol>
+            <li><a href="#acknowledgments">Acknowledgments</a></li> -->
+          <!-- </ol> -->
+          <p>
+            &nbsp;1. <a href="#author-info">Author Info</a><br>
+            &nbsp;2. <a href="#about-the-project">About The Project</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#quick-overview">Quick Overview</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#built-with">Built With</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#project-structure">Project Structure</a><br>
+            &nbsp;3. <a href="#getting-started">Getting Started</a><br>
+            &nbsp;4. <a href="#usage-examples">Usage Examples</a><br>
+            &nbsp;5. <a href="#model-description">Model Description</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#problem-description">Problem Description</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#mathematical-formulation-objective-and-constraints">Mathematical Formulation</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#simulated-annealing-meta-heuristic">Simulated Annealing Meta-Heuristic</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#valid-inequalities">Valid Inequalities</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#dataset-generation">Dataset Generation</a><br>
+            &nbsp;6. <a href="#results-and-scalability-analysis">Results and Scalability Analysis</a><br>
+            &nbsp;7. <a href="#contributing">Contributing</a><br>
+            &nbsp;8. <a href="#license">License</a><br>
+            &nbsp;9. <a href="#references">References</a><br>
+            10. <a href="#acknowledgments">Acknowledgments</a><br>
+          </p>
         </div>
       </td></tr>
   </table>
