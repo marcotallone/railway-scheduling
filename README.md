@@ -40,6 +40,7 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
   <table>
       <tr><td>
         <h2>Table of Contents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+        <div style="display: inline-block; text-align: left;">
         <ol>
           <li><a href="#author-info">Author Info</a></li>
           <li><a href="#about-the-project">About The Project</a></li>
@@ -67,7 +68,15 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
           <li><a href="#license">License</a></li>
           <li><a href="#references">References</a></li>
           <li><a href="#acknowledgments">Acknowledgments</a></li>
+          <!-- <pre>
+          <b>1</b>. <a href="#author-info">Author Info</a>
+          <b>2</b>. <a href="#about-the-project">About The Project</a>
+            <b>-</b> <a href="#quick-overview">Quick Overview</a>
+            <b>-</b> <a href="#built-with">Built With</a>
+            <b>-</b> <a href="#project-structure">Project Structure</a>
+          </pre> -->
         </ol>
+        </div>
       </td></tr>
   </table>
 </div>
