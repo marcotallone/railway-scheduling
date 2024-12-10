@@ -41,7 +41,7 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
       <tr><td style="text-align: left;">
         <h2>Table of Contents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
         <div style="display: inline-block; text-align: left;">
-          <ol>
+          <ol style="text-align: left;">
             <li><a href="#author-info">Author Info</a></li>
             <li><a href="#about-the-project">About The Project</a></li>
             <ul>
