@@ -41,34 +41,6 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
       <tr><td style="text-align: left;">
         <h2>Table of Contents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
         <div style="display: inline-block; text-align: left;" align="left">
-          <!-- <ol style="text-align: left;"> -->
-            <!-- <li><a href="#author-info">Author Info</a></li>
-            <li><a href="#about-the-project">About The Project</a></li>
-            <ul>
-              <li><a href="#quick-overview">Quick Overview</a></li>
-              <li><a href="#built-with">Built With</a></li>
-              <li><a href="#project-structure">Project Structure</a></li>
-            </ul>
-            <li><a href="#getting-started">Getting Started</a></li>
-            <ul>
-              <li><a href="#requirements">Requirements</a></li>
-              <li><a href="#installation">Installation</a></li>
-            </ul>
-            <li><a href="#usage-examples">Usage Examples</a></li>
-            <li><a href="#model-description">Model Description</a></li>
-            <ul>
-              <li><a href="#problem-description">Problem Description</a></li>
-              <li><a href="#mathematical-formulation-objective-and-constraints">Mathematical Formulation</a></li>
-              <li><a href="#simulated-annealing-meta-heuristic">Simulated Annealing Meta-Heuristic</a></li>
-              <li><a href="#valid-inequalities">Valid Inequalities</a></li>
-              <li><a href="#dataset-generation">Dataset Generation</a></li>
-            </ul>
-            <li><a href="#results-and-scalability-analysis">Results and Scalability Analysis</a></li>
-            <li><a href="#contributing">Contributing</a></li>
-            <li><a href="#license">License</a></li>
-            <li><a href="#references">References</a></li>
-            <li><a href="#acknowledgments">Acknowledgments</a></li> -->
-          <!-- </ol> -->
           <p>
             &nbsp;1. <a href="#author-info">Author Info</a><br>
             &nbsp;2. <a href="#about-the-project">About The Project</a><br>
@@ -79,7 +51,8 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
             &nbsp;4. <a href="#usage-examples">Usage Examples</a><br>
             &nbsp;5. <a href="#model-description">Model Description</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#problem-description">Problem Description</a><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#mathematical-formulation-objective-and-constraints">Mathematical Formulation</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#decision-variables">Decision Variables</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#objective-and-constraints">Objective and Constraints</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#simulated-annealing-meta-heuristic">Simulated Annealing Meta-Heuristic</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#valid-inequalities">Valid Inequalities</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#dataset-generation">Dataset Generation</a><br>
@@ -94,43 +67,12 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
   </table>
 </div>
 
-
-
-<!-- <div align="center">
-    <p><b>📑 Table of Contents</b></p>
-    <div style="display: inline-block; text-align: left;">
-      <ol>
-        <li>
-          <a href="#about-the-project">About The Project</a>
-          <ul>
-            <li><a href="#quick-overview">Quick Overview</a></li>
-            <li><a href="#built-with">Built With</a></li>
-            <li><a href="#project-structure">Project Structure</a></li>
-          </ul>
-        </li>
-        <li>
-          <a href="#getting-started">Getting Started</a>
-          <ul>
-            <li><a href="#prerequisites">Prerequisites</a></li>
-            <li><a href="#installation">Installation</a></li>
-          </ul>
-        </li>
-        <li><a href="#usage">Usage</a></li>
-        <li><a href="#license">License</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="#references">References</a></li>
-        <li><a href="#acknowledgments">Acknowledgments</a></li>
-      </ol>
-    </div>
-</div> -->
-
 <!-- AUTHOR INFO-->
 ## Author Info
 
 | Name | Surname | Student ID | UniTS mail | Google mail | Master |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Marco | Tallone | SM3600002 | <marco.tallone@studenti.units.it> | <marcotallone85@gmail.com> | **SDIC** |
-
 
 >[!WARNING] 
 >**Copyright Notice**:\
@@ -235,9 +177,161 @@ Furthermore, in the [`apps/`](./apps) folder contains the following Python scrip
 <!-- MODEL DESCRIPTION -->
 ## Model Description
 
+In the following section a summary of the mathematical model presented by *Y.R. de Weert et al.* [<a href="#ref1">1</a>] is presented to better understand the scheduling problem addressed by the models implemented in this repository.
+
 ### Problem Description
 
-### Mathematical Formulation: Objective and Constraints
+In the railway maintainance scheduling problem addressed by the implemented models we consider a railway network over a finite discrete time horizon
+
+$$
+T = \{1, 2, \ldots, T_{end}\}
+$$
+
+with a set of nodes representing stations
+
+$$
+N = \{1, 2, \ldots, n\}
+$$
+
+and a set of arcs representing the direct railway lines connecting the stations
+
+$$
+\mathcal{A} = \{(i, j) \mid \forall i, j \in N, i < j\}
+$$
+
+where the arc $a = (i,j) \in \mathcal{A}$ represents the bidirectional connection between the $i^{th}$ and $j^{th}$ station. To each arc is associated a travel time by train $\omega^e_a \in \mathbb{R}$ and a travel time by alternative services $\omega^j_a \in \mathbb{R}$. In the case of this study, while the former is computed as the Euclidean distance between the stations (*randomly placed in a unitary circle*), the latter is modelled as the first one multiplied by some delay factor. To model this delay factor, the relation presented in the paper has been used:
+
+$$
+\omega^j_a = 1.35 \cdot \omega^e_a
+$$
+
+In normal conditions, the travel time by train is used, while in case of maintainance jobs on the arc the travel time by alternative services is used.\
+Moreover, given any possible origin-desination pair $(o, d) \in N \times N \mid o \neq d$, we define the set $\Omega_{od}$ of average travel times by train from the given origin $o$ to the destination $d$. Each entry of this set is basically the sum of the travel times by train $\omega^e_a$ over the arcs of the shortest path connecting the origin and the destination.\
+As anticipated, in this context we consider the set of maintainance jobs
+
+$$
+J = \{1, 2, \ldots, n_{\text{jobs}}\}
+$$
+
+that have to be scheduled on the arcs of the network. Each job $j \in J$ is characterized by a subset 
+$\mathcal{A}_j \subseteq \mathcal{A}$ of one or more arcs on which the maintainance has to be performed and by a processing time $\pi_j \in \mathbb{N}$ representing the duration of the job itself. Simmetrically, for each arc $a \in \mathcal{A}$, we also introduce the set
+
+$$
+J_a = \{j \in J \mid a \in \mathcal{A}_j\}
+$$
+
+of jobs that have to be scheduled on the arc $a$. Additionally, some arcs might require that a certain time interval $\tau_a \in \mathbb{N}$ has to pass between two consecutive jobs scheduled on the same arc.\
+In some cases, it might be the case that some subset of arcs cannot be unavailable simultaneously. Hence, the set $C$ containing combinations of arcs on which jobs cannot be scheduled at the same time is introduced.\
+For each time period $t \in T$, we then define the passenger deman $\phi_{odt}$ for each possible origin-destination pair, the share  passengers travelling in the peak moment in time $t$ from $o$ to $d$ as $\beta_{odt}$ and the limited capacity $\Lambda_{at}$ for alternative services substituting the train transportation in case a job is scheduled on the arc $a$ at time $t$.\
+Trains that run on the arcs not subject to maintainance jobs are assumed to have an unlimited capacity, modelled by the variable $M \gg 1$. $M$ is set to a relatively big number and surely satisfies:
+
+$$
+M > \sum_{(o,d) \in N \times N} \sum_{t \in T} \phi_{odt}
+$$
+
+One final element to introduce in this model are event requests. It might happen that, at any time $t \in T$ an event might occur that increases the passenger demand in a subset of arcs of the network. This is modelled by the set $E$ consisting of tracks segments $s$, i.e. sets of consecutive arcs of different length, for each event happening at time $t$. The capacity of the service should always be sufficient during event requests to avoid overcrowding. This is always the case when trains are operational but it might not be the case when alternative services are used in case a job has been scheduled on the arcs of the event request. In the latter case the capacity is limited to
+
+$$
+\Lambda_{st} = \sum_{a \in s} \Lambda_{at},\quad \forall s \in E, \forall t \in T
+$$
+
+Finally, it's assumed that, when travelling from origin $o$ to destination $d$, passenger can consider up to $K \in \mathbb{N}$ possible alternative routes aiming for the one that minimizes the total travel time. Therefore, the set $R$ contains, for each origin-destination pair $(o,d) \in N \times N \mid o \neq d$, the $K$ shortest paths connecting the origin and the destination. These can be easily computed using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) once the topology of the network is known.\
+Further assumptions made for this model are listed below:
+
+- there is no precedence relation between jobs, i.e. jobs can be scheduled in any order
+- each job has equal urgency
+- jobs cannot be interrupted once started
+- all passengers travelling between the same origin-destination pair at any given time choose the same route, i.e. the shortest path connecting the origin and the destination
+- outside event requests, the capacity of alternative services is always sufficient to avoid overcrowding
+
+### Decision Variables
+
+The decision variables of the model are the following:
+
+- $y_{jt}$: binary variable that is equal to 1 if job $j$ starts at time $t$, 0 otherwise
+- $x_{at}$: binary variable that is equal to 1 if arc $a$ is available (by train) at time $t$, 0 otherwise
+- $h_{odtk}$: binary variable that is equal to 1 if route option $k$ is used when travelling from origin $o$ to destination $d$ at time $t$, 0 otherwise
+- $w_{at}$: continuous variable representing the travel time traversing arc $a$ at time $t$
+- $v_{odt}$: continuous variable representing the travel time from origin $o$ to destination $d$ at time $t$
+
+### Objective and Constraints
+
+The goal of the model is to **minimize the total passenger delay** in the network. The **delay** is defined as the **increase in the travel time compared to the average travel time** between an origin and a destination. According to this, the following objective function is defined:
+$$
+\underset{v}{\min}
+  \sum_{(o,d) \in N \times N} \sum_{t \in T}
+  \phi_{odt} \left(v_{odt} - \Omega_{odt}\right)
+  \tag{1}
+$$
+
+A **feasible solution** of this mathematical model **finds a schedule such that all the jobs are scheduled** within the time horizon $T_{end}$.\
+Therefore a constraint must be set in order for a job to be started and finished within the time horizon:
+
+$$
+\sum_{t=1}^{T_{end} - \pi_j + 1} y_{jt} = 1, \quad \forall j \in J
+\tag{2}
+$$
+
+While a job is processed, the subset $\mathcal{A}_j$ of arcs on which the job has to be performed must be unavailable for other jobs. This is modelled by the following constraint:
+
+$$
+x_{at} + \sum_{t'=\min(1, t-\pi_j+1)}^{\max(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a
+\tag{3}
+$$
+
+Accordingly the travel time $w_{at}$ on an arc $a$ at time $t$ depends on the availability of the train services on that arc by the following constraint:
+
+$$
+w_{at} = \omega^e_a x_{at} + \omega^j_a (1 - x_{at}), \quad \forall a \in \mathcal{A}, \forall t \in T
+\tag{4}
+$$
+
+Since variables $x_{at}$ are only bounded by $(3)$, an optional constraint is added to ensure the correct arc traversal time for free variables:
+
+$$
+\sum_{t \in T} x_{at} = T_{end} - \sum_{j \in J_a} \pi_j, \quad \forall a \in \mathcal{A}
+\tag{5}
+$$
+
+Due to the fact that there might be multiple combinations $c$ of arcs that cannot be unavailable simultaneously according to set $C$, the following constraint is added:
+
+$$
+\sum_{a \in c} (1 - x_{at}) \leq 1, \quad \forall c \in C, \forall t \in T
+\tag{6}
+$$
+
+Since jobs on the same arc cannot overlap in time the following constriant is needed:
+
+$$
+\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{T_{end}} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A}
+\tag{7}
+$$
+
+For a track segment $s$ included in an event request the passenger flow in the peak moment of the considered time period must be less than the capacity of the alternative services:
+
+$$
+\sum_{a \in s} \sum_{(o,d) \in N \times N} \sum_{\substack{i = 1 \\ a \in R_{odi}}}^K h_{odti} \beta{odt} \phi_{odt} \leq \Lambda_{st} + M \sum_{a \in s} x_{at}, \quad \forall s \in E_t, \forall t \in T
+\tag{8}
+$$
+
+Concerning alternative routes, we must ensure that passenger flow is served by at least one (and no more than one) of the $K$ possible routes:
+
+$$
+\sum_{i = 1}^K h_{odti} = 1, \quad \forall (o,d) \in N \times N, \forall t \in T
+\tag{9}
+$$
+
+Accordingly, the following two constraints provide a lower and an upper bound for the travel time from origin $o$ to destination $d$ at time $t$:
+
+$$
+v_{odt} \geq \sum_{a \in R_{odi}} w_{at} - M (1 - h_{odti}), \quad \forall i \in \{1,\dots,K\}, \forall (o,d) \in N \times N, \forall t \in T
+\tag{10}
+$$
+
+$$
+v_{odt} \leq \sum_{a \in R_{odi}} w_{at}
+\tag{11}
+$$
 
 ### Simulated Annealing Meta-Heuristic
 
