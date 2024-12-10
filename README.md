@@ -31,36 +31,76 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
         <!-- <td><a href="./presentation/presentation.pdf"><strong>PDF Presentation</strong></a></td> -->
         <td><a href="https://github.com/marcotallone/railway-scheduling/issues"><strong>Report bug</strong></a></td>
         <td><a href="https://github.com/marcotallone/railway-scheduling/issues"><strong>Request Feature</strong></a></td>
+      </tr>
     </table>
 </div>
 
 <!-- TABLE OF CONTENTS -->
-<details>
-  <!-- <summary><h3 style="color: #4078c0;">📑 Table of Contents</h3></summary> -->
-  <summary>📑 Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#quick-overview">Quick Overview</a></li>
-        <li><a href="#built-with">Built With</a></li>
-        <li><a href="#project-structure">Project Structure</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#references">References</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
+<div align="center">
+  <table>
+      <tr><td>
+        <h2>Table of Contents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+        <ol>
+          <li><a href="#author-info">Author Info</a></li>
+          <li><a href="#about-the-project">About The Project</a></li>
+          <ul>
+            <li><a href="#quick-overview">Quick Overview</a></li>
+            <li><a href="#built-with">Built With</a></li>
+            <li><a href="#project-structure">Project Structure</a></li>
+          </ul>
+          <li><a href="#getting-started">Getting Started</a></li>
+          <ul>
+            <li><a href="#requirements">Requirements</a></li>
+            <li><a href="#installation">Installation</a></li>
+          </ul>
+          <li><a href="#usage-examples">Usage Examples</a></li>
+          <li><a href="#model-description">Model Description</a></li>
+          <ul>
+            <li><a href="#problem-description">Problem Description</a></li>
+            <li><a href="#mathematical-formulation-objective-and-constraints">Mathematical Formulation</a></li>
+            <li><a href="#simulated-annealing-meta-heuristic">Simulated Annealing Meta-Heuristic</a></li>
+            <li><a href="#valid-inequalities">Valid Inequalities</a></li>
+            <li><a href="#dataset-generation">Dataset Generation</a></li>
+          </ul>
+          <li><a href="#results-and-scalability-analysis">Results and Scalability Analysis</a></li>
+          <li><a href="#contributing">Contributing</a></li>
+          <li><a href="#license">License</a></li>
+          <li><a href="#references">References</a></li>
+          <li><a href="#acknowledgments">Acknowledgments</a></li>
+        </ol>
+      </td></tr>
+  </table>
+</div>
+
+
+
+<!-- <div align="center">
+    <p><b>📑 Table of Contents</b></p>
+    <div style="display: inline-block; text-align: left;">
+      <ol>
+        <li>
+          <a href="#about-the-project">About The Project</a>
+          <ul>
+            <li><a href="#quick-overview">Quick Overview</a></li>
+            <li><a href="#built-with">Built With</a></li>
+            <li><a href="#project-structure">Project Structure</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#getting-started">Getting Started</a>
+          <ul>
+            <li><a href="#prerequisites">Prerequisites</a></li>
+            <li><a href="#installation">Installation</a></li>
+          </ul>
+        </li>
+        <li><a href="#usage">Usage</a></li>
+        <li><a href="#license">License</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#references">References</a></li>
+        <li><a href="#acknowledgments">Acknowledgments</a></li>
+      </ol>
+    </div>
+</div> -->
 
 <!-- AUTHOR INFO-->
 ## Author Info
@@ -83,7 +123,6 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
 ### Quick Overview
 
 This project implements the mixed integer linear programming (MILP) models proposed by *Y.R. de Weert et al.* [<a href="#ref1">1</a>] that minimizes passengers delays while scheduling maintainance projects in a railway network. In summary, the main problem addressed by these models is to find a suitable schedule for maintainance jobs that have to be performed on the arcs of a railway network, in order to minimize the passengers delays while respecting the event requests of railway operators within a finite time horizon. Moreover, such models includes capacity constraints for alternative services in event request areas during the execution of the maintenance projects.\
-Further details about the model and the problem can be found below, or in the referenced paper.\
 The implemented models are developed in the [Python `railway` module](./src/railway/) and the relative job scheduling problems have been solved using the [`Gurobi` solver](https://www.gurobi.com/). All the methods implemented in the models have been largely documented and it's therefore possible to gain futher information using the Python `help()` function as shown below:
 
 ```python
@@ -92,7 +131,8 @@ help(railway.Railway)
 ```
 
 Each model has been tested on small istances of the problem and a scalability analysis has also been performed to assess the performance of the models on larger instances as well. The datasets used for these tests have been randomly generated following the description provided in the original paper.\
-Futher information about the models mathematical formulation and implementation, the scheduling problems istances and the results obtained can be found below after the [Usage Examples](#usage-examples) section or in the [presentation](https://marcotallone.github.io/railway-scheduling/) provided in the repository.
+Futher information about the models mathematical formulation and implementation, the scheduling problem istances and the results obtained can be found in the
+[Model Description](#model-description) section below or in the [presentation](https://marcotallone.github.io/railway-scheduling/) provided in this repository.
 
 ### Project Structure
 
@@ -150,10 +190,10 @@ This can be done manually or by taking advantage of the provided [`setup.py`](./
 pip install -e .
 ```
 
-from the root directory of the project. After that, the module can be imported in any Python script or notebook with the following command:
+from the root directory of the project. After that, the module can be imported in any Python script or notebook with the following import statement:
 
 ```python
-import railway
+from railway import Railway
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -161,26 +201,37 @@ import railway
 <!-- USAGE EXAMPLES -->
 ## Usage Examples
 
+The [`notebooks/`](./notebooks) folder contains a set of Jupiter Notebooks that show how to use the implemented models to solve the scheduling problem. In particular, the folder contains $3$ notebooks ([`model0.ipynb`](./notebooks/model0.ipynb), [`model1.ipynb`](./notebooks/model1.ipynb) and [`model2.ipynb`](./notebooks/model2.ipynb)) showing how to instantiate the $3$ models presented below using the implemented `Railway` class and its methods, while the [`model_formulation.ipynb`](./notebooks/model_formulation.ipynb) notebook provides a detailed description of the mathematical formulation of the models. The content of the latter is not used in practice but shows in details how each element of the mathematical formulation is implemented in practice in the final module.\
+Furthermore, in the [`apps/`](./apps) folder contains the following Python scripts showing practical usage examples of the models:
+
+- [`generate.py`](./apps/generate.py): a script that generates random istances of the scheduling problem for given parameters and saves them in the [`datasets/`](./datasets) folder as JSON files.
+- [`test.py`](./apps/test.py): a script that tests the performance of all the models and compares them on the same istances of the scheduling problem.
+- [`scalability.py`](./apps/scalability.py): a script that tests the scalability of the models on larger istances of the scheduling problem.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Problem Description
+<!-- MODEL DESCRIPTION -->
+## Model Description
 
-## Mathematical Formulation: Objective and Constraints
+### Problem Description
 
-## Simulated Annealing Meta-Heuristic
+### Mathematical Formulation: Objective and Constraints
 
-## Valid Inequalities
+### Simulated Annealing Meta-Heuristic
 
-## Dataset Generation
+### Valid Inequalities
 
-## Results
+### Dataset Generation
 
-## Conclusions
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- RESULTS -->
+## Results and Scalability Analysis
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
 ## Contributing
-
-<!-- Although this repository started as a simple university exam project, if you have a suggestion that would make this better or you attempted to implement one of the above mentioned improvements and want to share it with us, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement" or "extension". -->
 
 The goal of this repository was to implement and reproduce the results of the models presented in paper by *Y.R. de Weert et al.* [<a href="#ref1">1</a>] in the context of a university exam project. However, if you have a suggestion that would make this better or extend its functionalities and want to share it with me, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement" or "extension".\
 Suggested contribution procedure:
@@ -228,11 +279,8 @@ https://doi.org/10.1016/j.dam.2012.05.027.
 (https://www.sciencedirect.com/science/article/pii/S0166218X12002338)
 Abstract: We consider the problem of scheduling a set of maintenance jobs on the arcs of a network so that the total flow over the planning time horizon is maximized. A maintenance job causes an arc outage for its duration, potentially reducing the capacity of the network. The problem can be expected to have applications across a range of network infrastructures critical to modern life. For example, utilities such as water, sewerage and electricity all flow over networks. Products are manufactured and transported via supply chain networks. Such networks need regular, planned maintenance in order to continue to function. However the coordinated timing of maintenance jobs can have a major impact on the network capacity lost due to maintenance. Here we describe the background to the problem, define it, prove it is strongly NP-hard, and derive four local search-based heuristic methods. These methods integrate exact maximum flow solutions within a local search framework. The availability of both primal and dual solvers, and dual information from the maximum flow solver, is exploited to gain efficiency in the algorithms. The performance of the heuristics is evaluated on both randomly generated instances, and on instances derived from real-world data. These are compared with a state-of-the-art integer programming solver.
 Keywords: Network flows; Scheduling; Maintenance planning; Local search; Hybrid algorithms -->
-<a id="ref2"></a>
-[2] Natashia Boland, Thomas Kalinowski, Hamish Waterer, Lanbo Zheng, *"Scheduling arc maintenance jobs in a network to maximize total flow over time"*, Discrete Applied Mathematics, Volume 163, Part 1, 2014, Pages 34-52, ISSN 0166-218X, [https://doi.org/10.1016/j.dam.2012.05.027](https://www.sciencedirect.com/science/article/pii/S0166218X12002338)
-
-
-
+<!-- <a id="ref2"></a>
+[2] Natashia Boland, Thomas Kalinowski, Hamish Waterer, Lanbo Zheng, *"Scheduling arc maintenance jobs in a network to maximize total flow over time"*, Discrete Applied Mathematics, Volume 163, Part 1, 2014, Pages 34-52, ISSN 0166-218X, [https://doi.org/10.1016/j.dam.2012.05.027](https://www.sciencedirect.com/science/article/pii/S0166218X12002338) -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
