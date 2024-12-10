@@ -38,44 +38,44 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
 <!-- TABLE OF CONTENTS -->
 <div align="center">
   <table>
-      <tr><td>
+      <tr><td style="text-align: left;">
         <h2>Table of Contents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
         <div style="display: inline-block; text-align: left;">
-        <ol>
-          <li><a href="#author-info">Author Info</a></li>
-          <li><a href="#about-the-project">About The Project</a></li>
-          <ul>
-            <li><a href="#quick-overview">Quick Overview</a></li>
-            <li><a href="#built-with">Built With</a></li>
-            <li><a href="#project-structure">Project Structure</a></li>
-          </ul>
-          <li><a href="#getting-started">Getting Started</a></li>
-          <ul>
-            <li><a href="#requirements">Requirements</a></li>
-            <li><a href="#installation">Installation</a></li>
-          </ul>
-          <li><a href="#usage-examples">Usage Examples</a></li>
-          <li><a href="#model-description">Model Description</a></li>
-          <ul>
-            <li><a href="#problem-description">Problem Description</a></li>
-            <li><a href="#mathematical-formulation-objective-and-constraints">Mathematical Formulation</a></li>
-            <li><a href="#simulated-annealing-meta-heuristic">Simulated Annealing Meta-Heuristic</a></li>
-            <li><a href="#valid-inequalities">Valid Inequalities</a></li>
-            <li><a href="#dataset-generation">Dataset Generation</a></li>
-          </ul>
-          <li><a href="#results-and-scalability-analysis">Results and Scalability Analysis</a></li>
-          <li><a href="#contributing">Contributing</a></li>
-          <li><a href="#license">License</a></li>
-          <li><a href="#references">References</a></li>
-          <li><a href="#acknowledgments">Acknowledgments</a></li>
-          <!-- <pre>
-          <b>1</b>. <a href="#author-info">Author Info</a>
-          <b>2</b>. <a href="#about-the-project">About The Project</a>
-            <b>-</b> <a href="#quick-overview">Quick Overview</a>
-            <b>-</b> <a href="#built-with">Built With</a>
-            <b>-</b> <a href="#project-structure">Project Structure</a>
-          </pre> -->
-        </ol>
+          <ol>
+            <li><a href="#author-info">Author Info</a></li>
+            <li><a href="#about-the-project">About The Project</a></li>
+            <ul>
+              <li><a href="#quick-overview">Quick Overview</a></li>
+              <li><a href="#built-with">Built With</a></li>
+              <li><a href="#project-structure">Project Structure</a></li>
+            </ul>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <ul>
+              <li><a href="#requirements">Requirements</a></li>
+              <li><a href="#installation">Installation</a></li>
+            </ul>
+            <li><a href="#usage-examples">Usage Examples</a></li>
+            <li><a href="#model-description">Model Description</a></li>
+            <ul>
+              <li><a href="#problem-description">Problem Description</a></li>
+              <li><a href="#mathematical-formulation-objective-and-constraints">Mathematical Formulation</a></li>
+              <li><a href="#simulated-annealing-meta-heuristic">Simulated Annealing Meta-Heuristic</a></li>
+              <li><a href="#valid-inequalities">Valid Inequalities</a></li>
+              <li><a href="#dataset-generation">Dataset Generation</a></li>
+            </ul>
+            <li><a href="#results-and-scalability-analysis">Results and Scalability Analysis</a></li>
+            <li><a href="#contributing">Contributing</a></li>
+            <li><a href="#license">License</a></li>
+            <li><a href="#references">References</a></li>
+            <li><a href="#acknowledgments">Acknowledgments</a></li>
+            <!-- <pre>
+            <b>1</b>. <a href="#author-info">Author Info</a>
+            <b>2</b>. <a href="#about-the-project">About The Project</a>
+              <b>-</b> <a href="#quick-overview">Quick Overview</a>
+              <b>-</b> <a href="#built-with">Built With</a>
+              <b>-</b> <a href="#project-structure">Project Structure</a>
+            </pre> -->
+          </ol>
         </div>
       </td></tr>
   </table>
