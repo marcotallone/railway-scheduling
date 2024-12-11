@@ -617,7 +617,21 @@ class Railway:
             name="13",
         )
 
-    # TODO: missing constraint (14)!!!
+        # Availability of arcs included in all routes during event requests     (14)
+        self.model.addConstrs(
+            (
+                self.x[*a, t] == 1
+                for a in self.A
+                for t in self.T
+                for s in self.E[t]
+                if a in self.E[t][s]
+                for o, d in self.OD
+                if all(a in self.R[(o, d)][i - 1] for i in range(1, self.K + 1))
+                if self.beta[o, d, t]*self.phi[o, d, t] >
+                quicksum(self.Lambd[a, t] for a in self.E[t][s])
+            ),
+            name="14",
+        ) 
 
     # Set objective function
     def set_objective(self):
