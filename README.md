@@ -96,7 +96,7 @@ help(railway.Railway)
 
 Each model has been tested on small istances of the problem and a scalability analysis has also been performed to assess the performance of the models on larger instances as well. The datasets used for these tests have been randomly generated following the description provided in the original paper.\
 Futher information about the models mathematical formulation and implementation, the scheduling problem istances and the results obtained can be found in the
-[Model Description](#model-description) section below or in the [presentation](https://marcotallone.github.io/railway-scheduling/) provided in this repository.
+[Model Description](#model-description) and in the [Results and Scalability Analysis](#results-and-scalability-analysis) sections below or in the [presentation](https://marcotallone.github.io/railway-scheduling/) provided in this repository.
 
 ### Project Structure
 
@@ -122,7 +122,7 @@ The project is structured as follows:
 
 The project is developed in `Python` and uses the [`Gurobi` solver](https://www.gurobi.com/) for the optimisation problems, hence the installation of the following library is needed:
 
-- `gurobipy`, version `12.0.0 build v12.0.0rc1`: the official `Gurobi` Python API, which requires to have an active `Gurobi` license and the solver installed on the machine. An [academic license](https://www.gurobi.com/academia/academic-program-and-licenses/) was used to develop the project.
+- `gurobipy`, version `12.0.0`: the official `Gurobi` Python API, which requires to have an active `Gurobi` license and the solver installed on the machine. An [academic license](https://www.gurobi.com/academia/academic-program-and-licenses/) was used to develop the project.
 
 The following **optional** Python libraries are needed in order to run the `Jupiter Notebooks` in the [notebooks/](./notebooks) folder:
 
@@ -235,7 +235,7 @@ $$
 \Lambda_{st} = \sum_{a \in s} \Lambda_{at},\quad \forall s \in E, \forall t \in T
 $$
 
-Finally, it's assumed that, when travelling from origin $o$ to destination $d$, passenger can consider up to $K \in \mathbb{N}$ possible alternative routes aiming for the one that minimizes the total travel time. Therefore, the set $R$ contains, for each origin-destination pair $(o,d) \in N \times N \mid o \neq d$, the $K$ shortest paths connecting the origin and the destination. These can be easily computed using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) once the topology of the network is known.\
+Finally, it's assumed that, when travelling from origin $o$ to destination $d$, passenger can consider up to $K \in \mathbb{N}$ possible alternative routes aiming for the one that minimizes the total travel time. Therefore, the set $R$ contains, for each origin-destination pair $(o,d) \in N \times N \mid o \neq d$, the $K$ shortest paths connecting the origin and the destination. These can be easily computed using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) once the topology of the network is known (implemented in the `YenKSP()` method of the `Railway` class).\
 Further assumptions made for this model are listed below:
 
 - there is no precedence relation between jobs, i.e. jobs can be scheduled in any order
@@ -334,16 +334,104 @@ v_{odt} \leq \sum_{a \in R_{odi}} w_{at}
 \tag{11}
 $$
 
+In addition to these constraints, since in some cases variables could take values that are never included in any feasible solution, further constraints can be added to reduce the search space and the computational cost.\
+In particular, the following two constraints express the availability of arcs that are never included in any job at any given time:
+
+$$
+x_{at} = 1, \quad \forall a \in \left\{a \in \mathcal{A} \mid J_a \neq \emptyset\right\}, \forall t \in T
+\tag{12}
+$$
+
+$$
+w_{at} = \omega^e_a, \quad \forall a \in \left\{a \in \mathcal{A} \mid J_a \neq \emptyset\right\}, \forall t \in T
+\tag{13}
+$$
+
+The final constraint deals with event requests. Consider the $K$ possible routes to travel from an origin $o$ to a destination $d$ at time $t$. Imagine that all the considered $K$ routes pass through the same arc $a$ at some point of the path and that such arc is included in an event request at time $t$. In this case, if $\beta_{odt} \phi_{odt}$ is greater than the capacity of the alternative services $\Lambda_{at}$ for such arc, we must ensure the availability of the arc to avoid an infeasible solution. This is embodied by the following constraint:
+
+$$
+x_{at} = 1, \quad \forall (a,t) \in \left\{
+  \substack{(a,t) \in \mathcal{A} \times T \mid \exists s \in E_t \text{ s.t. } a \in s \\
+  \land\ \exists (o,d) \in N \times N \text{ s.t. } a \in R_{odi} \forall i \in \{1,\dots,K\} \\ \land\ \beta_{odt} \phi_{odt} > \Lambda_{st}}
+\right\}
+\tag{14}
+$$
+
+All of these constraints and the cited objective function have been implemented in a Gurobi `model` object in the `Railway` class. Such model can be optimized using the `optimize()` method of the class, which returns the optimal solution of the scheduling problem.
+
 ### Simulated Annealing Meta-Heuristic
+
+Meta-heuristics can improve the computational times of MILP problems by providing a good initial solution guess in a reasonable amount of time. In this case, the [**simulated annealing**](https://en.wikipedia.org/wiki/Simulated_annealing) meta-heuristic has been used to find a good initial solution guess for the MILP model. This algorithm is applied to find an initial guess for the set of **starting times** $S = \left\{s_j \mid \forall j \in J\right\}$ of all jobs.\
+The algorithm, implemented in the `simulated_annealing()` method of the `Railway` class as described in the paper [[1](#ref1)], can be summarized in the following pseudo-code:
+
+```javascript
+function simulated_annealing(
+  S0: initial guess, 
+  T0: initial temperature,
+  c:  cooling factor,
+  L:  iterations per temperature,
+  STOP_CRITERION: stopping criterion
+):
+  S <- S0
+  T <- T0
+  while STOP_CRITERION do:
+    for l in {1,...,L} do:
+      Snew <- get_neighbor(S)
+      Δf <- f(S) - f(Snew)
+      if Δf >= 0:
+        S <- Snew
+      else:
+          S <- Snew with probability exp(-Δf/T)
+      end
+    end
+    T <- c * T
+  end
+  return S
+```
+
+In this algorithm, a new neighbor solution $S_{new}$ to a given one $S$ is generated every time by shifting the starting time of only one of the jobs in the solution and checking that such shift does not violate any constraint returning always a feasible solution.\
+Such algorithm hence returns a good initial guess for the starting times of all jobs, but it's possible to get the values of the associated decision variables from these in the following way:
+
+- $y$ can be obtained by setting the values $y_{js_j} = 1$ $\forall j \in J$ where $s_j \in S$ and all the other $y_{jt}$ to 0 for the remaining times $t \in T$
+- $x$ is unavailable, hence $x_{at} = 0$ only for $a \in \mathcal{A}$ and for $t \in T$ for which $t \in [s_j, s_j + \pi_j], \forall j \in J_a$
+- $w$ values can be easily obtained from constraint $(4)$ once $x$ values are known
+- $h$ and $v$ are computed once the other $3$ decision variables are set. In this case, for each origin-destination pair we can compute the shortest route among the $K$ given ones and set the $h$ values accordingly, while the $v$ values are simply the sum of the travel times over the arcs of the chosen shortest route
+
+The described procedure is the one implemented in the `get_vars_from_times(S)` method of the `Railway` class. Simmmetrically, it's very easy to obtain $S$ from the decision variables if needed as implemented in the `get_times_from_vars(y)` method.
 
 ### Valid Inequalities
 
+To further reduce the search space and the computational cost of the MILP model, it's possible to set the following valid inequalities via the `set_valid_inequalities()` method implemented. These inequalities come from the ``Single Machine Scheduling'' problem:
+
+- **Sousa and Wolsey** inequality:
+  $$
+  \sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
+  \tag{B1}
+  $$
+
+  with:
+  - $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$
+  - $Q'_j = [t - \pi_j + \Delta, t] \cap T$
+  - $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ *(i.e. maximum total processing time for the other jobs on the same arc as job $j$)*
+
+- non overlapping jobs inequality:
+  $$
+  y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
+  \tag{B2}
+  $$
+
 ### Dataset Generation
+
+Following the example provided in the [`generate.py`](./apps/generate.py) script, it's possible to generate random istances of the scheduling problem for given parameters.
+
+<!-- TODO: complete description after analysis of the data -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- RESULTS -->
 ## Results and Scalability Analysis
+
+<!-- TODO: complete description after analysis of the data -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
