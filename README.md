@@ -261,7 +261,7 @@ The goal of the model is to **minimize the total passenger delay** in the networ
 $$
 \underset{v}{\min}
   \sum_{(o,d) \in N \times N} \sum_{t \in T}
-  \phi_{odt} \left(v_{odt} - \Omega_{odt}\right)
+  \phi_{odt} (v_{odt} - \Omega_{odt})
   \tag{1}
 $$
 
@@ -311,7 +311,7 @@ $$
 For a track segment $s$ included in an event request the passenger flow in the peak moment of the considered time period must be less than the capacity of the alternative services:
 
 $$
-\sum_{a \in s} \sum_{(o,d) \in N \times N} \sum_{\substack{i = 1 \\ a \in R_{odi}}}^K h_{odti} \beta{odt} \phi_{odt} \leq \Lambda_{st} + M \sum_{a \in s} x_{at}, \quad \forall s \in E_t, \forall t \in T
+\sum_{a \in s} \sum_{(o,d) \in N \times N} \sum_{\substack{i = 1 \\ a \in R_{odi}}}^K h_{odti} \beta_{odt} \phi_{odt} \leq \Lambda_{st} + M \sum_{a \in s} x_{at}, \quad \forall s \in E_t, \forall t \in T
 \tag{8}
 $$
 
@@ -338,22 +338,22 @@ In addition to these constraints, since in some cases variables could take value
 In particular, the following two constraints express the availability of arcs that are never included in any job at any given time:
 
 $$
-x_{at} = 1, \quad \forall a \in \left\{a \in \mathcal{A} \mid J_a \neq \emptyset\right\}, \forall t \in T
+x_{at} = 1, \quad \forall a \in \{a \in \mathcal{A} \mid J_a \neq \emptyset\}, \forall t \in T
 \tag{12}
 $$
 
 $$
-w_{at} = \omega^e_a, \quad \forall a \in \left\{a \in \mathcal{A} \mid J_a \neq \emptyset\right\}, \forall t \in T
+w_{at} = \omega^e_a, \quad \forall a \in \{a \in \mathcal{A} \mid J_a \neq \emptyset\}, \forall t \in T
 \tag{13}
 $$
 
 The final constraint deals with event requests. Consider the $K$ possible routes to travel from an origin $o$ to a destination $d$ at time $t$. Imagine that all the considered $K$ routes pass through the same arc $a$ at some point of the path and that such arc is included in an event request at time $t$. In this case, if $\beta_{odt} \phi_{odt}$ is greater than the capacity of the alternative services $\Lambda_{at}$ for such arc, we must ensure the availability of the arc to avoid an infeasible solution. This is embodied by the following constraint:
 
 $$
-x_{at} = 1, \quad \forall (a,t) \in \left\{
+x_{at} = 1, \quad \forall (a,t) \in \{
   \substack{(a,t) \in \mathcal{A} \times T \mid \exists s \in E_t \text{ s.t. } a \in s \\
   \land\ \exists (o,d) \in N \times N \text{ s.t. } a \in R_{odi} \forall i \in \{1,\dots,K\} \\ \land\ \beta_{odt} \phi_{odt} > \Lambda_{st}}
-\right\}
+\}
 \tag{14}
 $$
 
@@ -361,7 +361,7 @@ All of these constraints and the cited objective function have been implemented 
 
 ### Simulated Annealing Meta-Heuristic
 
-Meta-heuristics can improve the computational times of MILP problems by providing a good initial solution guess in a reasonable amount of time. In this case, the [**simulated annealing**](https://en.wikipedia.org/wiki/Simulated_annealing) meta-heuristic has been used to find a good initial solution guess for the MILP model. This algorithm is applied to find an initial guess for the set of **starting times** $S = \left\{s_j \mid \forall j \in J\right\}$ of all jobs.\
+Meta-heuristics can improve the computational times of MILP problems by providing a good initial solution guess in a reasonable amount of time. In this case, the [**simulated annealing**](https://en.wikipedia.org/wiki/Simulated_annealing) meta-heuristic has been used to find a good initial solution guess for the MILP model. This algorithm is applied to find an initial guess for the set of **starting times** $S = \{s_j \mid \forall j \in J\}$ of all jobs.\
 The algorithm, implemented in the `simulated_annealing()` method of the `Railway` class as described in the paper [[1](#ref1)], can be summarized in the following pseudo-code:
 
 ```javascript
