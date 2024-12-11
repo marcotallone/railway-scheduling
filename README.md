@@ -381,7 +381,7 @@ function simulated_annealing(
       if Δf >= 0:
         S <- Snew
       else:
-          S <- Snew with probability exp(-Δf/T)
+        S <- Snew with probability exp(-Δf/T)
       end
     end
     T <- c * T
@@ -404,6 +404,7 @@ The described procedure is the one implemented in the `get_vars_from_times(S)` m
 To further reduce the search space and the computational cost of the MILP model, it's possible to set the following valid inequalities via the `set_valid_inequalities()` method implemented. These inequalities come from the ``Single Machine Scheduling'' problem:
 
 - **Sousa and Wolsey** inequality:
+
   $$
   \sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
   \tag{B1}
@@ -412,9 +413,11 @@ To further reduce the search space and the computational cost of the MILP model,
   with:
   - $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$
   - $Q'_j = [t - \pi_j + \Delta, t] \cap T$
-  - $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ *(i.e. maximum total processing time for the other jobs on the same arc as job $j$)*
+  - $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ 
+    *(i.e. maximum total processing time for the other jobs on the same arc as job $j$)*
 
 - non overlapping jobs inequality:
+
   $$
   y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
   \tag{B2}
