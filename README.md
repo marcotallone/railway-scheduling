@@ -425,9 +425,38 @@ To further reduce the search space and the computational cost of the MILP model,
 
 ### Dataset Generation
 
-Following the example provided in the [`generate.py`](./apps/generate.py) script, it's possible to generate random istances of the scheduling problem for given parameters.
+Following the example provided in the [`generate.py`](./apps/generate.py) script, it's possible to generate random istances of the scheduling problem for given parameters.\
+In particular, the implemented methods allows to generate an instance of the problem by selecting the desired total number of stations $n$, the number of jobs $n_{jobs}$, the time interval $T_{end}$, the number of alternative routes $K$ and the number of passengers in the network. With these values set, the remaining parameters of the model can be generated as explained in the following list:
 
-<!-- TODO: complete description after analysis of the data -->
+- **Network topology**: i.e. Euclidean coordinates of the $n$ stations, with the associated travel times. These are randomly generated in a unitary circle (following the procedure presented in the paper) at model instantiation.
+
+- $\pi_j$: processing times for each job $j$. Randomly generated in a desired range of integer values.
+
+- $A_j$: arcs on which each job $j$ has to be performed. For each job, a random starting station is drawn from the set $N$. Then, the "length" of each job, meaning the number of arcs that the job is going to be performed on, is randomly generated in a desired range of integer values that can be given in input. Having set these, a random arc from the ones incident to the starting station is selected and added to a list of arcs for the current job and the starting station is updated to the one at the end of the selected arc. This is repeated until the desired number of arcs is reached. This process also filters out the arcs that are already included in the job list, so that no arc is selected twice for the same job. For further details, consult the `__generate_Aj()` method of the `Railway` class.
+
+- $\tau_a$: minimum time interval between two consecutive jobs on the same arc $a$. Also in this case the user can set a minimum and maximum integer value for this parameter and the values are randomly generated in this range.
+
+- $\phi$: passenger demand for each origin-destination pair $(o,d)$ and each time $t$. A minimum and maximum passenger demand percentages (%) can be set in the range $[0, 1]$. The integer values for the parameter are then randomly sampled between the minimum percentage mutiplied by the total number of passengers and the maximum percentage multiplied by the total number of passengers. (Total number of passengers is set at instantiation by the user).
+  
+- $\beta$: share of passengers travelling in the peak moment in time $t$ from $o$ to $d$. Uniformly randomly distributed in a set range of values that can be given in input, between $0$ and $1$.
+
+- $\Lambda$: limited capacity for alternative services. A minimum and maximum capacity percentages (%) can be given in input in the range $[0, 1]$. The integer values for the parameter are then randomly sampled in the range having the following integer extremes:
+    $$
+    \Lambda_{min} = \lfloor \frac{\text{min percentage} \cdot \text{number of passengers}}{n} \rfloor
+    $$
+    $$
+    \Lambda_{max} = \lfloor \frac{\text{max percentage} \cdot \text{number of passengers}}{n} \rfloor
+    $$
+
+- $E$: event requests. The user can set a maximum number of event requests at each time $t$ (minimum is always $0$) and decide minimum and maximum length of the event request (i.e. how many arcs it is going to cover). The event requests are randomly generated similarly to how the set $A_j$ is (explained above). For further details consult the method `__generate_E()` of the `Railway` class.
+
+<!-- TODO: after having implemented __generate_C() write here --->
+- $C$: combinations of arcs on which jobs cannot be scheduled at the same time. $\dots$
+
+- $R$: set possible alternative routes for each origin-destination pair. Generated using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) to compute the $K$ shortest paths after the user has set the maximum number of alternative routes $K$ at instantiation.
+
+>[!NOTE]
+> When a problem is generated, there is of course no guarantee that it will be feasible. For this reason, the final part of the `generate.py` script tries to solve the problem and solve the dataset only if a finite solution is found within a certain time limit.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
