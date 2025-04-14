@@ -18,4 +18,5 @@ dependencies:
     - holoviews
     - hvplot
     - bokeh
+    - plotly
     # - jupiter_bokeh
