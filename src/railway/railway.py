@@ -1093,9 +1093,21 @@ class Railway:
         
         # Solve the problem with Gurobi
         self.model.optimize()
+
+        # Collect performance metrics
+        performance = {
+            "runtime": self.model.Runtime,              # Total runtime in seconds
+            "node_count": self.model.NodeCount,         # Number of branch-and-bound nodes
+            "simplex_iterations": self.model.IterCount, # Number of simplex iterations
+            "barrier_iterations": self.model.BarIterCount, # Barrier iterations (if applicable)
+            "mip_gap": self.model.MIPGap if hasattr(self.model, "MIPGap") else None,
+            "obj_val": self.model.ObjVal if self.model.status == GRB.OPTIMAL else None
+        }
         
         # Update starting times
         self.S = self.get_times_from_vars()
+        
+        return performance
 
     # Check feasibility of a given solution
     def check_feasibility(self, y, x, h, w, v):
