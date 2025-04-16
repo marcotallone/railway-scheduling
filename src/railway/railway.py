@@ -806,7 +806,7 @@ class Railway:
         """
         
         # Set cutting planes for optimization 
-        self.model.params.presolve = 1
+        # self.model.params.presolve = 1
         self.model.params.cuts = 0
         self.model.params.BQPCuts = -1
         self.model.params.CliqueCuts = -1
@@ -1836,7 +1836,7 @@ class Railway:
         for the railway scheduling problem."""
 
         feasible = False
-        max_tries = 10
+        max_tries = 50
         while not feasible and max_tries > 0:
 
             # Randomly chose an arc and a job on it
