@@ -2,6 +2,7 @@
 import json
 import random
 from collections import deque
+import time
 
 import gurobipy as gb
 import numpy as np
@@ -1096,16 +1097,17 @@ class Railway:
 
         # Collect performance metrics
         performance = {
-            "runtime": self.model.Runtime,              # Total runtime in seconds
-            "node_count": self.model.NodeCount,         # Number of branch-and-bound nodes
-            "simplex_iterations": self.model.IterCount, # Number of simplex iterations
-            "barrier_iterations": self.model.BarIterCount, # Barrier iterations (if applicable)
-            "mip_gap": self.model.MIPGap if hasattr(self.model, "MIPGap") else None,
-            "obj_val": self.model.ObjVal if self.model.status == GRB.OPTIMAL else None
+            "runtime": self.model.Runtime,
+            "nodes": self.model.NodeCount,
+            "iterations": self.model.IterCount,
+            "gap": self.model.MIPGap if hasattr(self.model, "MIPGap") else None,
+            "obj": self.model.ObjVal if hasattr(self.model, "ObjVal") else None,
         }
         
-        # Update starting times
-        self.S = self.get_times_from_vars()
+        # If at least one solution has been found
+        if (self.model.SolCount > 0):
+            # Update starting times
+            self.S = self.get_times_from_vars()
         
         return performance
 
@@ -1257,7 +1259,15 @@ class Railway:
             return False
 
     # Simulated annealing (SA) optimization
-    def simulated_annealing(self, T=1000, c=0.99, L=1, max_iter=1000):
+    def simulated_annealing(
+        self, 
+        T=1000, 
+        c=0.99, 
+        L=1, 
+        min_T = 1e-6,
+        max_time = 1800,
+        max_iter=10000
+    ):
         """Simulated annealing algorithm to find an initial good
         solution for the railway scheduling problem.
 
@@ -1269,26 +1279,39 @@ class Railway:
                 Cooling rate, by default 0.99
         L : int, optional
                 Number of iterations at each temperature, by default 1
+        min_T : float, optional
+                Minimum temperature, by default 1e-6
+        max_time : int, optional
+                Maximum time in seconds, by default 1800 s
         max_iter : int, optional
-                Maximum number of iterations, by default 1000
+                Maximum number of iterations, by default 10000
 
         Returns
         -------
         S : dict
                 Dictionary of starting times for jobs in J obtained by the SA
                 algorithm
+        elapsed_time : float
+                Elapsed time in seconds for the SA algorithm
         """
+
+        # Start timing
+        start_time = time.time()
+        elapsed_time = time.time() - start_time
 
         # Initialize solution and iteration counter
         S = self.generate_initial_solution()
         iter = 0
 
         # SA algorithm
-        while (T > 1e-6) and (iter < max_iter):
+        while (T > min_T) and (iter < max_iter) and (elapsed_time < max_time):
             for _ in range(L):
                 # Generate a new solution
                 S_new = self.generate_neighbor_solution(S)
-
+                
+                # If no solution is generated, skip the iteration
+                if S_new is None: continue
+                
                 # Get the solutions' variables
                 _, _, _, _, v = self.get_vars_from_times(S)
                 _, _, _, _, v_new = self.get_vars_from_times(S_new)
@@ -1311,9 +1334,12 @@ class Railway:
             # Increment the iteration counter
             iter += 1
 
-        # Save and return the best solution found
+            # Time check
+            elapsed_time = time.time() - start_time
+
+        # Save and return the best solution found and the elapsed time
         self.S = S
-        return S
+        return S, elapsed_time
 
     # Static methods -----------------------------------------------------------
 
@@ -1836,7 +1862,7 @@ class Railway:
         for the railway scheduling problem."""
 
         feasible = False
-        max_tries = 50
+        max_tries = 10
         while not feasible and max_tries > 0:
 
             # Randomly chose an arc and a job on it
