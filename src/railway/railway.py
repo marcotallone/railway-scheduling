@@ -254,17 +254,31 @@ class Railway:
         self.model.ModelSense = gb.GRB.MINIMIZE
         self.S = {}
 
+        ### XXX: Too many variables, some should not be NxN but rather OD cardinality!!!
+        # # Decision Variables
+        # self.y = self.model.addVars(self.J, self.T, vtype=gb.GRB.BINARY, name="y")
+        # self.x = self.model.addVars(self.A, self.T, vtype=gb.GRB.BINARY, name="x")
+        # self.h = self.model.addVars(
+        #     self.N, self.N, self.T, range(1, self.K + 1), vtype=gb.GRB.BINARY, name="h"
+        # )
+        # self.w = self.model.addVars(
+        #     self.A, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name="w"
+        # )
+        # self.v = self.model.addVars(
+        #     self.N, self.N, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name="v"
+        # )
+
         # Decision Variables
         self.y = self.model.addVars(self.J, self.T, vtype=gb.GRB.BINARY, name="y")
         self.x = self.model.addVars(self.A, self.T, vtype=gb.GRB.BINARY, name="x")
         self.h = self.model.addVars(
-            self.N, self.N, self.T, range(1, self.K + 1), vtype=gb.GRB.BINARY, name="h"
+            self.OD, self.T, range(1, self.K + 1), vtype=gb.GRB.BINARY, name="h"
         )
         self.w = self.model.addVars(
             self.A, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name="w"
         )
         self.v = self.model.addVars(
-            self.N, self.N, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name="v"
+            self.OD, self.T, lb=0, vtype=gb.GRB.CONTINUOUS, name="v"
         )
 
     # Copy constructor
@@ -452,9 +466,8 @@ class Railway:
         if self.phi == {}:
             self.M = 100 * self.passengers
         else:
-            self.M = sum(self.phi[(o, d, t)] for o, d in self.OD for t in self.T) + (
-                100 * self.passengers
-            )
+            self.M = sum(self.phi[(o, d, t)] for o, d in self.OD for t in self.T) + 1
+            # + (100 * self.passengers)
 
     # Set constraints
     def set_constraints(self):
@@ -512,15 +525,17 @@ class Railway:
         )
 
         # Arcs that cannt be unavailable simultaneously                         (6)
-        self.model.addConstrs(
-            (
-                quicksum(1 - self.x[*a, t] for a in c) <= 1
-                for t in self.T
-                for c in self.C
-                # for j in self.J # TODO: add this only if C depends on job j
-            ),
-            name="6",
-        )
+        # NOTE: this constraint is added only if C is not empty
+        if self.C:
+            self.model.addConstrs(
+                (
+                    quicksum(1 - self.x[*a, t] for a in c) <= 1
+                    for t in self.T
+                    for c in self.C
+                    # for j in self.J # NOTE: add this only if C depends on job j (i.e. C[j])
+                ),
+                name="6",
+            )
 
         # Non overlapping jobs on same arc                                      (7)
         self.model.addConstrs(
@@ -540,6 +555,10 @@ class Railway:
         )
 
         # Each track segment in an event request has limited capacity           (8)
+        # TODO: check if it's this constraint that introduces numerical instability when E empy
+        # If so consider: - removing it when E is empty
+        #                 - setting Lambd to 0 when E is empty
+        #                 - reducing M sice it can be very large depending on the sum of phi values
         self.model.addConstrs(
             (
                 quicksum(
@@ -577,6 +596,7 @@ class Railway:
                 self.v[o, d, t]
                 >= quicksum(self.w[*a, t] for a in self.R[(o, d)][i - 1])
                 - self.M * (1 - self.h[o, d, t, i])
+                for i in range(1, self.K + 1) # TODO: check correctness of this
                 for t in self.T
                 for o, d in self.OD
                 for i in range(1, self.K + 1)
@@ -589,6 +609,7 @@ class Railway:
             (
                 self.v[o, d, t]
                 <= quicksum(self.w[*a, t] for a in self.R[(o, d)][i - 1])
+                for i in range(1, self.K + 1) # TODO: check correctness of this
                 for t in self.T
                 for o, d in self.OD
                 for i in range(1, self.K + 1)
@@ -619,20 +640,22 @@ class Railway:
         )
 
         # Availability of arcs included in all routes during event requests     (14)
-        self.model.addConstrs(
-            (
-                self.x[*a, t] == 1
-                for a in self.A
-                for t in self.T
-                for s in self.E[t]
-                if a in self.E[t][s]
-                for o, d in self.OD
-                if all(a in self.R[(o, d)][i - 1] for i in range(1, self.K + 1))
-                if self.beta[o, d, t]*self.phi[o, d, t] >
-                quicksum(self.Lambd[a, t] for a in self.E[t][s])
-            ),
-            name="14",
-        ) 
+        # NOTE: this constraint is added only if E is not empty
+        if self.E:
+            self.model.addConstrs(
+                (
+                    self.x[*a, t] == 1
+                    for a in self.A
+                    for t in self.T
+                    for s in self.E[t]
+                    if a in self.E[t][s]
+                    for o, d in self.OD
+                    if all(a in self.R[(o, d)][i - 1] for i in range(1, self.K + 1))
+                    if self.beta[o, d, t]*self.phi[o, d, t] >
+                    quicksum(self.Lambd[a, t] for a in self.E[t][s])
+                ),
+                name="14",
+            ) 
 
     # Set objective function
     def set_objective(self):
