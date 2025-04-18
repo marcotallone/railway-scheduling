@@ -273,13 +273,14 @@ $$
 \tag{2}
 $$
 
-While a job is processed, the subset $\mathcal{A}_j$ of arcs on which the job has to be performed must be unavailable for other jobs. This is modelled by the following constraint:
+While a job is processed, the subset $\mathcal{A}_j$ of arcs on which the job has to be performed must be unavailable for other jobs since they are occupied. This is modelled by the following constraint where, if $x_{at} = 1$ then the arc $a$ is available at time $t$ and no job could had been scheduled neither at time $t$ itself nor in the prior time interval $[t - \pi_j + 1, t]$ (respecting time horizon), but if the arc is not available then each job $j$ can only start once in the time period preceeding time $t$ (hence the sum of its $y$ variables is at most $1$):
 
 $$
 x_{at} + \sum_{t'=\min(1, t-\pi_j+1)}^{\max(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a
 \tag{3}
 $$
 
+(Notice that this constraint alone still does not guarantee that jobs cannot overlap, a further constraint is added for this purpose in $(7)$).\
 Accordingly the travel time $w_{at}$ on an arc $a$ at time $t$ depends on the availability of the train services on that arc by the following constraint:
 
 $$
@@ -294,6 +295,7 @@ $$
 \tag{5}
 $$
 
+In other words, the leftmost sum corresponds to the total time in which the arc $a$ is available, while the second term equals to the time horizon minus the total processing time of all jobs on the arc $a$. Logically, the two terms must be equal. Notice that cases for which the total sum of processing times in any arc (*rightmost sum*) is greater than the time horizon $T_{end}$ automatically correspond to infeasible solutions. Hence the second term is always positive or, at most, null.\
 Due to the fact that there might be multiple combinations $c$ of arcs that cannot be unavailable simultaneously according to set $C$, the following constraint is added:
 
 $$
@@ -338,12 +340,12 @@ In addition to these constraints, since in some cases variables could take value
 In particular, the following two constraints express the availability of arcs that are never included in any job at any given time:
 
 $$
-x_{at} = 1, \quad \forall a \in \{a \in \mathcal{A} \mid J_a \neq \emptyset\}, \forall t \in T
+x_{at} = 1, \quad \forall a \in \{a \in \mathcal{A} \mid J_a = \emptyset\}, \forall t \in T
 \tag{12}
 $$
 
 $$
-w_{at} = \omega^e_a, \quad \forall a \in \{a \in \mathcal{A} \mid J_a \neq \emptyset\}, \forall t \in T
+w_{at} = \omega^e_a, \quad \forall a \in \{a \in \mathcal{A} \mid J_a = \emptyset\}, \forall t \in T
 \tag{13}
 $$
 
