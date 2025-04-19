@@ -2,6 +2,7 @@
 import json
 import random
 from collections import deque
+from itertools import combinations
 import time
 
 import gurobipy as gb
@@ -463,11 +464,13 @@ class Railway:
 
     # Set M upper bound
     def __set_M(self):
-        if self.phi == {}:
-            self.M = 100 * self.passengers
-        else:
-            self.M = sum(self.phi[(o, d, t)] for o, d in self.OD for t in self.T) + 1
-            # + (100 * self.passengers)
+        # if self.phi == {}:
+        #     self.M = 100 * self.passengers
+        # else:
+        #     self.M = sum(self.phi[(o, d, t)] for o, d in self.OD for t in self.T) + 1
+        #     # + (100 * self.passengers)
+        
+        self.M = 100000
 
     # Set constraints
     def set_constraints(self):
@@ -559,26 +562,27 @@ class Railway:
         # If so consider: - removing it when E is empty
         #                 - setting Lambd to 0 when E is empty
         #                 - reducing M sice it can be very large depending on the sum of phi values
-        self.model.addConstrs(
-            (
-                quicksum(
+        if self.E:
+            self.model.addConstrs(
+                (
                     quicksum(
                         quicksum(
-                            self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t]
-                            for i in range(1, self.K + 1)
-                            if a in self.R[(o, d)][i - 1]
+                            quicksum(
+                                self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t]
+                                for i in range(1, self.K + 1)
+                                if a in self.R[(o, d)][i - 1]
+                            )
+                            for o, d in self.OD
                         )
-                        for o, d in self.OD
+                        for a in self.E[t][s]
                     )
-                    for a in self.E[t][s]
-                )
-                <= quicksum(self.Lambd[a, t] for a in self.E[t][s])
-                + (self.M * quicksum(self.x[*a, t] for a in self.E[t][s]))
-                for t in self.T
-                for s in self.E[t]
-            ),
-            name="8",
-        )
+                    <= quicksum(self.Lambd[a, t] for a in self.E[t][s])
+                    + (self.M * quicksum(self.x[*a, t] for a in self.E[t][s]))
+                    for t in self.T
+                    for s in self.E[t]
+                ),
+                name="8",
+            )
 
         # Passeger flow from o to d is served by one of predefined routes       (9)
         self.model.addConstrs(
@@ -656,6 +660,49 @@ class Railway:
                 ),
                 name="14",
             ) 
+        
+        # Never used route options in origin o to destination d travels         (15)
+        never_used_routes = []
+        for o, d in self.OD:
+            
+            # Compute minimum and maximum travel time for each K route from o to d 
+            min_times = {}
+            max_times = {}
+            for i in range(1, self.K + 1):
+                min_times[i] = sum(self.omega_e[a] for a in self.R[(o, d)][i - 1])
+                max_times[i] = sum(
+                    # sum train times if a in arcs that have no job scheduled
+                    self.omega_e[a] if not any(a in self.Aj[j] for j in self.J)
+                    # otherwise sum alternative services travel times
+                    else self.omega_j[a]
+                    for a in self.R[(o, d)][i - 1]
+                )
+
+            # Find never used routes options
+            for combo in combinations(range(1, self.K + 1), 2):
+                i, j = combo
+
+                # If the minimum time of i-th path is greater than
+                # the maximum time of j-th path, 
+                # then i-th path is never used (in favor of j-th path)
+                if min_times[i] > max_times[j]:
+                    never_used_routes.append((o, d, i))
+                
+                # Ohterwise, if the maximum time of i-th path is less than
+                # the minimum time of j-th path,
+                # then j-th path is never used (in favor of i-th path)
+                elif max_times[i] < min_times[j]:
+                    never_used_routes.append((o, d, j))
+                    
+        # Add the never used routes constraints
+        self.model.addConstrs(
+            (
+                self.h[o, d, t, i] == 0
+                for o, d, i in never_used_routes
+                for t in self.T
+            ),
+            name="15",
+        )
 
     # Set objective function
     def set_objective(self):
@@ -1669,7 +1716,7 @@ class Railway:
     def __generate_phi(self, min_demand=0, max_demand=1):
         assert 0 <= min_demand <= 1, "min_demand must be between 0 and 1"
         assert 0 <= max_demand <= 1, "max_demand must be between 0 and 1"
-        assert min_demand < max_demand, "min_demand must be less than max_demand"
+        assert min_demand <= max_demand, "min_demand must be less than max_demand"
         min_demand_int = int(min_demand * self.passengers)
         max_demand_int = int(max_demand * self.passengers)
         self.phi = {
@@ -1685,7 +1732,7 @@ class Railway:
     def __generate_beta(self, min_share=0, max_share=1):
         assert 0 <= min_share <= 1, "min_share must be between 0 and 1"
         assert 0 <= max_share <= 1, "max_share must be between 0 and 1"
-        assert min_share < max_share, "min_share must be less than max_share"
+        assert min_share <= max_share, "min_share must be less than max_share"
         self.beta = {
             (o, d, t): random.uniform(min_share, max_share)
             for o, d in self.OD
@@ -1697,7 +1744,7 @@ class Railway:
         assert 0 <= min_capacity <= 1, "min_capacity must be between 0 and 1"
         assert 0 <= max_capacity <= 1, "max_capacity must be between 0 and 1"
         assert (
-            min_capacity < max_capacity
+            min_capacity <= max_capacity
         ), "min_capacity must be less than max_capacity"
         min_capacity_int = int(min_capacity * self.passengers / self.n)
         max_capacity_int = int(max_capacity * self.passengers / self.n)
