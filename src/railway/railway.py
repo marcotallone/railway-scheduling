@@ -1318,9 +1318,9 @@ class Railway:
         if all(feasible):
             return True
         else:
-            for i, f in enumerate(feasible):
-                if not f:
-                    print(f"Constraint ({i+2}) is not satisfied.")
+            # for i, f in enumerate(feasible):
+            #     if not f:
+            #         print(f"Constraint ({i+2}) is not satisfied.")
             return False
 
     # Simulated annealing (SA) optimization
@@ -1673,15 +1673,20 @@ class Railway:
         A = [] # List of k-shortest paths
         used_sequences = [] # List of used sequences for the paths
 
+        # Initialize max length of path
+        # max_length = (self.n - 2)//2
+        max_length = 1
+
         # Build the paths
         for _ in range(K):
+
+            # Check max length does not exceds a threshold
+            max_length = min(max_length, (self.n - 2) // 2)
             
             validate_sequence = False
-            max_tries = 100
+            max_tries = 50
             while not validate_sequence:
                 # Pick a random sequence of nodes not including source and sink
-                # max_length = (self.n - 2)//2
-                max_length = K
                 sequence = random.sample(
                     [node for node in self.N if node != source and node != sink],
                     random.randint(1, max_length),
@@ -1699,10 +1704,18 @@ class Railway:
                 max_tries -= 1
                 if max_tries <= 0:
                     raise ValueError("Max tries reached, random shortest path algorithm failed in finding a new random path.")
-                
-            # Convert the sequence to a list of arcs
+            
+            # Increase lenght for next path
+            max_length += 1    
+            
+            # Convert the sequence to a list of arcs and compute traversing time
             path = self.nodes_to_arcs(sequence)
-            A.append(path)
+            time = sum(self.omega_e[a] for a in path)
+            A.append((path, time))
+
+        # Sort the paths by their total average time and remove times
+        A.sort(key=lambda x: x[1])
+        A = [path for path, time in A]
 
         return A
 
@@ -1985,9 +1998,10 @@ class Railway:
         """Generate a neighbor solution N(S) to a given one S
         for the railway scheduling problem."""
 
-        feasible = False
+        # feasible = False
         max_tries = 10
-        while not feasible and max_tries > 0:
+        # while not feasible and max_tries > 0:
+        while max_tries > 0:
 
             # Randomly chose an arc and a job on it
             a = random.choice([aj for aj, ja in self.Ja.items() if ja])
@@ -2020,6 +2034,7 @@ class Railway:
             max_tries -= 1
 
         # If no feasible neighbor solution was found, return None
+        print(f'WARNING: Model could not generate a neighbor solution in {max_tries} tries.')
         return None
 
     # Save problem parameters to a json file
