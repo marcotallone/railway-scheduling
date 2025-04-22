@@ -243,12 +243,13 @@ class Railway:
                     self.graph[node][j] = self.omega_e[(i, j)]
                 elif j == node:
                     self.graph[node][i] = self.omega_e[(i, j)]
-        self.Omega = {
-            (o, d): self.dijkstra(self.graph, o)[0][
-                d
-            ]  # 0 because we want the distances (1st element)
-            for o, d in self.OD
-        }
+        # self.Omega = {
+        #     (o, d): self.dijkstra(self.graph, o)[0][
+        #         d
+        #     ]  # 0 because we want the distances (1st element)
+        #     for o, d in self.OD
+        # }
+        self.__set_Omega()  # set the Omega set of expected travel time for each OD pair
         self.__set_M()  # set the M upper bound
         self.model = Model()
         self.model.ModelSense = gb.GRB.MINIMIZE
@@ -449,14 +450,37 @@ class Railway:
         else:
             self.Ja = {a: [j for j in self.J if a in self.Aj[j]] for a in self.A}
 
+    # Set Omega set
+    def __set_Omega(self):
+        # If the set R of K routes has been provided, then
+        # entries in Omega correspond to the shortest path for each OD pair
+        if self.R:
+            self.Omega = {
+                (o, d): sum(
+                    self.omega_e[a] for a in self.R[(o, d, 1)]
+                )
+                for o, d in self.OD
+            }
+
+        # Otherwise, just compute the shortest path for each OD pair
+        else:
+            self.Omega = {
+                (o, d): self.dijkstra(self.graph, o)[0][d] 
+                # 0 because we want the distances (1st element in return list)
+                for o, d in self.OD
+            }
+
     # Set M upper bound
     def __set_M(self):
         if self.phi == {}:
             self.M = 100 * self.passengers
         else:
             self.M = sum(self.phi[(o, d, t)] for o, d in self.OD for t in self.T) + 1
-            # + (100 * self.passengers)
-
+            
+        # Set a hard threshold for the value of M in order to avoid "Big M" problems
+        # Reference: https://docs.gurobi.com/projects/optimizer/en/current/concepts/numericguide/tolerances_scaling.html#dealing-with-big-m-constraints
+        self.M = min(self.M, 1e5)
+            
     # Set constraints
     def set_constraints(self):
         """Set the constraints for the railway scheduling problem."""
@@ -544,7 +568,7 @@ class Railway:
 
         # Each track segment in an event request has limited capacity           (8)
         # NOTE: this constraint is added only if E is not empty
-        if self.E:
+        if (self.E) or any(self.E[l] for l in self.E):
             self.model.addConstrs(
                 (
                     quicksum(
@@ -628,7 +652,7 @@ class Railway:
 
         # Availability of arcs included in all routes during event requests     (14)
         # NOTE: this constraint is added only if E is not empty
-        if self.E:
+        if (self.E) or any(self.E[l] for l in self.E):
             self.model.addConstrs(
                 (
                     self.x[*a, t] == 1
@@ -806,12 +830,20 @@ class Railway:
             (
                 quicksum(
                     self.y[j,tp] 
-                    for tp in range(t - self.pi[j] + 1, t + delta - 1)  # Qj
+                    # for tp in range(t - self.pi[j] + 1, t + delta - 1)  # Qj
+                    for tp in range(                                    # Qj
+                        max(1, t - self.pi[j] + 1),
+                        min(t + delta - 1, self.Tend + 1)
+                    )
                 )
                 + quicksum(
                     quicksum(
                         self.y[jp,tp]
-                        for tp in range(t - self.pi[jp] + delta, t + 1)  # Q'l
+                        # for tp in range(t - self.pi[jp] + delta, t + 1)  # Q'l
+                        for tp in range(                                # Q'l
+                            max(1, t - self.pi[jp] + delta),
+                            min(t + 1, self.Tend + 1)
+                        )
                     ) for jp in self.Ja[a] if jp != j
                 )
                 <= 1
@@ -862,8 +894,6 @@ class Railway:
         """
         
         # Set cutting planes for optimization 
-        # self.model.params.presolve = 1
-        self.model.params.cuts = 0
         self.model.params.BQPCuts = -1
         self.model.params.CliqueCuts = -1
         self.model.params.CoverCuts = -1
@@ -879,10 +909,13 @@ class Railway:
         self.model.params.RelaxLiftCuts = -1
         self.model.params.StrongCGCuts = -1
         self.model.params.ZeroHalfCuts = -1
-        self.model.params.cutpasses = 0
+
+        # self.model.params.presolve = 1
+        # self.model.params.cuts = 0
+        # self.model.params.cutpasses = 0
         # self.model.params.threads = 1
-        self.model.params.heuristics = 0
-        self.model.params.symmetry = 0
+        # self.model.params.heuristics = 0
+        # self.model.params.symmetry = 0
 
     # Getters ------------------------------------------------------------------
 
@@ -1873,6 +1906,9 @@ class Railway:
             # Store the paths in the R dictionary
             for i, path in enumerate(shortest_paths, start=1):
                 self.R[(o, d, i)] = path
+
+        # Re-compute the set Omega of expected travel times after R generation
+        self.Omega = self.__set_Omega()
 
     # Generate problem parameters
     def generate(
