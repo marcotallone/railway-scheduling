@@ -489,7 +489,7 @@ class Railway:
         self.model.remove(self.model.getConstrs())
 
         # Job started once and completed within time horizon                    (2)
-        self.model.addConstrs(
+        constraint2 = self.model.addConstrs(
             (
                 quicksum(self.y[j, t] for t in range(1, self.Tend - self.pi[j] + 1))
                 == 1
@@ -499,7 +499,7 @@ class Railway:
         )
 
         # Availability of arc a at time t                                       (3)
-        self.model.addConstrs(
+        constraint3 = self.model.addConstrs(
             (
                 self.x[*a, t]
                 + quicksum(
@@ -515,7 +515,7 @@ class Railway:
         )
 
         # Increased travel time for service replacement                         (4)
-        self.model.addConstrs(
+        constraint4 = self.model.addConstrs(
             (
                 self.w[*a, t]
                 == self.x[*a, t] * self.omega_e[a]
@@ -527,7 +527,7 @@ class Railway:
         )
 
         # Ensure correct arc travel times for free variables                    (5)
-        self.model.addConstrs(
+        constraint5 = self.model.addConstrs(
             (
                 quicksum(self.x[*a, t] for t in self.T)
                 == self.Tend - quicksum(self.pi[j] for j in self.Ja[a])
@@ -538,8 +538,9 @@ class Railway:
 
         # Arcs that cannt be unavailable simultaneously                         (6)
         # NOTE: this constraint is added only if C is not empty
+        constraint6 = None
         if self.C:
-            self.model.addConstrs(
+            constraint6 = self.model.addConstrs(
                 (
                     quicksum(1 - self.x[*a, t] for a in c) <= 1
                     for t in self.T
@@ -550,7 +551,7 @@ class Railway:
             )
 
         # Non overlapping jobs on same arc                                      (7)
-        self.model.addConstrs(
+        constraint7 = self.model.addConstrs(
             (
                 quicksum(
                     quicksum(
@@ -568,8 +569,9 @@ class Railway:
 
         # Each track segment in an event request has limited capacity           (8)
         # NOTE: this constraint is added only if E is not empty
+        constraint8 = None
         if (self.E) or any(self.E[l] for l in self.E):
-            self.model.addConstrs(
+            constraint8 = self.model.addConstrs(
                 (
                     quicksum(
                         quicksum(
@@ -592,7 +594,7 @@ class Railway:
             )
 
         # Passeger flow from o to d is served by one of predefined routes       (9)
-        self.model.addConstrs(
+        constraint9 = self.model.addConstrs(
             (
                 quicksum(self.h[o, d, t, i] for i in range(1, self.K + 1)) == 1
                 for t in self.T
@@ -602,12 +604,12 @@ class Railway:
         )
 
         # Lower bound for travel time from o to d                               (10)
-        self.model.addConstrs(
+        constraint10 = self.model.addConstrs(
             (
                 self.v[o, d, t]
                 >= quicksum(self.w[*a, t] for a in self.R[(o, d, i)])
                 - self.M * (1 - self.h[o, d, t, i])
-                # for i in range(1, self.K + 1) # TODO: check correctness of this
+                for i in range(1, self.K + 1)
                 for t in self.T
                 for o, d in self.OD
                 for i in range(1, self.K + 1)
@@ -616,11 +618,11 @@ class Railway:
         )
 
         # Upper bound for travel time from o to d                               (11)
-        self.model.addConstrs(
+        constraint11 = self.model.addConstrs(
             (
                 self.v[o, d, t]
                 <= quicksum(self.w[*a, t] for a in self.R[(o, d, i)])
-                # for i in range(1, self.K + 1) # TODO: check correctness of this
+                for i in range(1, self.K + 1)
                 for t in self.T
                 for o, d in self.OD
                 for i in range(1, self.K + 1)
@@ -629,18 +631,19 @@ class Railway:
         )
 
         # Arcs never included in any job are always available                   (12)
-        self.model.addConstrs(
-            (
-                self.x[*a, t] == 1
-                for a in self.A
-                for t in self.T
-                if not any(a in self.Aj[j] for j in self.J)
-            ),
-            name="12",
-        )
+        constraint12 = None
+        # constraint12 = self.model.addConstrs(
+        #     (
+        #         self.x[*a, t] == 1
+        #         for a in self.A
+        #         for t in self.T
+        #         if not any(a in self.Aj[j] for j in self.J)
+        #     ),
+        #     name="12",
+        # )
 
         # Travel times for arcs never included in any job are equal to omega_e  (13)
-        self.model.addConstrs(
+        constraint13 = self.model.addConstrs(
             (
                 self.w[*a, t] == self.omega_e[a]
                 for a in self.A
@@ -652,8 +655,9 @@ class Railway:
 
         # Availability of arcs included in all routes during event requests     (14)
         # NOTE: this constraint is added only if E is not empty
+        constraint14 = None
         if (self.E) or any(self.E[l] for l in self.E):
-            self.model.addConstrs(
+            constraint14 = self.model.addConstrs(
                 (
                     self.x[*a, t] == 1
                     for a in self.A
@@ -701,9 +705,12 @@ class Railway:
                 # then j-th path is never used (in favor of i-th path)
                 elif max_times[i] < min_times[j]:
                     never_used_routes.append((o, d, j))
-                    
+
+        # Remove duplicates from the never used routes
+        never_used_routes = list(set(never_used_routes))
+
         # Add the never used routes constraints
-        self.model.addConstrs(
+        constraint15 = self.model.addConstrs(
             (
                 self.h[o, d, t, i] == 0
                 for o, d, i in never_used_routes
@@ -711,6 +718,35 @@ class Railway:
             ),
             name="15",
         )
+
+        print('-'*20)
+        somma_test = sum(
+            1
+            for o, d, i in never_used_routes
+            for t in self.T
+        )
+        print(f"Never used routes: {len(never_used_routes)}")
+        print('sum:', somma_test)
+        print('-'*20)
+        
+        # Return constraints objects
+        constraints = [
+            constraint2,
+            constraint3,
+            constraint4,
+            constraint5,
+            constraint6,
+            constraint7,
+            constraint8,
+            constraint9,
+            constraint10,
+            constraint11,
+            constraint12,
+            constraint13,
+            constraint14,
+            constraint15,
+        ]
+        return constraints
 
     # Set objective function
     def set_objective(self):
