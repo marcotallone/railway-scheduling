@@ -9,12 +9,12 @@ K = 3
 timelimit = 300
 heuristics_timelimit = 60
 
-# N = 10; J = 10; T = 10 ; ID =  1
+N = 10; J = 10; T = 10 ; ID =  1
 # N = 10; J = 10; T = 50 ; ID =  2
 # N = 10; J = 10; T = 100; ID =  3
 # N = 10; J = 40; T = 10 ; ID =  4
 # N = 10; J = 40; T = 50 ; ID =  5
-N = 10; J = 40; T = 100; ID =  6
+# N = 10; J = 40; T = 100; ID =  6
 # N = 10; J = 80; T = 10 ; ID =  7
 # N = 10; J = 80; T = 50 ; ID =  8
 # N = 10; J = 80; T = 100; ID =  9
@@ -125,7 +125,7 @@ print(
     f"| objective".ljust(12),
     f"| nodes".ljust(10),
 )
-print("-" * 88)
+print("-" * 95)
 
 print(
     f"   {0}".ljust(6),
@@ -136,7 +136,7 @@ print(
     f"| {results0['runtime']:.2f}".ljust(10),
     f"| {100*results0['gap']:.2f}%".ljust(10),
     f"| {results0['obj']:.2e}".ljust(12),
-    f"| {results0['nodes']}".ljust(10),
+    f"| {int(results0['nodes']):d}".ljust(10),
 )
 
 
@@ -197,7 +197,7 @@ print(
     f"| {SAtime + results1['runtime']:.2f}".ljust(10),
     f"| {100*results1['gap']:.2f}%".ljust(10),
     f"| {results1['obj']:.2e}".ljust(12),
-    f"| {results1['nodes']}".ljust(10),
+    f"| {int(results1['nodes']):d}".ljust(10),
 )
 
 
@@ -260,13 +260,13 @@ print(
     f"| {SAtime + results2['runtime']:.2f}".ljust(10),
     f"| {100*results2['gap']:.2f}%".ljust(10),
     f"| {results2['obj']:.2e}".ljust(12),
-    f"| {results2['nodes']}".ljust(10),
+    f"| {int(results2['nodes']):d}".ljust(10),
 )
 
-# Append results to the dataframe
-df.loc[len(df)] = row0
-df.loc[len(df)] = row1
-df.loc[len(df)] = row2
+# # Append results to the dataframe
+# df.loc[len(df)] = row0
+# df.loc[len(df)] = row1
+# df.loc[len(df)] = row2
 
-# Save the dataframe to the csv file
-df.to_csv(RESULTFILE, index=False)
+# # Save the dataframe to the csv file
+# df.to_csv(RESULTFILE, index=False)
