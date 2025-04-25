@@ -173,6 +173,8 @@ class Railway:
             convert a list of arcs to a suitable list of nodes in N
     YenKSP(graph, source, sink, K)
             Yen's K-shortest paths algorithm to find the K-shortest paths in a graph
+    randomKSP(source, sink, K)
+            Randomly generate K paths in a graph
 
     Generators
     ----------
@@ -243,12 +245,6 @@ class Railway:
                     self.graph[node][j] = self.omega_e[(i, j)]
                 elif j == node:
                     self.graph[node][i] = self.omega_e[(i, j)]
-        # self.Omega = {
-        #     (o, d): self.dijkstra(self.graph, o)[0][
-        #         d
-        #     ]  # 0 because we want the distances (1st element)
-        #     for o, d in self.OD
-        # }
         self.__set_Omega()  # set the Omega set of expected travel time for each OD pair
         self.__set_M()  # set the M upper bound
         self.model = Model()
@@ -367,8 +363,6 @@ class Railway:
             for k1, v1 in data["E"].items()
         }
         data["R"] = {
-            # TODO: remove the old version after checking new one
-            # eval(k): [[tuple(a) for a in l] for l in v] for k, v in data["R"].items()
             eval(k): [tuple(a) for a in l] for k, l in data["R"].items()
         }
 
@@ -578,7 +572,6 @@ class Railway:
                             quicksum(
                                 self.h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t]
                                 for i in range(1, self.K + 1)
-                                # if a in self.R[(o, d)][i - 1]
                                 if a in self.R[(o, d, i)]
                             )
                             for o, d in self.OD
@@ -609,7 +602,7 @@ class Railway:
                 self.v[o, d, t]
                 >= quicksum(self.w[*a, t] for a in self.R[(o, d, i)])
                 - self.M * (1 - self.h[o, d, t, i])
-                for i in range(1, self.K + 1)
+                # for i in range(1, self.K + 1) # (redundant)
                 for t in self.T
                 for o, d in self.OD
                 for i in range(1, self.K + 1)
@@ -622,7 +615,7 @@ class Railway:
             (
                 self.v[o, d, t]
                 <= quicksum(self.w[*a, t] for a in self.R[(o, d, i)])
-                for i in range(1, self.K + 1)
+                # for i in range(1, self.K + 1) # (redundant)
                 for t in self.T
                 for o, d in self.OD
                 for i in range(1, self.K + 1)
@@ -631,16 +624,15 @@ class Railway:
         )
 
         # Arcs never included in any job are always available                   (12)
-        constraint12 = None
-        # constraint12 = self.model.addConstrs(
-        #     (
-        #         self.x[*a, t] == 1
-        #         for a in self.A
-        #         for t in self.T
-        #         if not any(a in self.Aj[j] for j in self.J)
-        #     ),
-        #     name="12",
-        # )
+        constraint12 = self.model.addConstrs(
+            (
+                self.x[*a, t] == 1
+                for a in self.A
+                for t in self.T
+                if not any(a in self.Aj[j] for j in self.J)
+            ),
+            name="12",
+        )
 
         # Travel times for arcs never included in any job are equal to omega_e  (13)
         constraint13 = self.model.addConstrs(
@@ -686,7 +678,6 @@ class Railway:
                     self.omega_e[a] if not any(a in self.Aj[j] for j in self.J)
                     # otherwise sum alternative services travel times
                     else self.omega_j[a]
-                    # for a in self.R[(o, d)][i - 1]
                     for a in self.R[(o, d, i)]
                 )
 
@@ -719,16 +710,6 @@ class Railway:
             name="15",
         )
 
-        print('-'*20)
-        somma_test = sum(
-            1
-            for o, d, i in never_used_routes
-            for t in self.T
-        )
-        print(f"Never used routes: {len(never_used_routes)}")
-        print('sum:', somma_test)
-        print('-'*20)
-        
         # Return constraints objects
         constraints = [
             constraint2,
@@ -754,13 +735,13 @@ class Railway:
 
         # Objective function                                                    (1)
         self.model.setObjective(
-            quicksum(
+            (quicksum(
                 quicksum(
-                    self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d])
+                    (self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d]))
                     for t in self.T
                 )
                 for o, d in self.OD
-            ),
+            )),
             gb.GRB.MINIMIZE
         )
 
@@ -866,7 +847,6 @@ class Railway:
             (
                 quicksum(
                     self.y[j,tp] 
-                    # for tp in range(t - self.pi[j] + 1, t + delta - 1)  # Qj
                     for tp in range(                                    # Qj
                         max(1, t - self.pi[j] + 1),
                         min(t + delta - 1, self.Tend + 1)
@@ -875,7 +855,6 @@ class Railway:
                 + quicksum(
                     quicksum(
                         self.y[jp,tp]
-                        # for tp in range(t - self.pi[jp] + delta, t + 1)  # Q'l
                         for tp in range(                                # Q'l
                             max(1, t - self.pi[jp] + delta),
                             min(t + 1, self.Tend + 1)
@@ -945,13 +924,6 @@ class Railway:
         self.model.params.RelaxLiftCuts = -1
         self.model.params.StrongCGCuts = -1
         self.model.params.ZeroHalfCuts = -1
-
-        # self.model.params.presolve = 1
-        # self.model.params.cuts = 0
-        # self.model.params.cutpasses = 0
-        # self.model.params.threads = 1
-        # self.model.params.heuristics = 0
-        # self.model.params.symmetry = 0
 
     # Getters ------------------------------------------------------------------
 
@@ -1141,7 +1113,6 @@ class Railway:
             for o, d in self.OD:
                 # Computes times for each route by summing arcs travel times
                 routes_times = [
-                    # sum(w[a, t] for a in self.R[(o, d)][i - 1])
                     sum(w[a, t] for a in self.R[(o, d, i)])
                     for i in range(1, self.K + 1)
                 ]
@@ -1327,7 +1298,6 @@ class Railway:
                         sum(
                             h[o, d, t, i] * self.beta[o, d, t] * self.phi[o, d, t]
                             for i in range(1, self.K + 1)
-                            # if a in self.R[(o, d)][i - 1]
                             if a in self.R[(o, d, i)]
                         )
                         for o, d in self.OD
@@ -1383,7 +1353,7 @@ class Railway:
             if not any(a in self.Aj[j] for j in self.J)
         )
 
-        # Return True if all constraints are satisfied
+        # Return True if all constraints are satisfied, False otherwise
         if all(feasible):
             return True
         else:
@@ -1433,8 +1403,10 @@ class Railway:
         start_time = time.time()
         elapsed_time = time.time() - start_time
 
-        # Initialize solution and iteration counter
+        # Initialize solution, objective and iteration counter
         S = self.generate_initial_solution()
+        _, _, _, _, v = self.get_vars_from_times(S)
+        f = self.get_objective_value(v)
         iter = 0
 
         # SA algorithm
@@ -1447,20 +1419,22 @@ class Railway:
                 if S_new is None: continue
                 
                 # Get the solutions' variables
-                _, _, _, _, v = self.get_vars_from_times(S)
+                # _, _, _, _, v = self.get_vars_from_times(S)
                 _, _, _, _, v_new = self.get_vars_from_times(S_new)
 
                 # Compute the objective function values
-                f = self.get_objective_value(v)
+                # f = self.get_objective_value(v)
                 f_new = self.get_objective_value(v_new)
 
                 # Accept solution if it's better or with a certain probability
                 if f_new <= f:
-                    S = S_new
+                    S = S_new.copy()
+                    f = f_new
                 else:
                     p = np.exp((f - f_new) / T)
                     if np.random.rand() < p:
-                        S = S_new
+                        S = S_new.copy()
+                        f = f_new
 
             # Cool down the temperature
             T *= c
@@ -1470,6 +1444,9 @@ class Railway:
 
             # Time check
             elapsed_time = time.time() - start_time
+
+            # DEBUG
+            # print(f'\rt: {elapsed_time:.1f} s, iter: {iter}, T: {T:.2f}, f: {f:.5e}', end='', flush=True)
 
         # Save and return the best solution found and the elapsed time
         self.S = S
@@ -2070,9 +2047,8 @@ class Railway:
         """Generate a neighbor solution N(S) to a given one S
         for the railway scheduling problem."""
 
-        # feasible = False
-        max_tries = 10
-        # while not feasible and max_tries > 0:
+        initial_max_tries = 10
+        max_tries = initial_max_tries
         while max_tries > 0:
 
             # Randomly chose an arc and a job on it
@@ -2106,7 +2082,7 @@ class Railway:
             max_tries -= 1
 
         # If no feasible neighbor solution was found, return None
-        print(f'WARNING: Model could not generate a neighbor solution in {max_tries} tries.')
+        print(f'WARNING: Model could not generate a neighbor solution in {initial_max_tries} tries.')
         return None
 
     # Save problem parameters to a json file
