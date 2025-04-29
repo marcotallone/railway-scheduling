@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+
+	<!-- Head ---------------------------------------------------------------->
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Railway Scheduling</title>
+		<meta name="description" content="Mathematical Optimization Exam">
+		<meta name="author" content="Marco Tallone">
+
+		<!-- Style Settings -->
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/personal.css" id="theme">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/nnfx-light.css">
+
+		<!-- Personal CSS Styling -->
+		<link rel="stylesheet" href="style.css" />
+
+	</head>
+
+	<!-- Body ---------------------------------------------------------------->
+	<body>
+
+		<!-- Start of slides -->
+		<div class="reveal">
+		<div class="slides">
+
+			<!-- Slide 1 -->
+			<section data-name="Slide 1">
+
+				<!-- Slide Title -->
+				<div class="slide-title">
+					<h1>Slide Title</h1>
+				</div>
+
+				<!-- Main body of the slide -->
+				<div class="slide-body">
+					<h1>Slide 1</h1>
+					<h2>Slide 1</h2>
+					<p>Paragraph</p>
+
+					<div class="cbox">
+						Simple normal text.
+					</div>
+				</div>
+
+			</section>
+
+			<!-- Slide 2 -->
+			<section data-name="Slide 2">
+				Slide 2
+			</section>
+
+		<!-- End of slides -->
+		</div>
+		</div>
+
+		<!-- Plugins and more ------------------------------------------------>
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/simplemenu/simplemenu.js"></script>
+		<script src="plugin/zoom/zoom.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/math/math.js"></script>
+		<script>
+			// INFO: More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				
+				// General configuration settings
+				transition: 'fade',
+				backgroundTransition: 'fade',
+				hideInactiveCursor: true,
+				hideCursorTime: 900,
+				hash: true, // Reload to current slide
+				disableLayout: true, // Enable standard CSS layout behavior
+
+				// INFO: Simplemenu Top Bar
+				// https://github.com/Martinomagnifico/reveal.js-simplemenu
+				simplemenu: {
+					inherit: "previous",
+					barhtml: {
+						header: "<div class='menubar'"+ 
+										"style='"+
+										"background-color: var(--primary);"+
+										"color: var(--light);"+
+										"z-index: 9999;"+
+										"'><ul class='menu'></ul></div>"
+					}
+				},
+
+				// INFO: Learn about plugins: https://revealjs.com/plugins/
+				plugins: [
+					Simplemenu,
+					RevealMath.KaTeX,
+					RevealHighlight,
+					RevealNotes,
+					RevealZoom,
+				]
+			});
+		</script>
+
+	</body>
+</html>

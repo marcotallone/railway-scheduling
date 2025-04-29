@@ -1,0 +1,181 @@
+/* Presentation Stylesheet Styles */
+
+/* Colors ------------------------------------------------------------------ */
+:root {
+	--primary: #001158;
+	--secondary: #72B4ED;
+	--accent: #f36d32;
+	--background: #fefefe;
+	--dark: #cbcedc;
+	--light: #ecedf2;
+	--textcolor: #000000;
+}
+
+/* General RevealJS Settings Overriding ------------------------------------ */
+
+/* Use all available space */
+.slides>section{ width: 100%; height: 100%; }
+
+/* Use all space and center sections */
+section {
+	display: flex !important;
+	top: unset !important;
+	flex-direction: column;
+	height: 100vh;
+	width: 100vh;
+}
+
+/* Math font size */
+.katex { font-size: 1em !important; }
+
+/* Code font size */
+.code { font-size: 0.8em !important; }
+
+/* Presentation Title ------------------------------------------------------ */
+
+.main-title-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 100px;
+}
+
+.main-title-logo {
+	height: 100px; 
+	background: transparent;
+}
+
+.main-title-image {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.main-title-image-item {
+	text-align: center;
+	margin-right: 100px;
+}
+
+.main-title-image-item:last-child {
+	margin-right: 0;
+}
+
+/* Section Titles ---------------------------------------------------------- */
+
+.section-title-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 75%;
+}
+
+.section-title { 
+	position: absolute;
+	z-index:500;
+	text-align: left;
+}
+
+/* Slides ------------------------------------------------------------------ */
+
+.slide-title { 
+	display: flex; 
+	justify-content: left; 
+	align-items: top;
+	padding: 80px 0px 20px 35px;
+	background-color: var(--dark);
+}
+
+.slide-body {
+	display: flex; 
+	justify-content: center; 
+	flex-direction: column;
+	align-items: center;
+	height: 100vh;
+}
+.slide-body b { font-style: bold; }
+.slide-body i { font-style: italic; }
+
+
+/* Boxes and Containers */
+.cbox {
+	background-color: var(--dark);
+	border-radius: 5px;
+	padding: 30px 30px 30px 30px;
+	text-align: left;
+	color: var(--textcolor);
+	width: 80%;
+	box-shadow: 4px 5px 10px rgba(134,142,176,1);
+}
+.cbox b { font-weight: bold; }
+.cbox i { font-style: italic; }
+
+
+.multi-column{
+  display: flex;
+}
+
+.column {
+  flex: 1;
+}
+
+.spaced-list li {
+	margin-bottom: 10px;
+	font-weight: bold;
+}
+
+
+.back-button {
+	display: inline-block;
+	padding: 5px 10px;
+	font-size: 1em;
+	color: var(--secondary);
+	border: none;
+	border-radius: 3px;
+	text-decoration: none;
+	text-align: center;
+}
+
+
+/* Tables */
+.latex-table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid var(--textcolor);
+	font-size: 1em;
+	text-align: center !important;
+	margin-bottom: 20px;
+	th, td {
+		border: 1px solid var(--textcolor);
+		padding: 8px;
+		text-align: center !important;
+	};
+	th {
+		background-color: var(--dark);
+		text-align: center !important;
+	}
+}
+
+/* References -------------------------------------------------------------- */
+.references {
+	list-style-type: none !important;
+	counter-reset: reference-counter;
+}
+
+.references li {
+	counter-increment: reference-counter;
+	position: relative;
+	padding-left: 50px;
+	font-size: 0.9em;
+}
+
+.references li i {
+	font-style: italic;
+}
+
+.references li::before {
+	content: "[" counter(reference-counter) "]";
+	position: absolute;
+	left: 0;
+}
+
