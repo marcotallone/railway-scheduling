@@ -56,18 +56,12 @@ section {
 
 /* Section Titles ---------------------------------------------------------- */
 
-.section-title-container {
-	display: flex;
-	justify-content: center;
+.section-title-body {
+	display: flex; 
+	justify-content: center; 
+	flex-direction: column;
 	align-items: center;
-	width: 100%;
-	height: 75%;
-}
-
-.section-title { 
-	position: absolute;
-	z-index:500;
-	text-align: left;
+	height: 100vh;
 }
 
 /* Slides ------------------------------------------------------------------ */

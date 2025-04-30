@@ -85,7 +85,8 @@
 				<ol class="spaced-list">
 					<li>Model Description</li>
 						<ul class="spaced-sublist">
-							<li>Sets and Variables</li>
+							<li>Problem Description</li>
+							<li>Decision Variables</li>
 							<li>Objective</li>
 							<li>Constraints</li>
 						</ul>
@@ -104,29 +105,151 @@
 		</section>
 
 
+		<!-- Section: Model Description  --------------------------------------->
+		<section data-name="1. Model Description">
 
-
-
-			<!-- Slide 1 -->
-			<section data-name="Slide 1">
-
-				<!-- Slide Title -->
-				<div class="slide-title">
-					<h1>Slide Title</h1>
+			<section data-background-color="var(--primary)">
+				<div class="section-title-body">
+					<h1 style="font-size: 2em;">Model Description</h1>
 				</div>
+			</section>
 
-				<!-- Main body of the slide -->
+			<!-- Slide 3 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Problem description</h1>
+
 				<div class="slide-body">
-					<h1>Slide 1</h1>
-					<h2>Slide 1</h2>
-					<p>Paragraph</p>
 
-					<div class="cbox">
-						Simple normal text.
-					</div>
+						<p>
+						Finite discrete time horizon:
+						\[
+							T = \{1, 2, \ldots, T_{end}\}
+						\]
+						</p>
+						<p>
+						Nodes representing the railway stations:
+						\[
+							N = \{1, 2, \ldots, n\}
+						\]
+						</p>
+						<p>
+						Bidirecitonal arcs connecting stations:
+						\[
+							\mathcal{A} = \{(i, j) \mid \forall i, j \in N, i &lt; j\}
+						\]
+						</p>
+
+						<!-- TODO: finish this with illustration -->
+
 				</div>
 
 			</section>
+
+			<!-- Slide 4 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Decision Variables</h1>
+
+				<div class="slide-body">
+
+				</div>
+
+			</section>
+
+			<!-- Slide 5 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Objective</h1>
+
+				<div class="slide-body">
+
+				</div>
+
+			</section>
+
+			<!-- Slide 6 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Constraints</h1>
+
+				<div class="slide-body">
+
+				</div>
+
+			</section>
+
+
+		</section>
+
+
+		<!-- Section: Model Improvements  -------------------------------------->
+		<section data-name="2. Model Improvements">
+
+			<section data-background-color="var(--primary)">
+				<div class="section-title-body">
+					<h1 style="font-size: 2em;">Model Improvements</h1>
+				</div>
+			</section>
+
+			<!-- Slide N -->
+			<!-- <section data-transition="slide"> -->
+			<!-- 	<h1 class="slide-title">SlideTitle</h1> -->
+			<!---->
+			<!-- 	<div class="slide-body"> -->
+			<!---->
+			<!-- 	</div> -->
+			<!---->
+			<!-- </section> -->
+
+		</section>
+
+		<!-- Section: Scalability Analysis ------------------------------------->
+		<section data-name="3. Scalability Analysis">
+
+			<section data-background-color="var(--primary)">
+				<div class="section-title-body">
+					<h1 style="font-size: 2em;">Scalability Analysis</h1>
+				</div>
+			</section>
+
+			<!-- Slide N -->
+			<!-- <section data-transition="slide"> -->
+			<!-- 	<h1 class="slide-title">SlideTitle</h1> -->
+			<!---->
+			<!-- 	<div class="slide-body"> -->
+			<!---->
+			<!-- 	</div> -->
+			<!---->
+			<!-- </section> -->
+
+		</section>
+
+
+		<!-- Section: Appendix -----------------.--------------------------->
+		<section data-name="Appendix" data-sm="false">
+			<a id="appendixLink"></a>
+			<h1 class="slide-title">Appendix: Insert Appendix</h1>
+
+			<div class="slide-body">
+
+					\[
+					\begin{aligned}
+					\mathcal{A} &= \begin{bmatrix}
+					\mathbb{I}\\
+					\mathbf{A}_{d,k}\\
+					\mathbf{A}_{d,k+1} \mathbf{A}_{d,k}\\
+					\vdots\\
+					\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k}
+					\end{bmatrix}\\ 
+					\end{aligned}
+					\]
+
+				<div>
+					<a href="#insertReferenceLink" class="back-button">
+						Back to <b>NameOfReferenceSection</b>
+					</a>
+				</div>
+
+			</div>
+
+		</section>
 
 
 
