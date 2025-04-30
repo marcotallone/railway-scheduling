@@ -3,7 +3,7 @@
 /* Colors ------------------------------------------------------------------ */
 :root {
 	--primary: #001158;
-	--secondary: #72B4ED;
+	--secondary: #487db1;
 	--accent: #f36d32;
 	--background: #fefefe;
 	--dark: #cbcedc;
@@ -33,32 +33,26 @@ section {
 
 /* Presentation Title ------------------------------------------------------ */
 
-.main-title-container {
-	display: flex;
+.main-title-body {
+	display: flex; 
+	justify-content: center; 
+	flex-direction: column;
 	align-items: center;
-	justify-content: center;
-	margin-top: 100px;
+	height: 100vh;
 }
 
-.main-title-logo {
-	height: 100px; 
-	background: transparent;
-}
-
-.main-title-image {
+.main-title-logos {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-.main-title-image-item {
+.main-title-logo-item {
 	text-align: center;
-	margin-right: 100px;
+	margin-left: 50px;
+	margin-right: 50px;
 }
 
-.main-title-image-item:last-child {
-	margin-right: 0;
-}
 
 /* Section Titles ---------------------------------------------------------- */
 
@@ -78,14 +72,6 @@ section {
 
 /* Slides ------------------------------------------------------------------ */
 
-.slide-title { 
-	display: flex; 
-	justify-content: left; 
-	align-items: top;
-	padding: 80px 0px 20px 35px;
-	background-color: var(--dark);
-}
-
 .slide-body {
 	display: flex; 
 	justify-content: center; 
@@ -96,6 +82,13 @@ section {
 .slide-body b { font-style: bold; }
 .slide-body i { font-style: italic; }
 
+.slide-title { 
+	display: flex; 
+	justify-content: left; 
+	align-items: top;
+	padding: 80px 0px 20px 35px;
+	background-color: var(--dark);
+}
 
 /* Boxes and Containers */
 .cbox {
@@ -110,20 +103,20 @@ section {
 .cbox b { font-weight: bold; }
 .cbox i { font-style: italic; }
 
+/* Multiple columns (mulicolumn) */
+.multi-column{ display: flex; }
+.column { flex: 1; }
 
-.multi-column{
-  display: flex;
-}
-
-.column {
-  flex: 1;
-}
-
+/* Lists */
 .spaced-list li {
 	margin-bottom: 10px;
 	font-weight: bold;
 }
-
+.spaced-sublist li {
+	margin-bottom: 10px;
+	font-style: italic;
+	font-weight: normal;
+}
 
 .back-button {
 	display: inline-block;
@@ -135,7 +128,6 @@ section {
 	text-decoration: none;
 	text-align: center;
 }
-
 
 /* Tables */
 .latex-table {

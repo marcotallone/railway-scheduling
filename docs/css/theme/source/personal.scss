@@ -27,9 +27,9 @@ $mainFont: 'Source Sans Pro', Helvetica, sans-serif;
 $headingFont: 'Source Sans Pro', Helvetica, sans-serif;
 $headingTextShadow: none;
 $headingLetterSpacing: normal;
-$headingTextTransform: none; /* uppercase; */
+$headingTextTransform: none; /* NOTE: force upper case with: uppercase; */
 $headingFontWeight: 600;
-$linkColor: #2a76dd;
+$linkColor: #487db1; /* NOTE: the progress bar and links will have this color */
 $linkColorHover: color.scale( $linkColor, $lightness: 15% );
 $selectionBackgroundColor: color.scale( $linkColor, $lightness: 25% );
 
