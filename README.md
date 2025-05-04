@@ -74,7 +74,7 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Marco | Tallone | SM3600002 | <marco.tallone@studenti.units.it> | <marcotallone85@gmail.com> | **SDIC** |
 
->[!WARNING] 
+>[!WARNING]
 >**Copyright Notice**:\
 > This project is based on the work published in the referenced paper by *Y.R. de Weert et al.* [<a href="#ref1">1</a>] and aims to reproduce the results and implement the models originally presented by the authors in the context of a university exam project.\
 > The main **contribution** proposed in this repository is **limited to the personal implementation of the models** and the **development of the new datasets to assess their performance** *(which might slightly differ from the ones proposed by the original authors)*.
@@ -213,7 +213,7 @@ $$
 J = \{1, 2, \ldots, n_{\text{jobs}}\}
 $$
 
-that have to be scheduled on the arcs of the network. Each job $j \in J$ is characterized by a subset 
+that have to be scheduled on the arcs of the network. Each job $j \in J$ is characterized by a subset
 $\mathcal{A}_j \subseteq \mathcal{A}$ of one or more arcs on which the maintainance has to be performed and by a processing time $\pi_j \in \mathbb{N}$ representing the duration of the job itself. Simmetrically, for each arc $a \in \mathcal{A}$, we also introduce the set
 
 $$
@@ -361,6 +361,8 @@ $$
 
 All of these constraints and the cited objective function have been implemented in a Gurobi `model` object in the `Railway` class. Such model can be optimized using the `optimize()` method of the class, which returns the optimal solution of the scheduling problem.
 
+<!-- //TODO: add constraint 15 -->
+
 ### Simulated Annealing Meta-Heuristic
 
 Meta-heuristics can improve the computational times of MILP problems by providing a good initial solution guess in a reasonable amount of time. In this case, the [**simulated annealing**](https://en.wikipedia.org/wiki/Simulated_annealing) meta-heuristic has been used to find a good initial solution guess for the MILP model. This algorithm is applied to find an initial guess for the set of **starting times** $S = \{s_j \mid \forall j \in J\}$ of all jobs.\
@@ -415,7 +417,7 @@ To further reduce the search space and the computational cost of the MILP model,
   with:
   - $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$
   - $Q'_j = [t - \pi_j + \Delta, t] \cap T$
-  - $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ 
+  - $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$
     *(i.e. maximum total processing time for the other jobs on the same arc as job $j$)*
 
 - non overlapping jobs inequality:
