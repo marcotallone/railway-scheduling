@@ -141,8 +141,46 @@
 							\mathcal{A} = \{(i, j) \mid \forall i, j \in N, i &lt; j\}
 						\]
 						</p>
-
-						<!-- TODO: finish this with illustration -->
+						<!-- <p> -->
+						<!-- Travel times by train: -->
+						<!-- \[ -->
+						<!-- 	\omega^e_a \in \mathbb{R}^+  -->
+						<!-- \] -->
+						<!-- </p> -->
+						<!-- <p> -->
+						<!-- Travel times by alternative services: -->
+						<!-- \[ -->
+						<!-- 	\omega^j_a \in \mathbb{R}^+  -->
+						<!-- \] -->
+						<!-- </p> -->
+						<!-- <p> -->
+						<!-- Average times by train for each origin-destination pair: -->
+						<!-- \[ -->
+						<!-- 	\Omega_{od}, \quad \forall (o, d) \in N \times N \mid o \neq d -->
+						<!-- \] -->
+						<!-- </p> -->
+						<!-- <p> -->
+						<!-- Set of maintenance jobs: -->
+						<!-- \[ -->
+						<!-- 	J = \{1, 2, \ldots, n_{\text{jobs}}\} -->
+						<!-- \] -->
+						<!-- </p> -->
+						
+					<div style="height: 100%; aspect-ratio: 1; margin: 0 auto;">
+						<!-- Plot stations -->
+						<iframe
+							src="stations_plot3.html"
+							style="
+								width: 100%;
+								height:100%;
+								margin: 0 auto;
+								border:0;
+							"
+							frameborder="0"
+							scrolling="no"
+						>
+						</iframe>
+					</div>
 
 				</div>
 
@@ -154,24 +192,28 @@
 
 				<div class="slide-body">
 
-					<p>
-						Testing the plot size and reshaping capabilities
-					</p>
-
-					<iframe
-						src="railway_schedule.html"
-						style="
-							width: 100%;
-							height:100%;
-							margin: 0 auto;
-							border:0;
-						"
-						frameborder="0"
-						scrolling="no"
-					>
-					</iframe>
-
-
+					<div class="slide-text">
+						<p style="margin: 30px 0px 30px 0px;">
+						The decision variables of the model are the following:
+						</p>
+						<ol class="list">
+							<li>
+								&nbsp;&nbsp;&nbsp;$y_{jt}$:&nbsp;&nbsp;&nbsp; binary variable that is equal to 1 if job $j$ starts at time $t$, 0 otherwise
+							</li>
+							<li>
+								&nbsp;&nbsp;&nbsp;$x_{at}$:&nbsp;&nbsp;&nbsp; binary variable that is equal to 1 if arc $a$ is available (by train) at time $t$, 0 otherwise
+							</li>
+							<li>
+								&nbsp;&nbsp;&nbsp;$h_{odtk}$:&nbsp;&nbsp;&nbsp; binary variable that is equal to 1 if route option $k$ is used when travelling from origin $o$ to destination $d$ at time $t$, 0 otherwise
+							</li>
+							<li>
+								&nbsp;&nbsp;&nbsp;$w_{at}$:&nbsp;&nbsp;&nbsp; continuous variable representing the travel time traversing arc $a$ at time $t$
+							</li>
+							<li>
+								&nbsp;&nbsp;&nbsp;$v_{odt}$:&nbsp;&nbsp;&nbsp; continuous variable representing the travel time from origin $o$ to destination $d$ at time $t$
+							</li>
+						</ol>
+					</div>
 
 				</div>
 
@@ -183,20 +225,187 @@
 
 				<div class="slide-body">
 
+					<div class="slide-text">
+					<p>
+						The goal of the model is to <b>minimize the total passenger delay</b> in the network.
+					</p>
+					<p>
+						<b>Delay</b> = <b>increase in the travel time</b> compared to the
+						average travel time $\Omega_{od}$ between an origin $o$ and a
+						destination $d$.
+					</p>
+
+					<p>
+						According to this, the following objective function is defined:
+						\[
+						\underset{v}{\min}
+						\sum_{(o,d) \in N \times N} \sum_{t \in T}
+						\phi_{odt} (v_{odt} - \Omega_{odt})
+						\tag{1}
+						\]
+					</p>
+
+					</div>
+
 				</div>
 
 			</section>
 
 			<!-- Slide 6 -->
-			<section data-transition="slide">
-				<h1 class="slide-title">Constraints</h1>
+			<!-- <section data-transition="slide"> -->
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
 
 				<div class="slide-body">
+
+					<!-- 2 -->
+					<div class="slide-text">
+						A feasible solution of this model schedules all the jobs within the time horizon $T_{end}$
+						\[
+						\sum_{t=1}^{T_{end} - \pi_j + 1} y_{jt} = 1, \quad \forall j \in J
+						\tag{2}
+						\]
+					</div>
+					<!-- 3 -->
+					<div class="slide-text">
+						Each job must start only once and, while it's being processed, the subset
+						$\mathcal{A}_j$ of its arcs must be unavailable for other jobs (since they are occupied) \[
+						x_{at} + \sum_{t'=\min(1, t-\pi_j+1)}^{\max(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a
+						\tag{3}
+						\]
+					</div>
 
 				</div>
 
 			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
 
+				<div class="slide-body">
+
+					<!-- 4 -->
+					<div class="slide-text">
+						Accordingly the travel time $w_{at}$ on an arc $a$ at time $t$ depends on the availability of the train services on that arc by the following constraint:
+						\[
+						w_{at} = \omega^e_a x_{at} + \omega^j_a (1 - x_{at}), \quad \forall a \in \mathcal{A}, \forall t \in T
+						\tag{4}
+						\]
+					</div>
+					<!-- 5 -->
+					<div class="slide-text">
+						Since variables $x_{at}$ are only bounded by $(3)$, an optional constraint is added to ensure the correct arc traversal time for free variables:
+						\[
+						\underbrace{\sum_{t \in T} x_{at}}_{\text{total time}\atop\text{availability of
+						arc }a}
+						= T_{end} - 
+						\underbrace{\sum_{j \in J_a} \pi_j,}_{\text{total processing time}\atop\text{of jobs on }a} \quad \forall a \in
+						\mathcal{A}
+						\tag{5}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
+
+				<div class="slide-body">
+
+					<!-- 6 -->
+					<div class="slide-text">
+						Due to the fact that there might be multiple combinations $c$ of arcs that cannot be unavailable simultaneously according to set $C$, the following constraint is added:
+						\[
+						\sum_{a \in c} (1 - x_{at}) \leq 1, \quad \forall c \in C, \forall t \in T
+						\tag{6}
+						\]
+					</div>
+					<!-- 7 -->
+					<div class="slide-text">
+						Since jobs on the same arc cannot overlap in time the following constriant is needed:
+						\[
+						\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{T_{end}} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A}
+						\tag{7}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
+
+				<div class="slide-body">
+
+					<!-- 8 -->
+					<div class="slide-text">
+						For a track segment $s$ included in an event request the passenger flow in the peak moment of the considered time period must be less than the capacity of the alternative services:
+						\[
+						\sum_{a \in s} \sum_{(o,d) \in N \times N} \sum_{\substack{i = 1 \\ a \in R_{odi}}}^K h_{odti} \beta_{odt} \phi_{odt} \leq \Lambda_{st} + M \sum_{a \in s} x_{at}, \quad \forall s \in E_t, \forall t \in T
+						\tag{8}
+						\]
+					</div>
+					<!-- 9 -->
+					<div class="slide-text">
+						Concerning alternative routes, we must ensure that passenger flow is served by at least one (and no more than one) of the $K$ possible routes:
+						\[
+						\sum_{i = 1}^K h_{odti} = 1, \quad \forall (o,d) \in N \times N, \forall t \in T
+						\tag{9}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
+
+				<div class="slide-body">
+
+					<!-- 10 and 11 -->
+					<div class="slide-text">
+						Accordingly, the following two constraints provide a lower and an upper bound for the travel time from origin $o$ to destination $d$ at time $t$:
+						\[
+						v_{odt} \geq \sum_{a \in R_{odi}} w_{at} - M (1 - h_{odti}), \quad \forall i \in \{1,\dots,K\}, \forall (o,d) \in N \times N, \forall t \in T
+						\tag{10}
+						\]
+						\[
+						v_{odt} \leq \sum_{a \in R_{odi}} w_{at}, \quad \forall (o,d) \in N \times N, \forall t \in T
+						\tag{11}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+			<!-- <section data-transition="slide" data-auto-animate> -->
+			<!-- 	<h1 class="slide-title" data-id="constraints-title">Constraints</h1> -->
+			<!---->
+			<!-- 	<div class="slide-body"> -->
+			<!---->
+					<!-- 12 -->
+			<!-- 		<div class="slide-text"> -->
+			<!-- 			 -->
+			<!-- 			\[ -->
+			<!-- 			\] -->
+			<!-- 		</div> -->
+					<!-- 13 -->
+			<!-- 		<div class="slide-text"> -->
+			<!---->
+			<!-- 			\[ -->
+			<!-- 			\] -->
+			<!-- 		</div> -->
+			<!---->
+			<!-- 	</div> -->
+			<!---->
+			<!-- </section> -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Example</h1>
+
+				<div class="slide-body">
+
+				</div>
+			</section>
 
 		</section>
 

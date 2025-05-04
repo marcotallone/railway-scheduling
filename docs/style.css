@@ -76,12 +76,19 @@ section {
 .slide-body b { font-style: bold; }
 .slide-body i { font-style: italic; }
 
+.slide-text {
+	width: 80%;
+	text-align: left;
+}
+
 .slide-title { 
 	display: flex; 
 	justify-content: left; 
 	align-items: top;
-	padding: 80px 0px 20px 35px;
+	padding: 35px 0px 35px 40px;
 	background-color: var(--dark);
+	position: relative; /* Or 'absolute' if needed */
+	top: 50px; /* Adjust the value as needed */
 }
 
 /* Boxes and Containers */
@@ -102,6 +109,10 @@ section {
 .column { flex: 1; }
 
 /* Lists */
+.list li {
+	margin-bottom: 30px;
+	font-weight: normal;
+}
 .spaced-list li {
 	margin-bottom: 10px;
 	font-weight: bold;
