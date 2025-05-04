@@ -23,6 +23,9 @@
 		<!-- Personal CSS Styling -->
 		<link rel="stylesheet" href="style.css" />
 
+		<!-- Other packages settings -->
+		<!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+
 	</head>
 
 	<!-- Body ---------------------------------------------------------------->
@@ -151,6 +154,25 @@
 
 				<div class="slide-body">
 
+					<p>
+						Testing the plot size and reshaping capabilities
+					</p>
+
+					<iframe
+						src="railway_schedule.html"
+						style="
+							width: 100%;
+							height:100%;
+							margin: 0 auto;
+							border:0;
+						"
+						frameborder="0"
+						scrolling="no"
+					>
+					</iframe>
+
+
+
 				</div>
 
 			</section>
@@ -223,32 +245,84 @@
 
 
 		<!-- Section: Appendix -----------------.--------------------------->
-		<section data-name="Appendix" data-sm="false">
-			<a id="appendixLink"></a>
-			<h1 class="slide-title">Appendix: Insert Appendix</h1>
+		<section data-name="Appendix 1" data-sm="false">
+			<a id="appendix1"></a>
+			<h1 class="slide-title">Appendix $1$: Dense Formulation matrices</h1>
 
 			<div class="slide-body">
 
-					\[
-					\begin{aligned}
-					\mathcal{A} &= \begin{bmatrix}
-					\mathbb{I}\\
-					\mathbf{A}_{d,k}\\
-					\mathbf{A}_{d,k+1} \mathbf{A}_{d,k}\\
-					\vdots\\
-					\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k}
-					\end{bmatrix}\\ 
-					\end{aligned}
-					\]
+				\[
+				\begin{aligned}
+				\mathcal{A} &= \begin{bmatrix}
+				\mathbb{I}\\
+				\mathbf{A}_{d,k}\\
+				\mathbf{A}_{d,k+1} \mathbf{A}_{d,k}\\
+				\vdots\\
+				\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k}
+				\end{bmatrix}\\ 
+				\mathcal{B} &= \begin{bmatrix}
+				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\mathbf{B}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\mathbf{A}_{d,k+1} \mathbf{B}_{d,k} & \mathbf{B}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\vdots & \vdots & \ddots & \vdots\\
+				\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k} \mathbf{B}_{d,k} & \ldots & \ldots &
+				\mathbf{B}_{d,k+N-2} & \mathbf{0}
+				\end{bmatrix}\\
+				\text{and}\quad \mathcal{D} &= \begin{bmatrix}
+				\mathbf{0}\\
+				\mathbf{d}_k\\
+				\mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{d}_{k+1}\\
+				\mathbf{A}_{d,k+2} \mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{A}_{d,k+2}
+				\mathbf{d}_{k+1} + \mathbf{d}_{k+2}\\
+				\vdots
+				\end{bmatrix}
+				\end{aligned}
+				\]
+
+			<div>
+				<a href="#dense-and-sparse-link" class="back-button">Back to <b>Dense & Sparse
+						Formulations</b></a>
+			</div>
+
+			</div>
+		</section>
+		<section data-name="Appendix 2" data-sm="false">
+			<a id="appendix2"></a>
+			<h1 class="slide-title">Appendix $2$: Sparse Formulation matrices</h1>
+
+			<div class="slide-body">
+
+				\[
+				\begin{aligned}
+				\mathcal{A} &= \begin{bmatrix}
+				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\mathbf{A}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\mathbf{0} & \mathbf{A}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\vdots & \vdots & \ddots & \vdots\\
+				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{A}_{d,k+N-1} & \mathbf{0}
+				\end{bmatrix}\\
+				\mathcal{B} &= \begin{bmatrix}
+				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\mathbf{B}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\mathbf{0} & \mathbf{B}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\
+				\vdots & \vdots & \ddots & \vdots\\
+				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{B}_{d,k+N-1} & \mathbf{0}
+				\end{bmatrix}\\
+				\mathcal{D} &= \begin{bmatrix}
+				\mathbb{I}\\
+				\mathbf{0}\\
+				\vdots\\
+				\mathbf{0}\\
+				\end{bmatrix}
+				\end{aligned}
+				\]
 
 				<div>
-					<a href="#insertReferenceLink" class="back-button">
-						Back to <b>NameOfReferenceSection</b>
-					</a>
+					<a href="#dense-and-sparse-link" class="back-button">Back to <b>Dense & Sparse
+							Formulations</b></a>
 				</div>
 
 			</div>
-
 		</section>
 
 
