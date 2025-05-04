@@ -1921,7 +1921,7 @@ class Railway:
                 self.R[(o, d, i)] = path
 
         # Re-compute the set Omega of expected travel times after R generation
-        self.Omega = self.__set_Omega()
+        self.__set_Omega()
 
     # Generate problem parameters
     def generate(
