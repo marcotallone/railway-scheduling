@@ -95,7 +95,7 @@
 						</ul>
 					<li>Model Improvements</li>
 						<ul class="spaced-sublist">
-							<li>Fixing Variables</li>
+							<li>Parameter Analysis</li>
 							<li>Meta-Heuristics</li>
 							<li>Valid Inequalities</li>
 						</ul>
@@ -378,27 +378,8 @@
 				</div>
 
 			</section>
-			<!-- <section data-transition="slide" data-auto-animate> -->
-			<!-- 	<h1 class="slide-title" data-id="constraints-title">Constraints</h1> -->
-			<!---->
-			<!-- 	<div class="slide-body"> -->
-			<!---->
-					<!-- 12 -->
-			<!-- 		<div class="slide-text"> -->
-			<!-- 			 -->
-			<!-- 			\[ -->
-			<!-- 			\] -->
-			<!-- 		</div> -->
-					<!-- 13 -->
-			<!-- 		<div class="slide-text"> -->
-			<!---->
-			<!-- 			\[ -->
-			<!-- 			\] -->
-			<!-- 		</div> -->
-			<!---->
-			<!-- 	</div> -->
-			<!---->
-			<!-- </section> -->
+
+			<!-- Slide 7 -->
 			<section data-transition="slide">
 				<h1 class="slide-title">Example</h1>
 
@@ -419,15 +400,180 @@
 				</div>
 			</section>
 
-			<!-- Slide N -->
-			<!-- <section data-transition="slide"> -->
-			<!-- 	<h1 class="slide-title">SlideTitle</h1> -->
-			<!---->
-			<!-- 	<div class="slide-body"> -->
-			<!---->
-			<!-- 	</div> -->
-			<!---->
-			<!-- </section> -->
+			<!-- Slide 8 -->
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="parameter-analysis-title">Parameter Analysis</h1>
+
+				<div class="slide-body">
+					<!-- 12 and 13 -->
+					<div class="slide-text">
+						Values of variables associated to arcs never included in any job can be considered as fixed
+						\[
+						x_{at} = 1, \quad \forall a \in \{a \in \mathcal{A} \mid J_a = \emptyset\}, \forall t \in T
+						\tag{12}
+						\]
+
+						\[
+						w_{at} = \omega^e_a, \quad \forall a \in \{a \in \mathcal{A} \mid J_a = \emptyset\}, \forall t \in T
+						\tag{13}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="parameter-analysis-title">Parameter Analysis</h1>
+
+				<div class="slide-body">
+					<!-- 14 -->
+					<div class="slide-text">
+						Consider $K$ routes from $o$ to $d$ at time $t$ that all pass through arc $a$, which is also included in an event request $E_t$.<br>
+						If $\beta_{odt} \phi_{odt} &gt; \Lambda_{at}$ (<i>capacity of alternative services</i>) for such arc, we must ensure the availability of the arc to avoid an infeasible solution
+						\[
+						x_{at} = 1, \quad \forall (a,t) \in \{
+						\substack{(a,t) \in \mathcal{A} \times T \mid \exists s \in E_t \text{ s.t. } a \in s \\
+						\land\ \exists (o,d) \in N \times N \text{ s.t. } a \in R_{odi} \forall i \in \{1,\dots,K\} \\ \land\ \beta_{odt} \phi_{odt} &gt; \Lambda_{st}}
+						\}
+						\tag{14}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="parameter-analysis-title">Parameter Analysis</h1>
+
+				<div class="slide-body">
+					<!-- 15 -->
+					<div class="slide-text" style="margin-bottom: 40px;" data-id="never-used-body">
+						Given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\}$ is <b>never used</b>, we can set the associated variable $h_{odt\tilde{k}} = 0$
+					</div>
+					<div class="cbox" data-id="never-used-cbox">
+						<b data-id="never-used-title">When is a route option never used?</b><br>
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="parameter-analysis-title">Parameter Analysis</h1>
+
+				<div class="slide-body">
+					<!-- 15 -->
+					<div class="slide-text" style="margin-bottom: 40px;" data-id="never-used-body">
+						Given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\}$ is <b>never used</b>, we can set the associated variable $h_{odt\tilde{k}} = 0$
+					</div>
+					<div class="cbox" data-id="never-used-cbox">
+						<b data-id="never-used-title">When is a route option never used?</b><br>
+						Consider path from $o$ to $d$: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $p_{od} = (a_1, \dots, a_n)$<br>
+						<ul>
+							<li>
+								<b>max travel time</b>: when all arcs of the path are unavailable simultaneously
+							</li>
+							<li>
+								<b>min travel time</b>: when all arcs of the path are available simultaneously
+						</ul>
+						<br>
+						Hence when:
+						<p data-id="never-used-p">
+						\[
+							\text{max time of } p^{(1)}_{od} &lt; \text{min time of } p^{(2)}_{od}
+							\quad \Rightarrow \quad
+							p^{(2)}_{od} \text{ is never used}
+						\]
+						</p>
+
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="parameter-analysis-title">Parameter Analysis</h1>
+
+				<div class="slide-body">
+					<!-- 15 -->
+					<div class="slide-text" style="margin-bottom: 40px;" data-id="never-used-body">
+						Given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\} = [K]$ is <b>never used</b>, we can set the associated variable $h_{odt\tilde{k}} = 0$
+					</div>
+					<div class="cbox" data-id="never-used-cbox">
+						<b data-id="never-used-title">When is a route option never used?</b><br>
+						<p data-id="never-used-p">
+						\[
+							\text{min time of } p^{(1)}_{od} &gt; \text{max time of } p^{(2)}_{od}
+							\quad \Rightarrow \quad
+							p^{(1)}_{od} \text{ is never used}
+						\]
+						</p>
+					</div>
+					<div class="slide-text" style="margin-bottom: 40px;" data-id="never-used-constraint">
+						\[
+							h_{odti} = 0, 
+							\quad \forall (o, d, i) \in
+							\{(o, d, i) \in N \times N \times [K] \mid
+							\min_{i \in [K]} \Omega_{odi} &gt; \max_{j \neq i \in [K]} \Omega_{odj
+							}\}
+							\tag{15}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+
+			<!-- Slide 9 -->
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
+
+				<div class="slide-body">
+					<!-- B1 and B2 -->
+					<div class="slide-text">
+						<b>Sousa and Wolsey</b> inequality from the "<i>Single Machine Scheduling</i>" problem:
+						\[
+						\sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
+						\tag{B1}
+						\]
+						with:<br>
+						<ul>
+							<li> $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$ </li>	
+							<li> $Q'_j = [t - \pi_j + \Delta, t] \cap T$ </li>
+							<li> $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ <i><br>(i.e. maximum total processing time for other jobs on the same arc as job $j$)</i></li>
+						</ul>
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
+
+				<div class="slide-body">
+					<!-- B1 and B2 -->
+					<div class="slide-text">
+						Non-overlapping jobs inequality:
+						\[
+						y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
+						\]
+						\[
+						\tag{B2}
+						\]
+					</div>
+
+				</div>
+
+			</section>
+
+			<!-- Slide 9 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Meta-Heuristics: Simulated Annealing</h1>
+
+				<div class="slide-body">
+
+				</div>
+
+			</section>
 
 		</section>
 
@@ -440,103 +586,93 @@
 				</div>
 			</section>
 
+			<!-- Slide 10 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Solution Strategies</h1>
+
+				<div class="slide-body">
+					Model0, Model1, Model2
+
+				</div>
+
+			</section>
+
+			<!-- Slide 11 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Dataset Generation</h1>
+
+				<div class="slide-body">
+					Parameter values and maybe how they were randomly generated
+
+				</div>
+
+			</section>
+
+			<!-- Slide 12 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Results</h1>
+
+				<div class="slide-body">
+
+				</div>
+
+			</section>
+
 			<!-- Slide N -->
-			<!-- <section data-transition="slide"> -->
-			<!-- 	<h1 class="slide-title">SlideTitle</h1> -->
-			<!---->
-			<!-- 	<div class="slide-body"> -->
-			<!---->
-			<!-- 	</div> -->
-			<!---->
-			<!-- </section> -->
+			<section data-transition="slide">
+				<h1 class="slide-title">SlideTitle</h1>
+
+				<div class="slide-body">
+
+				</div>
+
+			</section>
 
 		</section>
 
 
 		<!-- Section: Appendix -----------------.--------------------------->
-		<section data-name="Appendix 1" data-sm="false">
-			<a id="appendix1"></a>
-			<h1 class="slide-title">Appendix $1$: Dense Formulation matrices</h1>
-
-			<div class="slide-body">
-
-				\[
-				\begin{aligned}
-				\mathcal{A} &= \begin{bmatrix}
-				\mathbb{I}\\
-				\mathbf{A}_{d,k}\\
-				\mathbf{A}_{d,k+1} \mathbf{A}_{d,k}\\
-				\vdots\\
-				\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k}
-				\end{bmatrix}\\ 
-				\mathcal{B} &= \begin{bmatrix}
-				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\mathbf{B}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\mathbf{A}_{d,k+1} \mathbf{B}_{d,k} & \mathbf{B}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\vdots & \vdots & \ddots & \vdots\\
-				\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k} \mathbf{B}_{d,k} & \ldots & \ldots &
-				\mathbf{B}_{d,k+N-2} & \mathbf{0}
-				\end{bmatrix}\\
-				\text{and}\quad \mathcal{D} &= \begin{bmatrix}
-				\mathbf{0}\\
-				\mathbf{d}_k\\
-				\mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{d}_{k+1}\\
-				\mathbf{A}_{d,k+2} \mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{A}_{d,k+2}
-				\mathbf{d}_{k+1} + \mathbf{d}_{k+2}\\
-				\vdots
-				\end{bmatrix}
-				\end{aligned}
-				\]
-
-			<div>
-				<a href="#dense-and-sparse-link" class="back-button">Back to <b>Dense & Sparse
-						Formulations</b></a>
-			</div>
-
-			</div>
-		</section>
-		<section data-name="Appendix 2" data-sm="false">
-			<a id="appendix2"></a>
-			<h1 class="slide-title">Appendix $2$: Sparse Formulation matrices</h1>
-
-			<div class="slide-body">
-
-				\[
-				\begin{aligned}
-				\mathcal{A} &= \begin{bmatrix}
-				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\mathbf{A}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\mathbf{0} & \mathbf{A}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\vdots & \vdots & \ddots & \vdots\\
-				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{A}_{d,k+N-1} & \mathbf{0}
-				\end{bmatrix}\\
-				\mathcal{B} &= \begin{bmatrix}
-				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\mathbf{B}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\mathbf{0} & \mathbf{B}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\
-				\vdots & \vdots & \ddots & \vdots\\
-				\mathbf{0} & \mathbf{0} & \ldots & \mathbf{B}_{d,k+N-1} & \mathbf{0}
-				\end{bmatrix}\\
-				\mathcal{D} &= \begin{bmatrix}
-				\mathbb{I}\\
-				\mathbf{0}\\
-				\vdots\\
-				\mathbf{0}\\
-				\end{bmatrix}
-				\end{aligned}
-				\]
-
-				<div>
-					<a href="#dense-and-sparse-link" class="back-button">Back to <b>Dense & Sparse
-							Formulations</b></a>
-				</div>
-
-			</div>
-		</section>
-
-
-
-
+		<!-- <section data-name="Appendix 1" data-sm="false"> -->
+		<!-- 	<a id="appendix1"></a> -->
+		<!-- 	<h1 class="slide-title">Appendix $1$: Dense Formulation matrices</h1> -->
+		<!---->
+		<!-- 	<div class="slide-body"> -->
+		<!---->
+		<!-- 		\[ -->
+		<!-- 		\begin{aligned} -->
+		<!-- 		\mathcal{A} &= \begin{bmatrix} -->
+		<!-- 		\mathbb{I}\\ -->
+		<!-- 		\mathbf{A}_{d,k}\\ -->
+		<!-- 		\mathbf{A}_{d,k+1} \mathbf{A}_{d,k}\\ -->
+		<!-- 		\vdots\\ -->
+		<!-- 		\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k} -->
+		<!-- 		\end{bmatrix}\\  -->
+		<!-- 		\mathcal{B} &= \begin{bmatrix} -->
+		<!-- 		\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\ -->
+		<!-- 		\mathbf{B}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\ -->
+		<!-- 		\mathbf{A}_{d,k+1} \mathbf{B}_{d,k} & \mathbf{B}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\ -->
+		<!-- 		\vdots & \vdots & \ddots & \vdots\\ -->
+		<!-- 		\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k} \mathbf{B}_{d,k} & \ldots & \ldots & -->
+		<!-- 		\mathbf{B}_{d,k+N-2} & \mathbf{0} -->
+		<!-- 		\end{bmatrix}\\ -->
+		<!-- 		\text{and}\quad \mathcal{D} &= \begin{bmatrix} -->
+		<!-- 		\mathbf{0}\\ -->
+		<!-- 		\mathbf{d}_k\\ -->
+		<!-- 		\mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{d}_{k+1}\\ -->
+		<!-- 		\mathbf{A}_{d,k+2} \mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{A}_{d,k+2} -->
+		<!-- 		\mathbf{d}_{k+1} + \mathbf{d}_{k+2}\\ -->
+		<!-- 		\vdots -->
+		<!-- 		\end{bmatrix} -->
+		<!-- 		\end{aligned} -->
+		<!-- 		\] -->
+		<!---->
+		<!-- 	<div> -->
+		<!-- 		<a href="#dense-and-sparse-link" class="back-button">Back to <b>Dense & Sparse -->
+		<!-- 				Formulations</b></a> -->
+		<!-- 	</div> -->
+		<!---->
+		<!-- 	</div> -->
+		<!-- </section> -->
 
 		<!-- End of slides -->
 		</div>
