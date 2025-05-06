@@ -524,12 +524,12 @@
 			</section>
 
 			<!-- Slide 9 -->
-			<section data-transition="slide" data-auto-animate>
+			<section data-transition="slide">
 				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
 
 				<div class="slide-body">
 					<!-- B1 and B2 -->
-					<div class="slide-text">
+					<div class="slide-text fragment fade-out" style="position: absolute;">
 						<b>Sousa and Wolsey</b> inequality from the "<i>Single Machine Scheduling</i>" problem:
 						\[
 						\sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
@@ -542,16 +542,7 @@
 							<li> $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ <i><br>(i.e. maximum total processing time for other jobs on the same arc as job $j$)</i></li>
 						</ul>
 					</div>
-
-				</div>
-
-			</section>
-			<section data-transition="slide" data-auto-animate>
-				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
-
-				<div class="slide-body">
-					<!-- B1 and B2 -->
-					<div class="slide-text">
+					<div class="slide-text fragment fade-in" style="position: absolute;">
 						Non-overlapping jobs inequality:
 						\[
 						y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
@@ -564,12 +555,50 @@
 				</div>
 
 			</section>
+			<!-- <section data-transition="slide"> -->
+			<!-- 	<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1> -->
+			<!---->
+			<!-- 	<div class="slide-body"> -->
+			<!-- 		<div class="slide-text"> -->
+			<!-- 			Non-overlapping jobs inequality: -->
+			<!-- 			\[ -->
+			<!-- 			y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T -->
+			<!-- 			\] -->
+			<!-- 			\[ -->
+			<!-- 			\tag{B2} -->
+			<!-- 			\] -->
+			<!-- 		</div> -->
+			<!---->
+			<!-- 	</div> -->
+			<!---->
+			<!-- </section> -->
 
 			<!-- Slide 9 -->
 			<section data-transition="slide">
 				<h1 class="slide-title">Meta-Heuristics: Simulated Annealing</h1>
 
 				<div class="slide-body">
+
+					<p>
+					<b>Simulated Annealing</b> has been used to find a good initial solution for the MILP model.
+					</p>
+
+	<pre style="width: 70%;"><code><script type="text/template">
+	function simulated_annealing(S0, T0, c):
+		S <- S0
+		T <- T0
+		while STOP_CRITERION do:
+			Snew <- get_neighbor(S)
+			Δf <- f(S) - f(Snew)
+			if Δf >= 0:
+				S <- Snew
+			else:
+				S <- Snew with probability exp(-Δf/T)
+			end
+		end
+		T <- c * T
+		return S
+	</script></code></pre>
 
 				</div>
 
@@ -591,7 +620,56 @@
 				<h1 class="slide-title">Solution Strategies</h1>
 
 				<div class="slide-body">
-					Model0, Model1, Model2
+
+					<div class="slide-text">
+						<ul class="list" style="margin-bottom: 30px;">
+							<li>Models implemented in <code>Python</code> (<code>3.11.5</code>) using <code>Gurobi</code> (<code>12.0.1</code>) </li>
+							<li>Run on $\text{Intel}^{\text{(R)}} \text{ Core}^{\text{(TM)}} \text{ i}7\text{-}8565\text{Uz}$ CPU with $40$GB of RAM</li>
+						</ul>
+					</div>
+
+					<div class="multicolumn">
+
+						<div class="cbox"
+								 style="margin: 0px 15px 0px 15px;
+												padding: 15px;
+												font-size: 0.7em;
+											"
+						>
+						<b style="font-size: 1.3em;">Model $0$</b><br>
+						<i>"As-is" Gurobi model</i><br>
+						No meta-heuristics<br>
+						No valid inequalities<br>
+						</div>
+
+						<div class="cbox"
+								 style="margin: 0px 15px 0px 15px;
+												padding: 15px;
+												font-size: 0.7em;
+											"
+						>
+						<b style="font-size: 1.3em;">Model $1$</b><br>
+						<i>Improved initial solution</i><br>
+						Simulated annealing heuristic<br>
+						No valid inequalities<br>
+						</div>
+
+						<div class="cbox"
+								 style="margin: 0px 15px 0px 15px;
+												padding: 15px;
+												font-size: 0.7em;
+											"
+						>
+						<b style="font-size: 1.3em;">Model $2$</b><br>
+						<i>Full model</i><br>
+						Simulated annealing heuristic<br>
+						Valid inequalities<br>
+						Addition of cutting planes
+						</div>
+
+
+					</div>
+
 
 				</div>
 
@@ -602,7 +680,27 @@
 				<h1 class="slide-title">Dataset Generation</h1>
 
 				<div class="slide-body">
-					Parameter values and maybe how they were randomly generated
+					<div class="slide-text">
+						<p>
+						To test the scalability of the model, problem istances have been generated with combinations of the following parameters:<br>
+						</p>	
+						<p>
+						<ul class="list">
+							<li>Number of stations: $|N| \in \{10, 20, 40\}$</li>
+							<li>Number of jobs: $|J| \in \{10, 40, 80\}$</li>
+							<li>Time horizon: $T_{end} \in \{10, 50, 100\}$</li>
+							<li>Number of route options: $K = 3$</li>
+						</ul>
+						<p>
+						Set $E = \emptyset$ (<i>no event requests</i>) and $C = \emptyset$ (<i>no simultaneous arc unavailability</i>)
+						</p>	
+						<p>
+						Set $E = \emptyset$ (<i>no event requests</i>) and $C = \emptyset$ (<i>no simultaneous arc unavailability</i>)
+						</p>	
+						<p>
+						Remaining model parameters have been randomly generated within fixed input bounds.
+						</p>	
+					</div>
 
 				</div>
 
@@ -698,6 +796,9 @@
 				hideCursorTime: 900,
 				hash: true, // Reload to current slide
 				disableLayout: true, // Enable standard CSS layout behavior
+				highlight: { // Disable automatic code highlighting
+					highlightOnLoad: false,
+				},
 
 				// INFO: Simplemenu Top Bar
 				// https://github.com/Martinomagnifico/reveal.js-simplemenu
