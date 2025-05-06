@@ -1909,9 +1909,6 @@ class Railway:
     def __generate_R(self):
         self.R = {}
         for o, d in self.OD:
-            # TODO: remove this old version:
-            # self.R[(o, d)] = self.YenKSP(graph=self.graph, source=o, sink=d, K=self.K)
-
             # Compute the K shortest paths from o to d
             # shortest_paths = self.YenKSP(graph=self.graph, source=o, sink=d, K=self.K)
             shortest_paths = self.randomKSP(source=o, sink=d, K=self.K)
