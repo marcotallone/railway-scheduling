@@ -925,6 +925,46 @@ class Railway:
         self.model.params.StrongCGCuts = -1
         self.model.params.ZeroHalfCuts = -1
 
+    # Set Model0 configuration options
+    def set_model0(self, timelimit=None, verbose=True):
+        if not verbose: self.model.setParam('OutputFlag', 0)
+        if timelimit is not None: self.model.setParam('TimeLimit', timelimit)
+        self.model.setParam('LPWarmStart', 0)
+        self.model.setParam('PoolSolutions', 1)
+        self.model.setParam('Cuts', 0)
+        self.model.setParam('CutPasses', 0)
+        self.model.setParam('Heuristics', 0)
+        self.model.setParam('Symmetry', 0)
+        self.model.setParam('Threads', 1)
+        self.model.setParam('Presolve', 1)
+        self.model.setParam('NumericFocus', 3)
+
+    # Set Model1 configuration options
+    def set_model1(self, timelimit=None, verbose=True):
+        if not verbose: self.model.setParam('OutputFlag', 0)
+        if timelimit is not None: self.model.setParam('TimeLimit', timelimit)
+        self.model.setParam('PoolSolutions', 1)
+        self.model.setParam('Cuts', 0)
+        self.model.setParam('CutPasses', 0)
+        self.model.setParam('Heuristics', 0)
+        self.model.setParam('Symmetry', 0)
+        self.model.setParam('Threads', 1)
+        self.model.setParam('Presolve', 1)
+        self.model.setParam('NumericFocus', 3)
+
+    # Set Model2 configuration options
+    def set_model2(self, timelimit=None, verbose=True):
+        if not verbose: self.model.setParam('OutputFlag', 0)
+        if timelimit is not None: self.model.setParam('TimeLimit', timelimit)
+        self.model.setParam('PoolSolutions', 1)
+        self.model.setParam('Cuts', 0)
+        self.model.setParam('CutPasses', 0)
+        self.model.setParam('Heuristics', 0)
+        self.model.setParam('Symmetry', 0)
+        self.model.setParam('Threads', 1)
+        self.model.setParam('Presolve', 1)
+        self.model.setParam('NumericFocus', 3)
+
     # Getters ------------------------------------------------------------------
 
     # Get the status of the optimization model
