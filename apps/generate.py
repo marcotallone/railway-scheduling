@@ -67,7 +67,7 @@ for stations in N_range:
 				# Solve the problem and check that is feasible before saving it
 				rail.set_constraints()
 				rail.set_objective()
-				rail.model.optimize()
+				rail.optimize()
     
 				if (rail.get_status() != "INFEASIBLE"
 					and rail.get_status() != "UNBOUNDED"
