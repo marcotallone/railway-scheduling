@@ -936,7 +936,7 @@ class Railway:
         self.model.setParam('Heuristics', 0)
         self.model.setParam('Symmetry', 0)
         self.model.setParam('Threads', 1)
-        self.model.setParam('Presolve', 1)
+        self.model.setParam('Presolve', 0)
         self.model.setParam('NumericFocus', 3)
 
     # Set Model1 configuration options
@@ -949,7 +949,7 @@ class Railway:
         self.model.setParam('Heuristics', 0)
         self.model.setParam('Symmetry', 0)
         self.model.setParam('Threads', 1)
-        self.model.setParam('Presolve', 1)
+        self.model.setParam('Presolve', 0)
         self.model.setParam('NumericFocus', 3)
 
     # Set Model2 configuration options
@@ -962,7 +962,7 @@ class Railway:
         self.model.setParam('Heuristics', 0)
         self.model.setParam('Symmetry', 0)
         self.model.setParam('Threads', 1)
-        self.model.setParam('Presolve', 1)
+        self.model.setParam('Presolve', 0)
         self.model.setParam('NumericFocus', 3)
 
     # Getters ------------------------------------------------------------------
