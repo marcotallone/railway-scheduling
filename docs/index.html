@@ -76,34 +76,90 @@
 		<section data-state="hide-menubar hide-menu" >
 
 			<div class="slide-body">
+				<h1>Table of Contents</h1>
 
-				<div class="cbox" 
-							style="background-color: var(--primary);
-										 text-align: center;
-										 color: white;
-										 padding: 30px;
-										 font-size: 1em;
-					">
-				<h2 style="color: white;">Table of Contents</h2>
-				<ol class="spaced-list">
-					<li>Model Description</li>
-						<ul class="spaced-sublist">
+				<div class="multicolumn">
+
+					<div class="cbox"
+							 style="background-color: var(--primary);
+											color: white;
+											margin: 0px 15px 0px 15px;
+											padding: 30px;
+											font-size: 0.7em;
+							 ">
+						<b style="font-size: 1.3em">1. Model Description</b><br>
+						<ul class="spaced-sublist" style="padding-left: 40px;">
 							<li>Problem Description</li>
 							<li>Decision Variables</li>
 							<li>Objective</li>
 							<li>Constraints</li>
 						</ul>
-					<li>Model Improvements</li>
-						<ul class="spaced-sublist">
+					</div>
+					<div class="cbox"
+							 style="background-color: var(--primary);
+											color: white;
+											margin: 0px 15px 0px 15px;
+											padding: 30px;
+											font-size: 0.7em;
+							 ">
+						<b style="font-size: 1.3em">2. Model Improvements</b><br>
+						<ul class="spaced-sublist" style="padding-left: 40px;">
 							<li>Parameter Analysis</li>
 							<li>Meta-Heuristics</li>
 							<li>Valid Inequalities</li>
 						</ul>
-					<li>Scalability Analysis</li>
-				</ol>
+					</div>					<div class="cbox"
+							 style="background-color: var(--primary);
+											color: white;
+											margin: 0px 15px 0px 15px;
+											padding: 30px;
+											font-size: 0.7em;
+							 ">
+						<b style="font-size: 1.3em">3. Scalability Analysis</b><br>
+						<ul class="spaced-sublist" style="padding-left: 40px;">
+							<li>Solution Strategies</li>
+							<li>Dataset Generation</li>
+							<li>Results</li>
+						</ul>
+					</div>
+
+
+
+
+
 				</div>
 
 			</div>
+
+
+			<!---->
+			<!-- 	<div class="cbox"  -->
+			<!-- 				style="background-color: var(--primary); -->
+			<!-- 							 text-align: center; -->
+			<!-- 							 color: white; -->
+			<!-- 							 padding: 30px; -->
+			<!-- 							 font-size: 1em; -->
+			<!-- 		"> -->
+			<!-- 	<h2 style="color: white;">Table of Contents</h2> -->
+			<!-- 	<ol class="spaced-list"> -->
+			<!-- 		<li>Model Description</li> -->
+			<!-- 			<ul class="spaced-sublist"> -->
+			<!-- 				<li>Problem Description</li> -->
+			<!-- 				<li>Decision Variables</li> -->
+			<!-- 				<li>Objective</li> -->
+			<!-- 				<li>Constraints</li> -->
+			<!-- 			</ul> -->
+			<!-- 		<li>Model Improvements</li> -->
+			<!-- 			<ul class="spaced-sublist"> -->
+			<!-- 				<li>Parameter Analysis</li> -->
+			<!-- 				<li>Meta-Heuristics</li> -->
+			<!-- 				<li>Valid Inequalities</li> -->
+			<!-- 			</ul> -->
+			<!-- 		<li>Scalability Analysis</li> -->
+			<!-- 	</ol> -->
+			<!-- 	</div> -->
+
+			<!-- </div> -->
 			
 		</section>
 
@@ -625,6 +681,7 @@
 						<ul class="list" style="margin-bottom: 30px;">
 							<li>Models implemented in <code>Python</code> (<code>3.11.5</code>) using <code>Gurobi</code> (<code>12.0.1</code>) </li>
 							<li>Run on $\text{Intel}^{\text{(R)}} \text{ Core}^{\text{(TM)}} \text{ i}7\text{-}8565\text{Uz}$ CPU with $40$GB of RAM</li>
+							<li>Time limit: $5$ minutes for <code>Gurobi</code> solver and $2$ minutes for simulated annealing</li>
 						</ul>
 					</div>
 
