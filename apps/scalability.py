@@ -6,37 +6,8 @@ import pandas as pd
 # Define problem parameters
 P = 2000
 K = 3
-timelimit = 300 # 5 minutes
-heuristics_timelimit = 120 # 2 minutes
-
-N = 10; J = 10; T = 10 ; ID =  1
-# N = 10; J = 10; T = 50 ; ID =  2
-# N = 10; J = 10; T = 100; ID =  3
-# N = 10; J = 40; T = 10 ; ID =  4
-# N = 10; J = 40; T = 50 ; ID =  5
-# N = 10; J = 40; T = 100; ID =  6
-# N = 10; J = 80; T = 10 ; ID =  7
-# N = 10; J = 80; T = 50 ; ID =  8
-# N = 10; J = 80; T = 100; ID =  9
-# N = 20; J = 10; T = 10 ; ID = 10
-# N = 20; J = 10; T = 50 ; ID = 11
-# N = 20; J = 10; T = 100; ID = 12
-# N = 20; J = 40; T = 10 ; ID = 13
-# N = 20; J = 40; T = 50 ; ID = 14
-# N = 20; J = 40; T = 100; ID = 15
-# N = 20; J = 80; T = 10 ; ID = 16
-# N = 20; J = 80; T = 50 ; ID = 17
-# N = 20; J = 80; T = 100; ID = 18
-# N = 40; J = 10; T = 10 ; ID = 19
-# N = 40; J = 10; T = 50 ; ID = 20
-# N = 40; J = 10; T = 100; ID = 21
-# N = 40; J = 40; T = 10 ; ID = 22
-# N = 40; J = 40; T = 50 ; ID = 23
-# N = 40; J = 40; T = 100; ID = 24
-# N = 40; J = 80; T = 10 ; ID = 25
-# N = 40; J = 80; T = 50 ; ID = 26
-# N = 40; J = 80; T = 100; ID = 27
-
+timelimit = 120
+heuristics_timelimit = 60
 problems = {
     # ID: (N, J, T),
     1: (10, 10, 10),
@@ -68,13 +39,13 @@ problems = {
     27: (40, 80, 100),
 }
 
-# Starat a dummy model just to trigger license information notice
-dummy_model = Railway(N, T, J, P, K)
+# Starat a dummy model just to trigger license information notice message
+dummy_model = Railway(10, 10, 10, P, K)
 del dummy_model
 print()
 
 # Create a csv file for scalability results if it doesn't exist yet
-RESULTFILE = f"apps/results.csv"
+RESULTFILE = f"apps/results3.csv"
 columns=[
     'ID',
     'model',
@@ -119,32 +90,16 @@ print("-" * 95)
 # Solve problems one by one
 for ID, (N, J, T) in problems.items():
 
-    # Name of the file to load
-    FILENAME = f"datasets/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
 
-    # # Display problem parameters
-    # print('Time limit:', timelimit)
-    # print('Heuristics time limit:', heuristics_timelimit)
-    # print(f'ID: {ID}, N: {N}, J: {J}, T: {T}, P: {P}, K: {K}')
+    # Name of the file to load
+    FILENAME = f"datasets3/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
 
 
     # Model 0: "as-is" Gurobi model with no heuristics or cuts
-    # print("\nModel 0\n")
     model0 = Railway.load(FILENAME)
-    model0.model.setParam('OutputFlag', 0) # verbose
-    model0.model.setParam('TimeLimit', timelimit) # time limit
-    model0.model.setParam('LPWarmStart', 0)
-    model0.model.setParam('PoolSolutions', 1)
-    model0.model.setParam('Cuts', 0)
-    model0.model.setParam('CutPasses', 0)
-    model0.model.setParam('Heuristics', 0)
-    model0.model.setParam('Symmetry', 0)
-    model0.model.setParam('Threads', 1)
-    model0.model.setParam('Presolve', 0)
-
+    model0.set_model0(timelimit, False)
     model0.set_constraints()
     model0.set_objective()
-
     results0 = model0.optimize()
     row0 = {
         'ID': ID,
@@ -166,21 +121,6 @@ for ID, (N, J, T) in problems.items():
         'heuristics_limit': heuristics_timelimit
     }
 
-    # # Live results
-    # print()
-    # print(
-    #     f" Model".ljust(6),
-    #     f"| ID".ljust(4),
-    #     f"| status".ljust(13),
-    #     f"| runtime".ljust(10),
-    #     f"| heuristics".ljust(12),
-    #     f"| total".ljust(10),
-    #     f"| gap".ljust(10),
-    #     f"| objective".ljust(12),
-    #     f"| nodes".ljust(10),
-    # )
-    # print("-" * 95)
-
     print(
         f"   {0}".ljust(6),
         f"| {ID}".ljust(4),
@@ -195,20 +135,8 @@ for ID, (N, J, T) in problems.items():
 
 
     # Model 1: model with simulated annealing heuristic
-    # print("\nModel 1\n")
     model1 = Railway.load(FILENAME)
-    model1.model.setParam('OutputFlag', 0) # verbose
-    model1.model.setParam('TimeLimit', timelimit) # time limit
-    # model1.model.setParam('LPWarmStart', 1) # Must use warm start from SA
-    model1.model.setParam('PoolSolutions', 1)
-    model1.model.setParam('Cuts', 0)
-    model1.model.setParam('CutPasses', 0)
-    model1.model.setParam('Heuristics', 0)
-    model1.model.setParam('Symmetry', 0)
-    model1.model.setParam('Threads', 1)
-    model1.model.setParam('Presolve', 0)
-
-    # print('Running simulated annealing...')
+    model1.set_model1(timelimit, False)
     S, SAtime = model1.simulated_annealing(
         T=5e3,
         c=0.99,
@@ -217,10 +145,8 @@ for ID, (N, J, T) in problems.items():
         max_time=heuristics_timelimit
     )
     model1.set_solution(S)
-
     model1.set_constraints()
     model1.set_objective()
-
     results1 = model1.optimize()
     row1 = {
         'ID': ID,
@@ -256,19 +182,8 @@ for ID, (N, J, T) in problems.items():
 
 
     # Model 2: Full model plus valid inequalities and cutting planes
-    # print("\nModel 2\n")
     model2 = Railway.load(FILENAME)
-    model2.model.setParam('OutputFlag', 0) # verbose
-    model2.model.setParam('TimeLimit', timelimit) # time limit
-    model1.model.setParam('PoolSolutions', 1)
-    model1.model.setParam('Cuts', 0)
-    model1.model.setParam('CutPasses', 0)
-    model1.model.setParam('Heuristics', 0)
-    model1.model.setParam('Symmetry', 0)
-    model1.model.setParam('Threads', 1)
-    model1.model.setParam('Presolve', 0)
-
-    # print('Running simulated annealing...')
+    model2.set_model2(timelimit, False)
     S, SAtime = model2.simulated_annealing(
         T=5e3,
         c=0.99,
@@ -277,13 +192,10 @@ for ID, (N, J, T) in problems.items():
         max_time=heuristics_timelimit
     )
     model2.set_solution(S)
-
     model2.set_constraints()
     model2.set_objective()
-
     model2.set_valid_inequalities()
     model2.set_cutting_planes()
-
     results2 = model2.optimize()
     row2 = {
         'ID': ID,
@@ -316,6 +228,7 @@ for ID, (N, J, T) in problems.items():
         f"| {results2['obj']:.2e}".ljust(12),
         f"| {int(results2['nodes']):d}".ljust(10),
     )
+
 
     # Append results to the dataframe
     df.loc[len(df)] = row0
