@@ -1445,9 +1445,13 @@ class Railway:
 
         # Initialize solution, objective and iteration counter
         S = self.generate_initial_solution()
-        _, _, _, _, v = self.get_vars_from_times(S)
+        y, x, h, w, v = self.get_vars_from_times(S)
         f = self.get_objective_value(v)
         iter = 0
+        
+        # If the initial solution is not feasible, add a penalty to objective
+        if not self.check_feasibility(y, x, h, w, v): f += 1e6
+        
 
         # SA algorithm
         while (T > min_T) and (iter < max_iter) and (elapsed_time < max_time):
@@ -1901,10 +1905,10 @@ class Railway:
     # Random generator method: C (set of arcs that cannot be unavailable simultaneously)
     # TODO: def __generate_C(self): ... (maybe taking in account Aj or Ja sets to avoid infeasibility)
     # NOTE: given how the constriant (6) is written, C should be a list
-    # of lists of arcs that cannot be unavailable simultaneously:
+    # of tuples of arcs that cannot be unavailable simultaneously:
     #
-    # e.g. C = [ [(1, 2), (2, 3)],
-    # 			 [(3, 4), (4, 5), (5, 6)] ]
+    # e.g. C = [ ((1, 2), (2, 3)),
+    # 			 ((3, 4), (4, 5), (5, 6)) ]
     # XXX: when creating C ensure that no job needs a combination of arcs
     # that are in the same list of C otherwise the problem is infeasible...
 
@@ -2071,13 +2075,15 @@ class Railway:
                 when_free[a] = start_time + self.pi[j] + self.tau[a]
 
         # Get the decision variables values from the set of starting times S
-        y, x, h, w, v = self.get_vars_from_times(S)
+        # y, x, h, w, v = self.get_vars_from_times(S)
 
-        # Check the feasibility of the solution and return
-        if self.check_feasibility(y, x, h, w, v):
-            return S
-        else:
-            raise ValueError("Initial solution is not feasible")
+        # # Check the feasibility of the solution and return
+        # if self.check_feasibility(y, x, h, w, v):
+        #     return S
+        # else:
+        #     raise ValueError("Initial solution is not feasible")
+
+        return S
 
     # Generate a neighbor solution to a given one
     def generate_neighbor_solution(self, S):
