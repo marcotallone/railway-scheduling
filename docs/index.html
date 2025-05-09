@@ -123,10 +123,6 @@
 						</ul>
 					</div>
 
-
-
-
-
 				</div>
 
 			</div>
@@ -174,74 +170,305 @@
 			</section>
 
 			<!-- Slide 3 -->
-			<section data-transition="slide">
-				<h1 class="slide-title">Problem description</h1>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "description-title">Problem description</h1>
 
-				<div class="slide-body">
+				<div class="slide-body" data-id: "description-body">
 
-						<p>
-						Finite discrete time horizon:
-						\[
-							T = \{1, 2, \ldots, T_{end}\}
-						\]
-						</p>
-						<p>
-						Nodes representing the railway stations:
-						\[
-							N = \{1, 2, \ldots, n\}
-						\]
-						</p>
-						<p>
-						Bidirecitonal arcs connecting stations:
-						\[
-							\mathcal{A} = \{(i, j) \mid \forall i, j \in N, i &lt; j\}
-						\]
-						</p>
-						<!-- <p> -->
-						<!-- Travel times by train: -->
-						<!-- \[ -->
-						<!-- 	\omega^e_a \in \mathbb{R}^+  -->
-						<!-- \] -->
-						<!-- </p> -->
-						<!-- <p> -->
-						<!-- Travel times by alternative services: -->
-						<!-- \[ -->
-						<!-- 	\omega^j_a \in \mathbb{R}^+  -->
-						<!-- \] -->
-						<!-- </p> -->
-						<!-- <p> -->
-						<!-- Average times by train for each origin-destination pair: -->
-						<!-- \[ -->
-						<!-- 	\Omega_{od}, \quad \forall (o, d) \in N \times N \mid o \neq d -->
-						<!-- \] -->
-						<!-- </p> -->
-						<!-- <p> -->
-						<!-- Set of maintenance jobs: -->
-						<!-- \[ -->
-						<!-- 	J = \{1, 2, \ldots, n_{\text{jobs}}\} -->
-						<!-- \] -->
-						<!-- </p> -->
-						
-					<div style="height: 100%; aspect-ratio: 1; margin: 0 auto;">
-						<!-- Plot stations -->
-						<iframe
-							src="stations_plot3.html"
-							style="
-								width: 100%;
-								height:100%;
-								margin: 0 auto;
-								border:0;
-							"
-							frameborder="0"
-							scrolling="no"
-						>
-						</iframe>
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+						"description-multicolumn">
+
+						<div style="flex: 1" data-id: "description-left-col">
+							<div class="vertically-spaced-text">
+								<!-- <p> -->
+								<!-- Nodes representing the railway stations: -->
+								<!-- \[ -->
+								<!-- N = \{1, 2, \ldots, n\} -->
+								<!-- \] -->
+								<!-- </p> -->
+								<!-- <p> -->
+								<!-- Bidirecitonal arcs connecting stations: -->
+								<!-- \[ -->
+								<!-- \mathcal{A} = \{(i, j) \mid \forall i, j \in N, i &lt; j\} -->
+								<!-- \] -->
+								<!-- </p> -->
+								<!-- <p> -->
+								<!-- Train travel times: $\quad \omega^e_a \in \mathbb{R}^+$ -->
+								<!-- </p> -->
+								<!-- <p> -->
+								<!-- Alternative travel times: $\quad \omega^j_a \in -->
+								<!-- \mathbb{R}^+$ -->
+								<!-- </p> -->
+								<!-- <p> -->
+								<!-- Average train times from origin to destination: -->
+								<!-- \[ -->
+								<!-- 	\Omega_{od}, \quad \forall (o, d) \in N \times N \mid o \neq d -->
+								<!-- \] -->
+								<!-- </p> -->
+								<div style="text-align: left;">
+									<br>
+									Nodes representing the railway stations:
+									\[
+									N = \{1, 2, \ldots, n\}
+									\]
+									Bidirecitonal arcs connecting stations:
+									\[
+									\mathcal{A} = \{a_{ij}=(i, j) \mid \forall i, j \in N, i &lt; j\}
+									\]
+									Train travel times: $\quad \omega^e_a \in \mathbb{R}^+$
+									<br style="margin-bottom: 20px;">
+									Alternative travel times: $\quad \omega^j_a \in
+									\mathbb{R}^+$
+									<!-- <br style="margin-bottom: 15px;"> -->
+									<!-- Average train times from origin to destination: -->
+									<!-- \[ -->
+									<!-- \Omega_{od}, \quad \forall (o, d) \in N \times N \mid o \neq d -->
+									<!-- \] -->
+								</div>
+
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "description-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+									src="images/stations.html"
+									style="
+										width: 100%;
+										height:100%;
+										margin: 0 auto;
+										border:0;
+									"
+									frameborder="0"
+									scrolling="no"
+								>
+								</iframe>
+							</div>
+						</div>
+
 					</div>
 
 				</div>
 
 			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "description-title">Problem description</h1>
 
+				<div class="slide-body" data-id: "description-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+						"description-multicolumn">
+
+						<div style="flex: 1" data-id: "description-left-col">
+							<div class="vertically-spaced-text">
+								<div style="text-align: left;">
+									<br>
+									When travelling from origin $o$ to destination $d$, passengers
+									can consider up to $K \in \mathbb{N}$ possible routes.
+									<br style="margin-bottom: 20px;">
+The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
+\mid o \neq d$, the $K$ shortest paths connecting them.
+									<br style="margin-bottom: 20px;">
+									Then the set of average train times from origin to destination
+									is:
+									\[
+									\Omega_{od}, \quad \forall (o, d) \in N \times N \mid o \neq d
+									\]
+								</div>
+
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "description-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+									src="images/stations.html"
+									style="
+										width: 100%;
+										height:100%;
+										margin: 0 auto;
+										border:0;
+									"
+									frameborder="0"
+									scrolling="no"
+								>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "description-title">Problem description</h1>
+
+				<div class="slide-body" data-id: "description-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+						"description-multicolumn">
+
+						<div style="flex: 1" data-id: "description-left-col">
+							<div class="vertically-spaced-text">
+								<p>
+								Finite discrete time horizon:
+								\[
+								T = \{1, 2, \ldots, T_{end}\}
+								\]
+								</p>
+								<p>
+								Set of maintenance jobs:
+								\[
+									J = \{1, 2, \ldots, n_{\text{jobs}}\}
+								\]
+								</p>
+								<div style="text-align: left;">
+									Processing time of job $j$: $\quad \pi_j \in \mathbb{N}$
+									<br style="margin-bottom: 10px;">
+									Set of arcs associated to job $j$: $\quad \mathcal{A}_j \subseteq \mathcal{A}$
+									<br style="margin-bottom: 10px;">
+									Set of jobs associated to arc $a$: $\quad J_a \subseteq J$
+									<br style="margin-bottom: 10px;">
+									Time interval for consecutive jobs: $\quad \tau_a \in
+									\mathbb{N}$
+								</div>
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "description-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+									src="images/stations.html"
+									style="
+										width: 100%;
+										height:100%;
+										margin: 0 auto;
+										border:0;
+									"
+									frameborder="0"
+									scrolling="no"
+								>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "description-title">Problem description</h1>
+
+				<div class="slide-body" data-id: "description-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+						"description-multicolumn">
+
+						<div style="flex: 1" data-id: "description-left-col">
+							<div class="vertically-spaced-text">
+								<div style="text-align: left;">
+									<br>
+									Passenger flow from $o$ to $d$: $ \quad \phi_{odt}
+									\in \mathbb{N}$
+									<br style="margin-bottom: 20px;">
+									Trains have <i>"unlimited"</i> capacity $M \gg 1$:
+									\[
+										M &gt; \sum_{(o,d) \in N \times N} \sum_{t \in T} \phi_{odt}
+									\]
+									Alternative services capacity on $a$: $ \quad
+									\Lambda_{at} \in \mathbb{N}$
+									<br style="margin-bottom: 20px;">
+									The set $C$ contains all the combinations of arcs that cannot
+									be <b>unavailable simultaneously</b>:
+
+								</div>
+
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "description-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+									src="images/stations.html"
+									style="
+										width: 100%;
+										height:100%;
+										margin: 0 auto;
+										border:0;
+									"
+									frameborder="0"
+									scrolling="no"
+								>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "description-title">Problem description</h1>
+
+				<div class="slide-body" data-id: "description-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+						"description-multicolumn">
+
+						<div style="flex: 1" data-id: "description-left-col">
+							<div class="vertically-spaced-text">
+								<div style="text-align: left;">
+									<br>
+									It might happen that, at any time $t \in T$ <b>an event</b>
+									might occur that <b>increases the passenger demand</b> by a
+									factor $\beta_{odt}$ in a
+									subset of arcs of the network 
+									$\rightarrow$ modelled by the set $E$ of tracks segments $s$:
+									\[
+									E = \{ [a_{12}, a_{23}], [a_{45}, a_{35}, \dots], \dots \}
+									\]
+
+									During events, the <b>capacity of alternative services is
+										limited</b>:
+									\[
+									\Lambda_{st} = \sum_{a \in s} \Lambda_{at},\quad \forall s \in E, \forall t \in T
+									\]
+
+								</div>
+
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "description-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+									src="images/stations.html"
+									style="
+										width: 100%;
+										height:100%;
+										margin: 0 auto;
+										border:0;
+									"
+									frameborder="0"
+									scrolling="no"
+								>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</section>
 			<!-- Slide 4 -->
 			<section data-transition="slide">
 				<h1 class="slide-title">Decision Variables</h1>
@@ -436,16 +663,226 @@
 			</section>
 
 			<!-- Slide 7 -->
-			<section data-transition="slide">
-				<h1 class="slide-title">Example</h1>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "example-title">Example</h1>
 
-				<div class="slide-body">
+				<div class="slide-body" data-id: "example-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+											"example-multicolumn">
+
+						<div style="flex: 1" data-id: "example-left-col">
+							<div class="vertically-spaced-text">
+								<div style="text-align: left;">
+									<br>
+									$n = 5$ stations
+									<br style="margin-bottom: 25px;">
+									$T_{\text{end}} = 10$ time slots
+									<br style="margin-bottom: 25px;">
+									$n_{\text{jobs}} = 10$ jobs
+									<br style="margin-bottom: 25px;">
+									$K = 3$ routes
+									<br style="margin-bottom: 25px;">
+									$0 \leq \phi_{odt} \leq 2000$ passengers
+									<br style="margin-bottom: 25px;">
+								</div>
+
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "example-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+										src="images/stations.html"
+										style="
+													 width: 100%;
+													 height:100%;
+													 margin: 0 auto;
+													 border:0;
+													 "
+										frameborder="0"
+										scrolling="no"
+										>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "example-title">Example</h1>
+
+				<div class="slide-body" data-id: "example-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+											"example-multicolumn">
+
+						<!-- <div style="flex: 1" data-id: "example-left-col"> -->
+						<!-- 	<div class="vertically-spaced-text"> -->
+						<!-- 		<div style="text-align: left;"> -->
+						<!-- 			<br> -->
+						<!-- 			$n = 5$ stations -->
+						<!-- 			<br style="margin-bottom: 25px;"> -->
+						<!-- 			$T_{\text{end}} = 10$ time slots -->
+						<!-- 			<br style="margin-bottom: 25px;"> -->
+						<!-- 			$n_{\text{jobs}} = 10$ jobs -->
+						<!-- 			<br style="margin-bottom: 25px;"> -->
+						<!-- 			$K = 3$ routes -->
+						<!-- 			<br style="margin-bottom: 25px;"> -->
+						<!-- 			$0 \leq \phi_{odt} \leq 2000$ passengers -->
+						<!-- 			<br style="margin-bottom: 25px;"> -->
+						<!-- 		</div> -->
+						<!---->
+						<!-- 	</div> -->
+						<!-- </div> -->
+
+						<div style="flex: 1" data-id: "example-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+										src="images/stations.html"
+										style="
+													 width: 100%;
+													 height:100%;
+													 margin: 0 auto;
+													 border:0;
+													 "
+										frameborder="0"
+										scrolling="no"
+										>
+								</iframe>
+							</div>
+						</div>
+						<div style="flex: 1" data-id: "example-new-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+										src="images/schedule.html"
+										style="
+													 width: 100%;
+													 height:100%;
+													 margin: 0 auto;
+													 border:0;
+													 "
+										frameborder="0"
+										scrolling="no"
+										>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "example-title">Example</h1>
+
+				<div class="slide-body" data-id: "example-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+											"example-multicolumn">
+
+						<div style="flex: 1" data-id: "example-new-left-col">
+							<div class="vertically-spaced-text">
+								<p>
+								In this example we set:
+								\[
+								C = \{ [a_{45}, a_{35}], [a_{14}, a_{25}] \}
+								\]
+								</p>
+								<p>
+								We can see how the solution changes by adding arc $a_{12}$ to
+								the second list of required simultaneously available arcs
+								$\dots$
+								</p>
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "example-new-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+										src="images/scheduleC1.html"
+										style="
+													 width: 100%;
+													 height:100%;
+													 margin: 0 auto;
+													 border:0;
+													 "
+										frameborder="0"
+										scrolling="no"
+										>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id: "example-title">Example</h1>
+
+				<div class="slide-body" data-id: "example-body">
+
+					<div class="multicolumn" style="margin-top: 50px;" data-id:
+											"example-multicolumn">
+
+						<div style="flex: 1" data-id: "example-new-left-col">
+							<div class="vertically-spaced-text">
+								<p>
+								In this example we set:
+								\[
+								C = \{ [a_{45}, a_{35}], [a_{14}, a_{25}] \}
+								\]
+								</p>
+								<p>
+								We can see how the solution changes by adding arc $a_{12}$ to
+								the second list of required simultaneously available arcs
+								$\dots$
+								</p>
+								<p>
+								\[
+								C = \{ [a_{45}, a_{35}], [a_{14}, a_{25}, a_{12}] \}
+								\]
+								</p>
+								<!-- <p> -->
+								<!-- Job $6$ and job $10$ would have violated the constraint $(6)$. -->
+								<!-- </p> -->
+							</div>
+						</div>
+
+						<div style="flex: 1" data-id: "example-new-right-col">
+							<!-- Plot stations -->
+							<div style="aspect-ratio: 1; margin: 0 auto;">
+								<iframe
+										src="images/scheduleC2.html"
+										style="
+													 width: 100%;
+													 height:100%;
+													 margin: 0 auto;
+													 border:0;
+													 "
+										frameborder="0"
+										scrolling="no"
+										>
+								</iframe>
+							</div>
+						</div>
+
+					</div>
 
 				</div>
 			</section>
 
-		</section>
 
+			</section>
+		</section>
 
 		<!-- Section: Model Improvements  -------------------------------------->
 		<section data-name="2. Model Improvements">

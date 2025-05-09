@@ -81,6 +81,14 @@ section {
 	text-align: left;
 }
 
+.vertically-spaced-text {
+	display: flex; 
+	justify-content: left !important;
+	flex-direction: column;
+	align-items: center;
+	height: 100%;
+}
+
 .slide-title { 
 	display: flex; 
 	justify-content: left; 
