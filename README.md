@@ -235,7 +235,7 @@ $$
 \Lambda_{st} = \sum_{a \in s} \Lambda_{at},\quad \forall s \in E, \forall t \in T
 $$
 
-Finally, it's assumed that, when travelling from origin $o$ to destination $d$, passenger can consider up to $K \in \mathbb{N}$ possible alternative routes aiming for the one that minimizes the total travel time. Therefore, the set $R$ contains, for each origin-destination pair $(o,d) \in N \times N \mid o \neq d$, the $K$ shortest paths connecting the origin and the destination. These can be easily computed using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) once the topology of the network is known (implemented in the `YenKSP()` method of the `Railway` class).\
+Finally, it's assumed that, when travelling from origin $o$ to destination $d$, passengers can consider up to $K \in \mathbb{N}$ possible alternative routes aiming for the one that minimizes the total travel time. Therefore, the set $R$ contains, for each origin-destination pair $(o,d) \in N \times N \mid o \neq d$, the $K$ shortest paths connecting the origin and the destination. These can be easily computed using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) once the topology of the network is known (implemented in the `YenKSP()` method of the `Railway` class).\
 Further assumptions made for this model are listed below:
 
 - there is no precedence relation between jobs, i.e. jobs can be scheduled in any order
