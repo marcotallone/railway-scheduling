@@ -148,32 +148,16 @@ section {
 }
 
 /* Tables */
-/* .latex-table { */
-/* 	width: 100%; */
-/* 	border-collapse: collapse; */
-/* 	border: 1px solid var(--textcolor); */
-/* 	font-size: 1em; */
-/* 	text-align: center !important; */
-/* 	margin-bottom: 20px; */
-/* 	th, td { */
-/* 		border: 1px solid var(--textcolor); */
-/* 		padding: 8px; */
-/* 		text-align: center !important; */
-/* 	}; */
-/* 	th { */
-/* 		background-color: var(--dark); */
-/* 		text-align: center !important; */
-/* 	} */
-/* } */
 .latex-table {
 	width: 80%;
 	border-collapse: collapse;
 	border: 1px solid var(--textcolor);
-	font-size: 0.8em;
+	font-size: 0.53em;
 	text-align: center !important;
+    line-height: 0.8;
 	th, td {
 		border: 1px solid var(--textcolor);
-		padding: 8px;
+		padding: 2px;
 		text-align: center !important;
 	};
 	th {
@@ -181,6 +165,24 @@ section {
 		text-align: center !important;
 	}
 }
+.latex-table2 {
+	width: 80%;
+	border-collapse: collapse;
+	border: 1px solid var(--textcolor);
+	font-size: 0.8em;
+	text-align: center !important;
+    line-height: 1;
+	th, td {
+		border: 1px solid var(--textcolor);
+		padding: 2px;
+		text-align: center !important;
+	};
+	th {
+		background-color: var(--dark);
+		text-align: center !important;
+	}
+}
+
 
 /* References -------------------------------------------------------------- */
 .references {

@@ -944,7 +944,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						Given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\}$ is <b>never used</b>, we can set the associated variable $h_{odt\tilde{k}} = 0$
 					</div>
 					<div class="cbox" data-id="never-used-cbox">
-						<b data-id="never-used-title">When is a route option never used?</b><br>
+						<p data-id="never-used-title"><b>When is a route option never used?</b></p>
 					</div>
 
 				</div>
@@ -959,7 +959,8 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						Given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\}$ is <b>never used</b>, we can set the associated variable $h_{odt\tilde{k}} = 0$
 					</div>
 					<div class="cbox" data-id="never-used-cbox">
-						<b data-id="never-used-title">When is a route option never used?</b><br>
+						<p data-id="never-used-title"><b>When is a route option never used?</b></p>
+						<p data-id="never-used-explanation">
 						Consider path from $o$ to $d$: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $p_{od} = (a_1, \dots, a_n)$<br>
 						<ul>
 							<li>
@@ -968,8 +969,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 							<li>
 								<b>min travel time</b>: when all arcs of the path are available simultaneously
 						</ul>
-						<br>
-						Hence when:
+						</p>
 						<p data-id="never-used-p">
 						\[
 							\text{max time of } p^{(1)}_{od} &lt; \text{min time of } p^{(2)}_{od}
@@ -989,19 +989,19 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 				<div class="slide-body">
 					<!-- 15 -->
 					<div class="slide-text" style="margin-bottom: 40px;" data-id="never-used-body">
-						Given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\} = [K]$ is <b>never used</b>, we can set the associated variable $h_{odt\tilde{k}} = 0$
+						Given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\}$ is <b>never used</b>, we can set the associated variable $h_{odt\tilde{k}} = 0$
 					</div>
 					<div class="cbox" data-id="never-used-cbox">
-						<b data-id="never-used-title">When is a route option never used?</b><br>
+						<p data-id="never-used-title"><b>When is a route option never used?</b></p>
 						<p data-id="never-used-p">
 						\[
-							\text{min time of } p^{(1)}_{od} &gt; \text{max time of } p^{(2)}_{od}
+							\text{max time of } p^{(1)}_{od} &lt; \text{min time of } p^{(2)}_{od}
 							\quad \Rightarrow \quad
-							p^{(1)}_{od} \text{ is never used}
+							p^{(2)}_{od} \text{ is never used}
 						\]
 						</p>
 					</div>
-					<div class="slide-text" style="margin-bottom: 40px;" data-id="never-used-constraint">
+					<div class="slide-text" data-id="never-used-constraint">
 						\[
 							h_{odti} = 0, 
 							\quad \forall (o, d, i) \in
@@ -1017,12 +1017,11 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 			</section>
 
 			<!-- Slide 9 -->
-			<section data-transition="slide">
+			<section data-transition="slide" data-auto-animate>
 				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
-
-				<div class="slide-body">
+				<div class="slide-body" data-id="valid-inequalities-body">
 					<!-- B1 and B2 -->
-					<div class="slide-text fragment fade-out" style="position: absolute;">
+					<div class="slide-text" data-id="valid-inequalities-text1">
 						<b>Sousa and Wolsey</b> inequality from the "<i>Single Machine Scheduling</i>" problem:
 						\[
 						\sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
@@ -1035,7 +1034,12 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 							<li> $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ <i><br>(i.e. maximum total processing time for other jobs on the same arc as job $j$)</i></li>
 						</ul>
 					</div>
-					<div class="slide-text fragment fade-in" style="position: absolute;">
+				</div>
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
+				<div class="slide-body" data-id="valid-inequalities-body">
+					<div class="slide-text" data-id="valid-inequalities-text2">
 						Non-overlapping jobs inequality:
 						\[
 						y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
@@ -1044,27 +1048,8 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\tag{B2}
 						\]
 					</div>
-
 				</div>
-
 			</section>
-			<!-- <section data-transition="slide"> -->
-			<!-- 	<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1> -->
-			<!---->
-			<!-- 	<div class="slide-body"> -->
-			<!-- 		<div class="slide-text"> -->
-			<!-- 			Non-overlapping jobs inequality: -->
-			<!-- 			\[ -->
-			<!-- 			y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T -->
-			<!-- 			\] -->
-			<!-- 			\[ -->
-			<!-- 			\tag{B2} -->
-			<!-- 			\] -->
-			<!-- 		</div> -->
-			<!---->
-			<!-- 	</div> -->
-			<!---->
-			<!-- </section> -->
 
 			<!-- Slide 9 -->
 			<section data-transition="slide">
@@ -1096,6 +1081,59 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 				</div>
 
 			</section>
+			<section data-transition="slide">
+				<h1 class="slide-title">Meta-Heuristics: Simulated Annealing</h1>
+
+				<div class="slide-body">
+
+					<p style="text-align: left;">
+					<b>Initial solution</b>: schedule jobs from the one with most arcs to ones with less arcs
+					<br>
+					<b>Example</b>: Job $5$ $\rightarrow$ Job $2$ $\rightarrow$ Job $7$ $\rightarrow$ Job $10$ $\rightarrow$ Job $3$ $\rightarrow$ $\dots$
+					</p>
+
+                    <iframe
+                        src="images/initial.html"
+                        style="
+                            width: 70%;
+                            height: 80%;
+                            margin: 0 auto;
+                            border:0;
+                        "
+                        frameborder="0"
+                        scrolling="no"
+                    >
+                    </iframe>
+				</div>
+
+			</section>
+			<section data-transition="slide">
+				<h1 class="slide-title">Meta-Heuristics: Simulated Annealing</h1>
+
+				<div class="slide-body">
+
+					<p style="text-align: left;">
+					<b>Neighbor solution</b>: reschedule a single job by moving it to a different time slot
+					<br>
+					<b>Example</b>: Reschedule job $7$ to a feasible time slot
+					</p>
+
+                    <iframe
+                        src="images/neighbor.html"
+                        style="
+                            width: 70%;
+                            height: 80%;
+                            margin: 0 auto;
+                            border:0;
+                        "
+                        frameborder="0"
+                        scrolling="no"
+                    >
+                    </iframe>
+
+				</div>
+
+			</section>
 
 		</section>
 
@@ -1117,7 +1155,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 					<div class="slide-text">
 						<ul class="list" style="margin-bottom: 30px;">
 							<li>Models implemented in <code>Python</code> (<code>3.11.5</code>) using <code>Gurobi</code> (<code>12.0.1</code>) </li>
-							<li>Run on $\text{Intel}^{\text{(R)}} \text{ Core}^{\text{(TM)}} \text{ i}7\text{-}8565\text{Uz}$ CPU with $40$GB of RAM</li>
+							<li>Run on $\text{Intel}^{\text{(R)}} \text{ Core}^{\text{(TM)}} \text{ i}7\text{-}8565\text{U}$ CPU with $40$GB of RAM</li>
 							<li>Time limit: $5$ minutes for <code>Gurobi</code> solver and $2$ minutes for simulated annealing</li>
 						</ul>
 					</div>
@@ -1199,22 +1237,935 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 				</div>
 
 			</section>
-
-			<!-- Slide 12 -->
 			<section data-transition="slide">
-				<h1 class="slide-title">Results</h1>
+				<h1 class="slide-title">Problem Istances</h1>
 
 				<div class="slide-body">
+                <!-- ID   N   J    T  K
+                1  10  10   10  3
+                2  10  10   50  3
+                3  10  10  100  3
+                4  10  40   10  3
+                5  10  40   50  3
+                6  10  40  100  3
+                7  10  80   10  3
+                8  10  80   50  3
+                9  10  80  100  3
+                10  20  10   10  3
+                11  20  10   50  3
+                12  20  10  100  3
+                13  20  40   10  3
+                14  20  40   50  3
+                15  20  40  100  3
+                16  20  80   10  3
+                17  20  80   50  3
+                18  20  80  100  3
+                19  40  10   10  3
+                20  40  10   50  3
+                21  40  10  100  3
+                22  40  40   10  3
+                23  40  40   50  3
+                24  40  40  100  3
+                25  40  80   10  3
+                26  40  80   50  3
+                27  40  80  100  3 -->
+                    <div class="multicolumn">
+
+                        <!-- Column 1 -->
+                        <div style="margin: 0px 5px 0px 5px;">
+                        <table class="latex-table2">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>$|N|$</th>
+                                    <th>$|J|$</th>
+                                    <th>$|T|$</th>
+                                    <th>$K$</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>10</td>
+                                    <td>10</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>10</td>
+                                    <td>10</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>10</td>
+                                    <td>10</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>10</td>
+                                    <td>40</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>10</td>
+                                    <td>40</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>10</td>
+                                    <td>40</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>10</td>
+                                    <td>80</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>10</td>
+                                    <td>80</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>10</td>
+                                    <td>80</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div style="margin: 0px 5px 0px 5px;">
+                        <table class="latex-table2">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>$|N|$</th>
+                                    <th>$|J|$</th>
+                                    <th>$|T|$</th>
+                                    <th>$K$</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>10</td>
+                                    <td>20</td>
+                                    <td>10</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td>20</td>
+                                    <td>10</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>12</td>
+                                    <td>20</td>
+                                    <td>10</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>13</td>
+                                    <td>20</td>
+                                    <td>40</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>14</td>
+                                    <td>20</td>
+                                    <td>40</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>15</td>
+                                    <td>20</td>
+                                    <td>40</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>16</td>
+                                    <td>20</td>
+                                    <td>80</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>17</td>
+                                    <td>20</td>
+                                    <td>80</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>18</td>
+                                    <td>20</td>
+                                    <td>80</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <!-- Column 3 -->
+                        <div style="margin: 0px 5px 0px 5px;">
+                        <table class="latex-table2">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>$|N|$</th>
+                                    <th>$|J|$</th>
+                                    <th>$|T|$</th>
+                                    <th>$K$</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>19</td>
+                                    <td>40</td>
+                                    <td>10</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>20</td>
+                                    <td>40</td>
+                                    <td>10</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>21</td>
+                                    <td>40</td>
+                                    <td>10</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>22</td>
+                                    <td>40</td>
+                                    <td>40</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>23</td>
+                                    <td>40</td>
+                                    <td>40</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>24</td>
+                                    <td>40</td>
+                                    <td>40</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>25</td>
+                                    <td>40</td>
+                                    <td>80</td>
+                                    <td>10</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>26</td>
+                                    <td>40</td>
+                                    <td>80</td>
+                                    <td>50</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>27</td>
+                                    <td>40</td>
+                                    <td>80</td>
+                                    <td>100</td>
+                                    <td>3</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                    </div>
 
 				</div>
 
 			</section>
 
-			<!-- Slide N -->
+			<!-- Slide 12 -->
 			<section data-transition="slide">
-				<h1 class="slide-title">SlideTitle</h1>
+				<h1 class="slide-title">Results Model 1</h1>
 
 				<div class="slide-body">
+                <!-- ID           gap  total_time  heuristics_time    nodes  iterations
+                1      0.000000   13.551369        13.384254      3.0       801.0
+                2      0.000000   82.892668        75.206872    697.0     16171.0
+                3      0.000000  128.356246       120.113449     84.0     13184.0
+                4      0.000000   19.909886        18.091038    711.0      8419.0
+                5     47.985609  393.587134        93.586084  14789.0    791891.0
+                6     88.634262  420.096782       120.087608    973.0    223359.0
+                7    223.738382  317.725292        17.725082  77956.0   3212781.0
+                8    103.267425  413.028796       113.026327   1004.0    485693.0
+                9    117.660413  420.534959       120.519974    627.0    347945.0
+                10      0.000000   82.357783        81.404268     43.0      1489.0
+                11      0.000000  126.231088       120.308549      3.0      8789.0
+                12      0.000000  152.162566       121.768637     66.0     15791.0
+                13      0.000000  106.499191       100.577314    439.0      9059.0
+                14      9.709903  420.384332       120.349038   4452.0    248848.0
+                15     22.446457  420.680066       120.609235   1228.0    120064.0
+                16      0.000000  116.686720       102.247399   1193.0     19768.0
+                17     77.164522  420.475908       120.456611    788.0    190160.0
+                18     97.074590  421.017748       120.944853    306.0    151308.0
+                19      0.000000  126.111768       120.267398      3.0      2345.0
+                20      0.000000  178.427255       120.348357      3.0     14770.0
+                21      0.000000  284.777731       120.235905      3.0     27688.0
+                22      0.000000  132.318818       120.068829     50.0      8419.0
+                23      0.552255  423.328152       123.086812    302.0     54424.0
+                24  23487.831547  427.222423       126.519209      1.0     45991.0
+                25      0.863533  420.085797       120.044487  17182.0    274587.0
+                26  13290.344394  423.464317       123.304786      1.0     68247.0
+                27  12452.753477  425.077386       124.704933      1.0     63012.0 -->
+
+                <table class="latex-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>MIP Gap (%)</th>
+                            <th>Runtime (total)</th>
+                            <th>Runtime (heuristics)</th>
+                            <th>Nodes</th>
+                            <th>Iterations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>0.00</td>
+                            <td>13.55</td>
+                            <td>13.38</td>
+                            <td>3</td>
+                            <td>801</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>0.00</td>
+                            <td>82.89</td>
+                            <td>75.21</td>
+                            <td>697</td>
+                            <td>16171</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>0.00</td>
+                            <td>128.36</td>
+                            <td>120.11</td>
+                            <td>84</td>
+                            <td>13184</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>0.00</td>
+                            <td>19.91</td>
+                            <td>18.09</td>
+                            <td>711</td>
+                            <td>8419</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>47.99</td>
+                            <td>393.59</td>
+                            <td>93.59</td>
+                            <td>14789</td>
+                            <td>791891</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>88.63</td>
+                            <td>420.10</td>
+                            <td>120.09</td>
+                            <td>973</td>
+                            <td>223359</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>223.74</td>
+                            <td>317.73</td>
+                            <td>17.73</td>
+                            <td>77956</td>
+                            <td>3212781</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>103.27</td>
+                            <td>413.03</td>
+                            <td>113.03</td>
+                            <td>1004</td>
+                            <td>485693</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>117.66</td>
+                            <td>420.53</td>
+                            <td>120.52</td>
+                            <td>627</td>
+                            <td>347945</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>0.00</td>
+                            <td>82.36</td>
+                            <td>81.40</td>
+                            <td>43</td>
+                            <td>1489</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>0.00</td>
+                            <td>126.23</td>
+                            <td>120.31</td>
+                            <td>3</td>
+                            <td>8789</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>0.00</td>
+                            <td>152.16</td>
+                            <td>121.77</td>
+                            <td>66</td>
+                            <td>15791</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>0.00</td>
+                            <td>106.50</td>
+                            <td>100.58</td>
+                            <td>439</td>
+                            <td>9059</td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>9.71</td>
+                            <td>420.38</td>
+                            <td>120.35</td>
+                            <td>4452</td>
+                            <td>248848</td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>22.45</td>
+                            <td>420.68</td>
+                            <td>120.61</td>
+                            <td>1228</td>
+                            <td>120064</td>
+                        </tr>
+                        <tr>
+                            <td>16</td>
+                            <td>0.00</td>
+                            <td>116.69</td>
+                            <td>102.25</td>
+                            <td>1193</td>
+                            <td>19768</td>
+                        </tr>
+                        <tr>
+                            <td>17</td>
+                            <td>77.16</td>
+                            <td>420.48</td>
+                            <td>120.46</td>
+                            <td>788</td>
+                            <td>190160</td>
+                        </tr>
+                        <tr>
+                            <td>18</td>
+                            <td>97.07</td>
+                            <td>421.02</td>
+                            <td>120.94</td>
+                            <td>306</td>
+                            <td>151308</td>
+                        </tr>
+                        <tr>
+                            <td>19</td>
+                            <td>0.00</td>
+                            <td>126.11</td>
+                            <td>120.27</td>
+                            <td>3</td>
+                            <td>2345</td>
+                        </tr>
+                        <tr>
+                            <td>20</td>
+                            <td>0.00</td>
+                            <td>178.43</td>
+                            <td>120.35</td>
+                            <td>3</td>
+                            <td>14770</td>
+                        </tr>
+                        <tr>
+                            <td>21</td>
+                            <td>0.00</td>
+                            <td>284.78</td>
+                            <td>120.24</td>
+                            <td>3</td>
+                            <td>27688</td>
+                        </tr>
+                        <tr>
+                            <td>22</td>
+                            <td>0.00</td>
+                            <td>132.32</td>
+                            <td>120.07</td>
+                            <td>50</td>
+                            <td>8419</td>
+                        </tr>
+                        <tr>
+                            <td>23</td>
+                            <td>0.55</td>
+                            <td>423.33</td>
+                            <td>123.09</td>
+                            <td>302</td>
+                            <td>54424</td>
+                        </tr>
+                        <tr>
+                            <td>24</td>
+                            <td>23487.83</td>
+                            <td>427.22</td>
+                            <td>126.52</td>
+                            <td>1</td>
+                            <td>45991</td>
+                        </tr>
+                        <tr>
+                            <td>25</td>
+                            <td>0.86</td>
+                            <td>420.09</td>
+                            <td>120.04</td>
+                            <td>17182</td>
+                            <td>274587</td>
+                        </tr>
+                        <tr>
+                            <td>26</td>
+                            <td>13290.34</td>
+                            <td>423.46</td>
+                            <td>123.30</td>
+                            <td>1</td>
+                            <td>68247</td>
+                        </tr>
+                        <tr>
+                            <td>27</td>
+                            <td>12452.75</td>
+                            <td>425.08</td>
+                            <td>124.70</td>
+                            <td>1</td>
+                            <td>63012</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+				</div>
+
+			</section>
+
+			<!-- Slide 13 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Results Model 2</h1>
+
+				<div class="slide-body">
+                <!-- ID        gap  total_time  heuristics_time   nodes  iterations
+                1   0.000000   13.497359        13.463802     1.0       180.0
+                2   0.000000   79.727374        79.402521     1.0       949.0
+                3   0.000000  123.616694       120.109806    57.0      2808.0
+                4   0.000000   18.935950        18.218682   312.0      6717.0
+                5   0.000000  115.143434        92.293065   552.0     78036.0
+                6   5.449769  420.198809       120.137734    16.0    132303.0
+                7   0.000000   58.303281        17.693545  8033.0    669270.0
+                8   3.211084  410.865371       110.817743   389.0    327410.0
+                9  96.716285  420.219228       120.118639     1.0     82817.0
+                10   0.000000   80.937260        80.849751     1.0        65.0
+                11   0.000000  120.838762       120.140487     1.0       208.0
+                12   0.000000  122.930807       121.004945     1.0       684.0
+                13   0.000000   94.738176        94.563081     1.0       863.0
+                14   0.000000  138.496113       120.076378  1767.0    137166.0
+                15   0.000000  161.404876       120.812325     1.0     28984.0
+                16   0.009324  102.324125       101.475571     1.0      3853.0
+                17   0.570342  420.579142       120.519768   684.0    408924.0
+                18   2.664279  420.666120       120.547176     1.0    113408.0
+                19   0.000000  121.065766       120.208662     1.0        42.0
+                20   0.000000  127.270449       120.907803     1.0        78.0
+                21   0.000000  136.042087       122.128849     1.0      1229.0
+                22   0.000000  121.486038       120.589185     1.0       527.0
+                23   0.002832  130.340487       122.166721     1.0      6691.0
+                24   0.009963  151.588990       126.378641     1.0     33735.0
+                25   0.008583  121.999166       120.656488     1.0      2694.0
+                26   0.008013  364.313962       123.376969  3013.0    644220.0
+                27   0.009139  388.335476       125.455730   828.0    331506.0 -->
+
+                <table class="latex-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>MIP Gap (%)</th>
+                            <th>Runtime (total)</th>
+                            <th>Runtime (heuristics)</th>
+                            <th>Nodes</th>
+                            <th>Iterations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>0.00</td>
+                            <td>13.50</td>
+                            <td>13.46</td>
+                            <td>1</td>
+                            <td>180</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>0.00</td>
+                            <td>79.73</td>
+                            <td>79.40</td>
+                            <td>1</td>
+                            <td>949</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>0.00</td>
+                            <td>123.62</td>
+                            <td>120.11</td>
+                            <td>57</td>
+                            <td>2808</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>0.00</td>
+                            <td>18.94</td>
+                            <td>18.22</td>
+                            <td>312</td>
+                            <td>6717</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>0.00</td>
+                            <td>115.14</td>
+                            <td>92.29</td>
+                            <td>552</td>
+                            <td>78036</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>5.45</td>
+                            <td>420.20</td>
+                            <td>120.14</td>
+                            <td>16</td>
+                            <td>132303</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>0.00</td>
+                            <td>58.30</td>
+                            <td>17.69</td>
+                            <td>8033</td>
+                            <td>669270</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>3.21</td>
+                            <td>410.87</td>
+                            <td>110.82</td>
+                            <td>389</td>
+                            <td>327410</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>96.72</td>
+                            <td>420.22</td>
+                            <td>120.12</td>
+                            <td>1</td>
+                            <td>82817</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>0.00</td>
+                            <td>80.94</td>
+                            <td>80.85</td>
+                            <td>1</td>
+                            <td>65</td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>0.00</td>
+                            <td>120.84</td>
+                            <td>120.14</td>
+                            <td>1</td>
+                            <td>208</td>
+                        </tr>
+                        <tr>
+                            <td>12</td>
+                            <td>0.00</td>
+                            <td>122.93</td>
+                            <td>121.00</td>
+                            <td>1</td>
+                            <td>684</td>
+                        </tr>
+                        <tr>
+                            <td>13</td>
+                            <td>0.00</td>
+                            <td>94.74</td>
+                            <td>94.56</td>
+                            <td>1</td>
+                            <td>863</td>
+                        </tr>
+                        <tr>
+                            <td>14</td>
+                            <td>0.00</td>
+                            <td>138.50</td>
+                            <td>120.08</td>
+                            <td>1767</td>
+                            <td>137166</td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td>0.00</td>
+                            <td>161.40</td>
+                            <td>120.81</td>
+                            <td>1</td>
+                            <td>28984</td>
+                        </tr>
+                        <tr>
+                            <td>16</td>
+                            <td>0.01</td>
+                            <td>102.32</td>
+                            <td>101.48</td>
+                            <td>1</td>
+                            <td>3853</td>
+                        </tr>
+                        <tr>
+                            <td>17</td>
+                            <td>0.57</td>
+                            <td>420.58</td>
+                            <td>120.52</td>
+                            <td>684</td>
+                            <td>408924</td>
+                        </tr>
+                        <tr>
+                            <td>18</td>
+                            <td>2.66</td>
+                            <td>420.67</td>
+                            <td>120.55</td>
+                            <td>1</td>
+                            <td>113408</td>
+                        </tr>
+                        <tr>
+                            <td>19</td>
+                            <td>0.00</td>
+                            <td>121.07</td>
+                            <td>120.21</td>
+                            <td>1</td>
+                            <td>42</td>
+                        </tr>
+                        <tr>
+                            <td>20</td>
+                            <td>0.00</td>
+                            <td>127.27</td>
+                            <td>120.91</td>
+                            <td>1</td>
+                            <td>78</td>
+                        </tr>
+                        <tr>
+                            <td>21</td>
+                            <td>0.00</td>
+                            <td>136.04</td>
+                            <td>122.13</td>
+                            <td>1</td>
+                            <td>1229</td>
+                        </tr>
+                        <tr>
+                            <td>22</td>
+                            <td>0.00</td>
+                            <td>121.49</td>
+                            <td>120.59</td>
+                            <td>1</td>
+                            <td>527</td>
+                        </tr>
+                        <tr>
+                            <td>23</td>
+                            <td>0.00</td>
+                            <td>130.34</td>
+                            <td>122.17</td>
+                            <td>1</td>
+                            <td>6691</td>
+                        </tr>
+                        <tr>
+                            <td>24</td>
+                            <td>0.01</td>
+                            <td>151.59</td>
+                            <td>126.38</td>
+                            <td>1</td>
+                            <td>33735</td>
+                        </tr>
+                        <tr>
+                            <td>25</td>
+                            <td>0.01</td>
+                            <td>122.00</td>
+                            <td>120.66</td>
+                            <td>1</td>
+                            <td>2694</td>
+                        </tr>
+                        <tr>
+                            <td>26</td>
+                            <td>0.01</td>
+                            <td>364.31</td>
+                            <td>123.38</td>
+                            <td>3013</td>
+                            <td>644220</td>
+                        </tr>
+                        <tr>
+                            <td>27</td>
+                            <td>0.01</td>
+                            <td>388.34</td>
+                            <td>125.46</td>
+                            <td>828</td>
+                            <td>331506</td>
+                        </tr>
+                    </tbody>
+                </table> 
+
+				</div>
+
+			</section>
+
+			<!-- Slide 14 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Results: MIP Gap (%)</h1>
+
+				<div class="slide-body">
+
+                    <iframe
+                        src="images/results-gap.html"
+                        style="
+                            width: 90%;
+                            height: 85%;
+                            margin: 0 auto;
+                            border:0;
+                        "
+                        frameborder="0"
+                        scrolling="no"
+                    >
+                    </iframe>
+
+				</div>
+
+			</section>
+
+			<!-- Slide 15 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Results: Runtime (total)</h1>
+
+				<div class="slide-body">
+
+                    <iframe
+                        src="images/results-runtime.html"
+                        style="
+                            width: 90%;
+                            height: 85%;
+                            margin: 0 auto;
+                            border:0;
+                        "
+                        frameborder="0"
+                        scrolling="no"
+                    >
+                    </iframe>
+
+				</div>
+
+			</section>
+
+			<!-- Slide 16 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Results: Runtime (heuristics)</h1>
+
+				<div class="slide-body">
+
+                    <iframe
+                        src="images/results-heuristics.html"
+                        style="
+                            width: 90%;
+                            height: 85%;
+                            margin: 0 auto;
+                            border:0;
+                        "
+                        frameborder="0"
+                        scrolling="no"
+                    >
+                    </iframe>
+
+				</div>
+
+			</section>
+
+			<!-- Slide 17 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Results: Nodes Explored</h1>
+
+				<div class="slide-body">
+
+                    <iframe
+                        src="images/results-nodes.html"
+                        style="
+                            width: 90%;
+                            height: 85%;
+                            margin: 0 auto;
+                            border:0;
+                        "
+                        frameborder="0"
+                        scrolling="no"
+                    >
+                    </iframe>
+
+				</div>
+
+			</section>
+
+			<!-- Slide 18 -->
+			<section data-transition="slide">
+				<h1 class="slide-title">Results: Iterations</h1>
+
+				<div class="slide-body">
+
+                    <iframe
+                        src="images/results-iterations.html"
+                        style="
+                            width: 90%;
+                            height: 85%;
+                            margin: 0 auto;
+                            border:0;
+                        "
+                        frameborder="0"
+                        scrolling="no"
+                    >
+                    </iframe>
 
 				</div>
 
