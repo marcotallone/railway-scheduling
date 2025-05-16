@@ -536,6 +536,43 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 
 			<!-- Slide 6 -->
 			<!-- <section data-transition="slide"> -->
+			<!-- <section data-transition="slide" data-auto-animate> -->
+			<!-- 	<h1 class="slide-title" data-id="constraints-title">Constraints</h1> -->
+			<!---->
+			<!-- 	<div class="slide-body"> -->
+			<!---->
+					<!-- 2 -->
+			<!-- 		<div class="slide-text"> -->
+			<!-- 					A feasible solution of this model schedules all the jobs within the time horizon $T_{end}$ -->
+			<!-- 			</div> -->
+			<!---->
+			<!-- 			<div class="multicolumn"> -->
+			<!---->
+			<!-- 				<div style="flex: 1"> -->
+			<!-- 					\[ -->
+			<!-- 					\sum_{t=1}^{T_{end} - \pi_j + 1} y_{jt} = 1, \quad \forall j \in J -->
+			<!-- 					\tag{2} -->
+			<!-- 					\] -->
+			<!-- 				</div> -->
+			<!---->
+			<!-- 				<div style="flex: 1; padding: 20px 0px 0px 20px;"> -->
+			<!-- 					<img src="images/constraint2.svg" width="90%" /> -->
+			<!-- 				</div> -->
+			<!---->
+			<!---->
+			<!-- 			</div> -->
+					<!-- 3 -->
+			<!-- 		<div class="slide-text"> -->
+			<!-- 			Each job must start only once and, while it's being processed, the subset -->
+			<!-- 			$\mathcal{A}_j$ of its arcs must be unavailable for other jobs (since they are occupied) \[ -->
+			<!-- 			x_{at} + \sum_{t'=\max(1, t-\pi_j+1)}^{\min(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a -->
+			<!-- 			\tag{3} -->
+			<!-- 			\] -->
+			<!-- 		</div> -->
+			<!---->
+			<!-- 	</div> -->
+			<!---->
+			<!-- </section> -->
 			<section data-transition="slide" data-auto-animate>
 				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
 
@@ -549,14 +586,25 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\tag{2}
 						\]
 					</div>
+					<img src="images/constraint2.svg" width="40%" />
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
+
+				<div class="slide-body">
+
 					<!-- 3 -->
 					<div class="slide-text">
 						Each job must start only once and, while it's being processed, the subset
 						$\mathcal{A}_j$ of its arcs must be unavailable for other jobs (since they are occupied) \[
-						x_{at} + \sum_{t'=\min(1, t-\pi_j+1)}^{\max(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a
+						x_{at} + \sum_{t'=\max(1, t-\pi_j+1)}^{\min(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a
 						\tag{3}
 						\]
 					</div>
+					<img src="images/constraint3.svg" width="40%" />
 
 				</div>
 
@@ -603,6 +651,33 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\tag{6}
 						\]
 					</div>
+					<div class="cbox">
+						<b>Example</b>: suppose $C = \{[a_{12}, a_{23}]\}$, then at any $t
+						\in T$:<br>
+						<ul style="padding-left: 160px;">
+							<li> $x_{a_{12}t} = 1 \land x_{a_{23}t} = 1$ ✅ </li>
+							<li> $x_{a_{12}t} = 1 \land x_{a_{23}t} = 0$ ✅ </li>
+							<li> $x_{a_{12}t} = 0 \land x_{a_{23}t} = 1$ ✅ </li>
+							<li style="color: darkred;"> $x_{a_{12}t} = 0 \land x_{a_{23}t} = 0$ ❌ </li>
+						</ul>
+					</div>
+					<!-- 7 -->
+					<!-- <div class="slide-text"> -->
+					<!-- 	Since jobs on the same arc cannot overlap in time the following constriant is needed: -->
+					<!-- 	\[ -->
+					<!-- 	\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{T_{end}} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A} -->
+					<!-- 	\tag{7} -->
+					<!-- 	\] -->
+					<!-- </div> -->
+
+				</div>
+
+			</section>
+			<section data-transition="slide" data-auto-animate>
+				<h1 class="slide-title" data-id="constraints-title">Constraints</h1>
+
+				<div class="slide-body">
+
 					<!-- 7 -->
 					<div class="slide-text">
 						Since jobs on the same arc cannot overlap in time the following constriant is needed:
@@ -610,6 +685,15 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{T_{end}} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A}
 						\tag{7}
 						\]
+					</div>
+
+					<div class="multicolumn">
+						<div style="flex: 1">
+							<img src="images/constraint7ok.svg" width="90%" />
+						</div>
+						<div style="flex: 1;">
+							<img src="images/constraint7notok.svg" width="90%" />
+						</div>
 					</div>
 
 				</div>
@@ -653,7 +737,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\tag{10}
 						\]
 						\[
-						v_{odt} \leq \sum_{a \in R_{odi}} w_{at}, \quad \forall (o,d) \in N \times N, \forall t \in T
+						v_{odt} \leq \sum_{a \in R_{odi}} w_{at}, \quad \forall i \in \{1,\dots,K\}, \forall (o,d) \in N \times N, \forall t \in T
 						\tag{11}
 						\]
 					</div>
@@ -1227,9 +1311,6 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						Set $E = \emptyset$ (<i>no event requests</i>) and $C = \emptyset$ (<i>no simultaneous arc unavailability</i>)
 						</p>	
 						<p>
-						Set $E = \emptyset$ (<i>no event requests</i>) and $C = \emptyset$ (<i>no simultaneous arc unavailability</i>)
-						</p>	
-						<p>
 						Remaining model parameters have been randomly generated within fixed input bounds.
 						</p>	
 					</div>
@@ -1518,10 +1599,10 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 			</section>
 
 			<!-- Slide 12 -->
-			<section data-transition="slide">
-				<h1 class="slide-title">Results Model 1</h1>
-
-				<div class="slide-body">
+			<!-- <section data-transition="slide"> -->
+			<!-- 	<h1 class="slide-title">Results Model 1</h1> -->
+			<!---->
+			<!-- 	<div class="slide-body"> -->
                 <!-- ID           gap  total_time  heuristics_time    nodes  iterations
                 1      0.000000   13.551369        13.384254      3.0       801.0
                 2      0.000000   82.892668        75.206872    697.0     16171.0
@@ -1550,248 +1631,248 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
                 25      0.863533  420.085797       120.044487  17182.0    274587.0
                 26  13290.344394  423.464317       123.304786      1.0     68247.0
                 27  12452.753477  425.077386       124.704933      1.0     63012.0 -->
-
-                <table class="latex-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>MIP Gap (%)</th>
-                            <th>Runtime (total)</th>
-                            <th>Runtime (heuristics)</th>
-                            <th>Nodes</th>
-                            <th>Iterations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>0.00</td>
-                            <td>13.55</td>
-                            <td>13.38</td>
-                            <td>3</td>
-                            <td>801</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>0.00</td>
-                            <td>82.89</td>
-                            <td>75.21</td>
-                            <td>697</td>
-                            <td>16171</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>0.00</td>
-                            <td>128.36</td>
-                            <td>120.11</td>
-                            <td>84</td>
-                            <td>13184</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>0.00</td>
-                            <td>19.91</td>
-                            <td>18.09</td>
-                            <td>711</td>
-                            <td>8419</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>47.99</td>
-                            <td>393.59</td>
-                            <td>93.59</td>
-                            <td>14789</td>
-                            <td>791891</td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>88.63</td>
-                            <td>420.10</td>
-                            <td>120.09</td>
-                            <td>973</td>
-                            <td>223359</td>
-                        </tr>
-                        <tr>
-                            <td>7</td>
-                            <td>223.74</td>
-                            <td>317.73</td>
-                            <td>17.73</td>
-                            <td>77956</td>
-                            <td>3212781</td>
-                        </tr>
-                        <tr>
-                            <td>8</td>
-                            <td>103.27</td>
-                            <td>413.03</td>
-                            <td>113.03</td>
-                            <td>1004</td>
-                            <td>485693</td>
-                        </tr>
-                        <tr>
-                            <td>9</td>
-                            <td>117.66</td>
-                            <td>420.53</td>
-                            <td>120.52</td>
-                            <td>627</td>
-                            <td>347945</td>
-                        </tr>
-                        <tr>
-                            <td>10</td>
-                            <td>0.00</td>
-                            <td>82.36</td>
-                            <td>81.40</td>
-                            <td>43</td>
-                            <td>1489</td>
-                        </tr>
-                        <tr>
-                            <td>11</td>
-                            <td>0.00</td>
-                            <td>126.23</td>
-                            <td>120.31</td>
-                            <td>3</td>
-                            <td>8789</td>
-                        </tr>
-                        <tr>
-                            <td>12</td>
-                            <td>0.00</td>
-                            <td>152.16</td>
-                            <td>121.77</td>
-                            <td>66</td>
-                            <td>15791</td>
-                        </tr>
-                        <tr>
-                            <td>13</td>
-                            <td>0.00</td>
-                            <td>106.50</td>
-                            <td>100.58</td>
-                            <td>439</td>
-                            <td>9059</td>
-                        </tr>
-                        <tr>
-                            <td>14</td>
-                            <td>9.71</td>
-                            <td>420.38</td>
-                            <td>120.35</td>
-                            <td>4452</td>
-                            <td>248848</td>
-                        </tr>
-                        <tr>
-                            <td>15</td>
-                            <td>22.45</td>
-                            <td>420.68</td>
-                            <td>120.61</td>
-                            <td>1228</td>
-                            <td>120064</td>
-                        </tr>
-                        <tr>
-                            <td>16</td>
-                            <td>0.00</td>
-                            <td>116.69</td>
-                            <td>102.25</td>
-                            <td>1193</td>
-                            <td>19768</td>
-                        </tr>
-                        <tr>
-                            <td>17</td>
-                            <td>77.16</td>
-                            <td>420.48</td>
-                            <td>120.46</td>
-                            <td>788</td>
-                            <td>190160</td>
-                        </tr>
-                        <tr>
-                            <td>18</td>
-                            <td>97.07</td>
-                            <td>421.02</td>
-                            <td>120.94</td>
-                            <td>306</td>
-                            <td>151308</td>
-                        </tr>
-                        <tr>
-                            <td>19</td>
-                            <td>0.00</td>
-                            <td>126.11</td>
-                            <td>120.27</td>
-                            <td>3</td>
-                            <td>2345</td>
-                        </tr>
-                        <tr>
-                            <td>20</td>
-                            <td>0.00</td>
-                            <td>178.43</td>
-                            <td>120.35</td>
-                            <td>3</td>
-                            <td>14770</td>
-                        </tr>
-                        <tr>
-                            <td>21</td>
-                            <td>0.00</td>
-                            <td>284.78</td>
-                            <td>120.24</td>
-                            <td>3</td>
-                            <td>27688</td>
-                        </tr>
-                        <tr>
-                            <td>22</td>
-                            <td>0.00</td>
-                            <td>132.32</td>
-                            <td>120.07</td>
-                            <td>50</td>
-                            <td>8419</td>
-                        </tr>
-                        <tr>
-                            <td>23</td>
-                            <td>0.55</td>
-                            <td>423.33</td>
-                            <td>123.09</td>
-                            <td>302</td>
-                            <td>54424</td>
-                        </tr>
-                        <tr>
-                            <td>24</td>
-                            <td>23487.83</td>
-                            <td>427.22</td>
-                            <td>126.52</td>
-                            <td>1</td>
-                            <td>45991</td>
-                        </tr>
-                        <tr>
-                            <td>25</td>
-                            <td>0.86</td>
-                            <td>420.09</td>
-                            <td>120.04</td>
-                            <td>17182</td>
-                            <td>274587</td>
-                        </tr>
-                        <tr>
-                            <td>26</td>
-                            <td>13290.34</td>
-                            <td>423.46</td>
-                            <td>123.30</td>
-                            <td>1</td>
-                            <td>68247</td>
-                        </tr>
-                        <tr>
-                            <td>27</td>
-                            <td>12452.75</td>
-                            <td>425.08</td>
-                            <td>124.70</td>
-                            <td>1</td>
-                            <td>63012</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-
-				</div>
-
-			</section>
-
+			<!---->
+   <!--              <table class="latex-table"> -->
+   <!--                  <thead> -->
+   <!--                      <tr> -->
+   <!--                          <th>ID</th> -->
+   <!--                          <th>MIP Gap (%)</th> -->
+   <!--                          <th>Runtime (total)</th> -->
+   <!--                          <th>Runtime (heuristics)</th> -->
+   <!--                          <th>Nodes</th> -->
+   <!--                          <th>Iterations</th> -->
+   <!--                      </tr> -->
+   <!--                  </thead> -->
+   <!--                  <tbody> -->
+   <!--                      <tr> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>13.55</td> -->
+   <!--                          <td>13.38</td> -->
+   <!--                          <td>3</td> -->
+   <!--                          <td>801</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>2</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>82.89</td> -->
+   <!--                          <td>75.21</td> -->
+   <!--                          <td>697</td> -->
+   <!--                          <td>16171</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>3</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>128.36</td> -->
+   <!--                          <td>120.11</td> -->
+   <!--                          <td>84</td> -->
+   <!--                          <td>13184</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>4</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>19.91</td> -->
+   <!--                          <td>18.09</td> -->
+   <!--                          <td>711</td> -->
+   <!--                          <td>8419</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>5</td> -->
+   <!--                          <td>47.99</td> -->
+   <!--                          <td>393.59</td> -->
+   <!--                          <td>93.59</td> -->
+   <!--                          <td>14789</td> -->
+   <!--                          <td>791891</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>6</td> -->
+   <!--                          <td>88.63</td> -->
+   <!--                          <td>420.10</td> -->
+   <!--                          <td>120.09</td> -->
+   <!--                          <td>973</td> -->
+   <!--                          <td>223359</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>7</td> -->
+   <!--                          <td>223.74</td> -->
+   <!--                          <td>317.73</td> -->
+   <!--                          <td>17.73</td> -->
+   <!--                          <td>77956</td> -->
+   <!--                          <td>3212781</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>8</td> -->
+   <!--                          <td>103.27</td> -->
+   <!--                          <td>413.03</td> -->
+   <!--                          <td>113.03</td> -->
+   <!--                          <td>1004</td> -->
+   <!--                          <td>485693</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>9</td> -->
+   <!--                          <td>117.66</td> -->
+   <!--                          <td>420.53</td> -->
+   <!--                          <td>120.52</td> -->
+   <!--                          <td>627</td> -->
+   <!--                          <td>347945</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>10</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>82.36</td> -->
+   <!--                          <td>81.40</td> -->
+   <!--                          <td>43</td> -->
+   <!--                          <td>1489</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>11</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>126.23</td> -->
+   <!--                          <td>120.31</td> -->
+   <!--                          <td>3</td> -->
+   <!--                          <td>8789</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>12</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>152.16</td> -->
+   <!--                          <td>121.77</td> -->
+   <!--                          <td>66</td> -->
+   <!--                          <td>15791</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>13</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>106.50</td> -->
+   <!--                          <td>100.58</td> -->
+   <!--                          <td>439</td> -->
+   <!--                          <td>9059</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>14</td> -->
+   <!--                          <td>9.71</td> -->
+   <!--                          <td>420.38</td> -->
+   <!--                          <td>120.35</td> -->
+   <!--                          <td>4452</td> -->
+   <!--                          <td>248848</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>15</td> -->
+   <!--                          <td>22.45</td> -->
+   <!--                          <td>420.68</td> -->
+   <!--                          <td>120.61</td> -->
+   <!--                          <td>1228</td> -->
+   <!--                          <td>120064</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>16</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>116.69</td> -->
+   <!--                          <td>102.25</td> -->
+   <!--                          <td>1193</td> -->
+   <!--                          <td>19768</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>17</td> -->
+   <!--                          <td>77.16</td> -->
+   <!--                          <td>420.48</td> -->
+   <!--                          <td>120.46</td> -->
+   <!--                          <td>788</td> -->
+   <!--                          <td>190160</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>18</td> -->
+   <!--                          <td>97.07</td> -->
+   <!--                          <td>421.02</td> -->
+   <!--                          <td>120.94</td> -->
+   <!--                          <td>306</td> -->
+   <!--                          <td>151308</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>19</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>126.11</td> -->
+   <!--                          <td>120.27</td> -->
+   <!--                          <td>3</td> -->
+   <!--                          <td>2345</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>20</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>178.43</td> -->
+   <!--                          <td>120.35</td> -->
+   <!--                          <td>3</td> -->
+   <!--                          <td>14770</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>21</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>284.78</td> -->
+   <!--                          <td>120.24</td> -->
+   <!--                          <td>3</td> -->
+   <!--                          <td>27688</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>22</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>132.32</td> -->
+   <!--                          <td>120.07</td> -->
+   <!--                          <td>50</td> -->
+   <!--                          <td>8419</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>23</td> -->
+   <!--                          <td>0.55</td> -->
+   <!--                          <td>423.33</td> -->
+   <!--                          <td>123.09</td> -->
+   <!--                          <td>302</td> -->
+   <!--                          <td>54424</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>24</td> -->
+   <!--                          <td>23487.83</td> -->
+   <!--                          <td>427.22</td> -->
+   <!--                          <td>126.52</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>45991</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>25</td> -->
+   <!--                          <td>0.86</td> -->
+   <!--                          <td>420.09</td> -->
+   <!--                          <td>120.04</td> -->
+   <!--                          <td>17182</td> -->
+   <!--                          <td>274587</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>26</td> -->
+   <!--                          <td>13290.34</td> -->
+   <!--                          <td>423.46</td> -->
+   <!--                          <td>123.30</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>68247</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>27</td> -->
+   <!--                          <td>12452.75</td> -->
+   <!--                          <td>425.08</td> -->
+   <!--                          <td>124.70</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>63012</td> -->
+   <!--                      </tr> -->
+   <!--                  </tbody> -->
+   <!--              </table> -->
+			<!---->
+			<!---->
+			<!-- 	</div> -->
+			<!---->
+			<!-- </section> -->
+			<!---->
 			<!-- Slide 13 -->
-			<section data-transition="slide">
-				<h1 class="slide-title">Results Model 2</h1>
-
-				<div class="slide-body">
+			<!-- <section data-transition="slide"> -->
+			<!-- 	<h1 class="slide-title">Results Model 2</h1> -->
+			<!---->
+			<!-- 	<div class="slide-body"> -->
                 <!-- ID        gap  total_time  heuristics_time   nodes  iterations
                 1   0.000000   13.497359        13.463802     1.0       180.0
                 2   0.000000   79.727374        79.402521     1.0       949.0
@@ -1820,241 +1901,241 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
                 25   0.008583  121.999166       120.656488     1.0      2694.0
                 26   0.008013  364.313962       123.376969  3013.0    644220.0
                 27   0.009139  388.335476       125.455730   828.0    331506.0 -->
-
-                <table class="latex-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>MIP Gap (%)</th>
-                            <th>Runtime (total)</th>
-                            <th>Runtime (heuristics)</th>
-                            <th>Nodes</th>
-                            <th>Iterations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>0.00</td>
-                            <td>13.50</td>
-                            <td>13.46</td>
-                            <td>1</td>
-                            <td>180</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>0.00</td>
-                            <td>79.73</td>
-                            <td>79.40</td>
-                            <td>1</td>
-                            <td>949</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>0.00</td>
-                            <td>123.62</td>
-                            <td>120.11</td>
-                            <td>57</td>
-                            <td>2808</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>0.00</td>
-                            <td>18.94</td>
-                            <td>18.22</td>
-                            <td>312</td>
-                            <td>6717</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>0.00</td>
-                            <td>115.14</td>
-                            <td>92.29</td>
-                            <td>552</td>
-                            <td>78036</td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>5.45</td>
-                            <td>420.20</td>
-                            <td>120.14</td>
-                            <td>16</td>
-                            <td>132303</td>
-                        </tr>
-                        <tr>
-                            <td>7</td>
-                            <td>0.00</td>
-                            <td>58.30</td>
-                            <td>17.69</td>
-                            <td>8033</td>
-                            <td>669270</td>
-                        </tr>
-                        <tr>
-                            <td>8</td>
-                            <td>3.21</td>
-                            <td>410.87</td>
-                            <td>110.82</td>
-                            <td>389</td>
-                            <td>327410</td>
-                        </tr>
-                        <tr>
-                            <td>9</td>
-                            <td>96.72</td>
-                            <td>420.22</td>
-                            <td>120.12</td>
-                            <td>1</td>
-                            <td>82817</td>
-                        </tr>
-                        <tr>
-                            <td>10</td>
-                            <td>0.00</td>
-                            <td>80.94</td>
-                            <td>80.85</td>
-                            <td>1</td>
-                            <td>65</td>
-                        </tr>
-                        <tr>
-                            <td>11</td>
-                            <td>0.00</td>
-                            <td>120.84</td>
-                            <td>120.14</td>
-                            <td>1</td>
-                            <td>208</td>
-                        </tr>
-                        <tr>
-                            <td>12</td>
-                            <td>0.00</td>
-                            <td>122.93</td>
-                            <td>121.00</td>
-                            <td>1</td>
-                            <td>684</td>
-                        </tr>
-                        <tr>
-                            <td>13</td>
-                            <td>0.00</td>
-                            <td>94.74</td>
-                            <td>94.56</td>
-                            <td>1</td>
-                            <td>863</td>
-                        </tr>
-                        <tr>
-                            <td>14</td>
-                            <td>0.00</td>
-                            <td>138.50</td>
-                            <td>120.08</td>
-                            <td>1767</td>
-                            <td>137166</td>
-                        </tr>
-                        <tr>
-                            <td>15</td>
-                            <td>0.00</td>
-                            <td>161.40</td>
-                            <td>120.81</td>
-                            <td>1</td>
-                            <td>28984</td>
-                        </tr>
-                        <tr>
-                            <td>16</td>
-                            <td>0.01</td>
-                            <td>102.32</td>
-                            <td>101.48</td>
-                            <td>1</td>
-                            <td>3853</td>
-                        </tr>
-                        <tr>
-                            <td>17</td>
-                            <td>0.57</td>
-                            <td>420.58</td>
-                            <td>120.52</td>
-                            <td>684</td>
-                            <td>408924</td>
-                        </tr>
-                        <tr>
-                            <td>18</td>
-                            <td>2.66</td>
-                            <td>420.67</td>
-                            <td>120.55</td>
-                            <td>1</td>
-                            <td>113408</td>
-                        </tr>
-                        <tr>
-                            <td>19</td>
-                            <td>0.00</td>
-                            <td>121.07</td>
-                            <td>120.21</td>
-                            <td>1</td>
-                            <td>42</td>
-                        </tr>
-                        <tr>
-                            <td>20</td>
-                            <td>0.00</td>
-                            <td>127.27</td>
-                            <td>120.91</td>
-                            <td>1</td>
-                            <td>78</td>
-                        </tr>
-                        <tr>
-                            <td>21</td>
-                            <td>0.00</td>
-                            <td>136.04</td>
-                            <td>122.13</td>
-                            <td>1</td>
-                            <td>1229</td>
-                        </tr>
-                        <tr>
-                            <td>22</td>
-                            <td>0.00</td>
-                            <td>121.49</td>
-                            <td>120.59</td>
-                            <td>1</td>
-                            <td>527</td>
-                        </tr>
-                        <tr>
-                            <td>23</td>
-                            <td>0.00</td>
-                            <td>130.34</td>
-                            <td>122.17</td>
-                            <td>1</td>
-                            <td>6691</td>
-                        </tr>
-                        <tr>
-                            <td>24</td>
-                            <td>0.01</td>
-                            <td>151.59</td>
-                            <td>126.38</td>
-                            <td>1</td>
-                            <td>33735</td>
-                        </tr>
-                        <tr>
-                            <td>25</td>
-                            <td>0.01</td>
-                            <td>122.00</td>
-                            <td>120.66</td>
-                            <td>1</td>
-                            <td>2694</td>
-                        </tr>
-                        <tr>
-                            <td>26</td>
-                            <td>0.01</td>
-                            <td>364.31</td>
-                            <td>123.38</td>
-                            <td>3013</td>
-                            <td>644220</td>
-                        </tr>
-                        <tr>
-                            <td>27</td>
-                            <td>0.01</td>
-                            <td>388.34</td>
-                            <td>125.46</td>
-                            <td>828</td>
-                            <td>331506</td>
-                        </tr>
-                    </tbody>
-                </table> 
-
-				</div>
-
-			</section>
+			<!---->
+   <!--              <table class="latex-table"> -->
+   <!--                  <thead> -->
+   <!--                      <tr> -->
+   <!--                          <th>ID</th> -->
+   <!--                          <th>MIP Gap (%)</th> -->
+   <!--                          <th>Runtime (total)</th> -->
+   <!--                          <th>Runtime (heuristics)</th> -->
+   <!--                          <th>Nodes</th> -->
+   <!--                          <th>Iterations</th> -->
+   <!--                      </tr> -->
+   <!--                  </thead> -->
+   <!--                  <tbody> -->
+   <!--                      <tr> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>13.50</td> -->
+   <!--                          <td>13.46</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>180</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>2</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>79.73</td> -->
+   <!--                          <td>79.40</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>949</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>3</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>123.62</td> -->
+   <!--                          <td>120.11</td> -->
+   <!--                          <td>57</td> -->
+   <!--                          <td>2808</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>4</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>18.94</td> -->
+   <!--                          <td>18.22</td> -->
+   <!--                          <td>312</td> -->
+   <!--                          <td>6717</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>5</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>115.14</td> -->
+   <!--                          <td>92.29</td> -->
+   <!--                          <td>552</td> -->
+   <!--                          <td>78036</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>6</td> -->
+   <!--                          <td>5.45</td> -->
+   <!--                          <td>420.20</td> -->
+   <!--                          <td>120.14</td> -->
+   <!--                          <td>16</td> -->
+   <!--                          <td>132303</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>7</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>58.30</td> -->
+   <!--                          <td>17.69</td> -->
+   <!--                          <td>8033</td> -->
+   <!--                          <td>669270</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>8</td> -->
+   <!--                          <td>3.21</td> -->
+   <!--                          <td>410.87</td> -->
+   <!--                          <td>110.82</td> -->
+   <!--                          <td>389</td> -->
+   <!--                          <td>327410</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>9</td> -->
+   <!--                          <td>96.72</td> -->
+   <!--                          <td>420.22</td> -->
+   <!--                          <td>120.12</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>82817</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>10</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>80.94</td> -->
+   <!--                          <td>80.85</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>65</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>11</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>120.84</td> -->
+   <!--                          <td>120.14</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>208</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>12</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>122.93</td> -->
+   <!--                          <td>121.00</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>684</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>13</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>94.74</td> -->
+   <!--                          <td>94.56</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>863</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>14</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>138.50</td> -->
+   <!--                          <td>120.08</td> -->
+   <!--                          <td>1767</td> -->
+   <!--                          <td>137166</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>15</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>161.40</td> -->
+   <!--                          <td>120.81</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>28984</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>16</td> -->
+   <!--                          <td>0.01</td> -->
+   <!--                          <td>102.32</td> -->
+   <!--                          <td>101.48</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>3853</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>17</td> -->
+   <!--                          <td>0.57</td> -->
+   <!--                          <td>420.58</td> -->
+   <!--                          <td>120.52</td> -->
+   <!--                          <td>684</td> -->
+   <!--                          <td>408924</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>18</td> -->
+   <!--                          <td>2.66</td> -->
+   <!--                          <td>420.67</td> -->
+   <!--                          <td>120.55</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>113408</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>19</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>121.07</td> -->
+   <!--                          <td>120.21</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>42</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>20</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>127.27</td> -->
+   <!--                          <td>120.91</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>78</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>21</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>136.04</td> -->
+   <!--                          <td>122.13</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>1229</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>22</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>121.49</td> -->
+   <!--                          <td>120.59</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>527</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>23</td> -->
+   <!--                          <td>0.00</td> -->
+   <!--                          <td>130.34</td> -->
+   <!--                          <td>122.17</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>6691</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>24</td> -->
+   <!--                          <td>0.01</td> -->
+   <!--                          <td>151.59</td> -->
+   <!--                          <td>126.38</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>33735</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>25</td> -->
+   <!--                          <td>0.01</td> -->
+   <!--                          <td>122.00</td> -->
+   <!--                          <td>120.66</td> -->
+   <!--                          <td>1</td> -->
+   <!--                          <td>2694</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>26</td> -->
+   <!--                          <td>0.01</td> -->
+   <!--                          <td>364.31</td> -->
+   <!--                          <td>123.38</td> -->
+   <!--                          <td>3013</td> -->
+   <!--                          <td>644220</td> -->
+   <!--                      </tr> -->
+   <!--                      <tr> -->
+   <!--                          <td>27</td> -->
+   <!--                          <td>0.01</td> -->
+   <!--                          <td>388.34</td> -->
+   <!--                          <td>125.46</td> -->
+   <!--                          <td>828</td> -->
+   <!--                          <td>331506</td> -->
+   <!--                      </tr> -->
+   <!--                  </tbody> -->
+   <!--              </table>  -->
+			<!---->
+			<!-- 	</div> -->
+			<!---->
+			<!-- </section> -->
 
 			<!-- Slide 14 -->
 			<section data-transition="slide">
