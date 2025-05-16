@@ -276,7 +276,7 @@ $$
 While a job is processed, the subset $\mathcal{A}_j$ of arcs on which the job has to be performed must be unavailable for other jobs since they are occupied. This is modelled by the following constraint where, if $x_{at} = 1$ then the arc $a$ is available at time $t$ and no job could had been scheduled neither at time $t$ itself nor in the prior time interval $[t - \pi_j + 1, t]$ (respecting time horizon), but if the arc is not available then each job $j$ can only start once in the time period preceeding time $t$ (hence the sum of its $y$ variables is at most $1$):
 
 $$
-x_{at} + \sum_{t'=\min(1, t-\pi_j+1)}^{\max(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a
+x_{at} + \sum_{t'=\max(1, t-\pi_j+1)}^{\min(T_{end}, t)} y_{jt'} \leq 1, \quad \forall a \in \mathcal{A}, \forall t \in T, \forall j \in J_a
 \tag{3}
 $$
 
@@ -349,7 +349,7 @@ w_{at} = \omega^e_a, \quad \forall a \in \{a \in \mathcal{A} \mid J_a = \emptyse
 \tag{13}
 $$
 
-The final constraint deals with event requests. Consider the $K$ possible routes to travel from an origin $o$ to a destination $d$ at time $t$. Imagine that all the considered $K$ routes pass through the same arc $a$ at some point of the path and that such arc is included in an event request at time $t$. In this case, if $\beta_{odt} \phi_{odt}$ is greater than the capacity of the alternative services $\Lambda_{at}$ for such arc, we must ensure the availability of the arc to avoid an infeasible solution. This is embodied by the following constraint:
+An additional constraint deals with event requests. Consider the $K$ possible routes to travel from an origin $o$ to a destination $d$ at time $t$. Imagine that all the considered $K$ routes pass through the same arc $a$ at some point of the path and that such arc is included in an event request at time $t$. In this case, if $\beta_{odt} \phi_{odt}$ is greater than the capacity of the alternative services $\Lambda_{at}$ for such arc, we must ensure the availability of the arc to avoid an infeasible solution. This is embodied by the following constraint:
 
 $$
 x_{at} = 1, \quad \forall (a,t) \in \{
@@ -359,9 +359,18 @@ x_{at} = 1, \quad \forall (a,t) \in \{
 \tag{14}
 $$
 
-All of these constraints and the cited objective function have been implemented in a Gurobi `model` object in the `Railway` class. Such model can be optimized using the `optimize()` method of the class, which returns the optimal solution of the scheduling problem.
+Finally, given the $K$ routes from $o$ to $d$ at time $t$, if route option $\tilde{k} \in \{1, \dots, K\}$ is **never used**, we can set the associated variable $h_{odt\tilde{k}} = 0$. Hence the following constraint can be added to the model:
 
-<!-- //TODO: add constraint 15 -->
+$$
+h_{odti} = 0, 
+\quad \forall (o, d, i) \in
+\{(o, d, i) \in N \times N \times [K] \mid
+\min_{i \in [K]} \Omega_{odi} < \max_{j \neq i \in [K]} \Omega_{odj
+}\}
+\tag{15}
+$$
+
+All of these constraints and the cited objective function have been implemented in a Gurobi `model` object in the `Railway` class. Such model can be optimized using the `optimize()` method of the class, which returns the optimal solution of the scheduling problem.
 
 ### Simulated Annealing Meta-Heuristic
 
@@ -454,10 +463,9 @@ In particular, the implemented methods allows to generate an instance of the pro
 
 - $E$: event requests. The user can set a maximum number of event requests at each time $t$ (minimum is always $0$) and decide minimum and maximum length of the event request (i.e. how many arcs it is going to cover). The event requests are randomly generated similarly to how the set $A_j$ is (explained above). For further details consult the method `__generate_E()` of the `Railway` class.
 
-<!-- TODO: after having implemented __generate_C() write here --->
-- $C$: combinations of arcs on which jobs cannot be scheduled at the same time. $\dots$
+- $C$: combinations of arcs on which jobs cannot be scheduled at the same time. This can be manually selected by the user at instantiation. In general, the set $C$ has been left empty in the generated datasets since it easily leads to infeasible problems given the considerable restriction that it imposes on the scheduling of jobs. However, it might be manually defined as a list of tuples, where tuples contain the arcs that cannot be unavailable at the same time.
 
-- $R$: set possible alternative routes for each origin-destination pair. Generated using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) to compute the $K$ shortest paths after the user has set the maximum number of alternative routes $K$ at instantiation.
+- $R$: set possible alternative routes for each origin-destination pair. Generated using either [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) or a random path generation algorithm to compute the $K$ shortest paths after the user has set the maximum number of alternative routes $K$ at instantiation.
 
 >[!NOTE]
 > When a problem is generated, there is of course no guarantee that it will be feasible. For this reason, the final part of the `generate.py` script tries to solve the problem and solve the dataset only if a finite solution is found within a certain time limit.
