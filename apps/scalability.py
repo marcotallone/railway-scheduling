@@ -45,7 +45,7 @@ del dummy_model
 print()
 
 # Create a csv file for scalability results if it doesn't exist yet
-RESULTFILE = f"apps/results_new.csv"
+RESULTFILE = f"results.csv"
 columns=[
     'ID',
     'model',
@@ -231,7 +231,7 @@ for ID, (N, J, T) in problems.items():
 
 
     # Append results to the dataframe
-    # df.loc[len(df)] = row0
+    df.loc[len(df)] = row0
     df.loc[len(df)] = row1
     df.loc[len(df)] = row2
 
@@ -239,6 +239,6 @@ for ID, (N, J, T) in problems.items():
     df.to_csv(RESULTFILE, index=False)
 
     # Delete the models for next iteration
-    # del model0
+    del model0
     del model1
     del model2
