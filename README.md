@@ -103,7 +103,26 @@ Futher information about the models mathematical formulation and implementation,
 The project is structured as follows:
 
 ```bash
-# TODO: Add project structure
+.
+├── 📂 apps             # Python scripts
+│   ├── generate.py
+│   ├── scalability.py
+│   └── test.py
+├── 📂 datasets         # Datasets
+│   └── example.json
+├── 📂 docs             # Presentation files
+│   └── presentation
+├── 🖼️ images           # Images
+├── ⚜️ LICENSE          # License
+├── 📒 notebooks        # Python notebooks
+│   └── formulation.ipynb
+├── 📃 papers           # Reference papers
+├── 📜 README.md        # This file
+├── 📂 results          # Scalability results
+│   └── results.csv
+├── 🐍 setup.py         # Python setup file
+└── 📂 src              # Source files
+    └── railway
 ```
   
 ### Built With
@@ -474,6 +493,8 @@ In particular, the implemented methods allows to generate an instance of the pro
 
 <!-- RESULTS -->
 ## Results and Scalability Analysis
+
+The following tables resport the detailed results of the scalability study of the models on randomly generated instances of the scheduling problem with different parameters.
 
 <!-- TODO: complete description after analysis of the data -->
 
