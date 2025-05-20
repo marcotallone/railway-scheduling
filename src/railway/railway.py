@@ -1410,7 +1410,8 @@ class Railway:
         L=1, 
         min_T = 1e-6,
         max_time = 1800,
-        max_iter=10000
+        max_iter=10000,
+        debug = False
     ):
         """Simulated annealing algorithm to find an initial good
         solution for the railway scheduling problem.
@@ -1429,6 +1430,8 @@ class Railway:
                 Maximum time in seconds, by default 1800 s
         max_iter : int, optional
                 Maximum number of iterations, by default 10000
+        debug : bool, optional
+                If True, print debug information, by default False
 
         Returns
         -------
@@ -1445,13 +1448,14 @@ class Railway:
 
         # Initialize solution, objective and iteration counter
         S = self.generate_initial_solution()
+        bestS = S.copy() # always save the best incumbent solution
         y, x, h, w, v = self.get_vars_from_times(S)
         f = self.get_objective_value(v)
+        f_best = f
         iter = 0
         
         # If the initial solution is not feasible, add a penalty to objective
         if not self.check_feasibility(y, x, h, w, v): f += 1e6
-        
 
         # SA algorithm
         while (T > min_T) and (iter < max_iter) and (elapsed_time < max_time):
@@ -1463,17 +1467,19 @@ class Railway:
                 if S_new is None: continue
                 
                 # Get the solutions' variables
-                # _, _, _, _, v = self.get_vars_from_times(S)
                 _, _, _, _, v_new = self.get_vars_from_times(S_new)
 
                 # Compute the objective function values
-                # f = self.get_objective_value(v)
                 f_new = self.get_objective_value(v_new)
 
                 # Accept solution if it's better or with a certain probability
                 if f_new <= f:
                     S = S_new.copy()
                     f = f_new
+                    # Update best only if the accepted new solution is better
+                    if f_new < f_best:
+                        bestS = S.copy() # save the best incumbent solution
+                        f_best = f_new
                 else:
                     p = np.exp((f - f_new) / T)
                     if np.random.rand() < p:
@@ -1490,11 +1496,14 @@ class Railway:
             elapsed_time = time.time() - start_time
 
             # DEBUG
-            # print(f'\rt: {elapsed_time:.1f} s, iter: {iter}, T: {T:.2f}, f: {f:.5e}', end='', flush=True)
+            if debug:
+                print(f'\rtime: {elapsed_time:5.1f} s, iter: {iter:5d}, T: {T:7.2f}, obj: {f:7.0f}, best obj: {f_best:7.0f}', end='', flush=True)
 
+        if debug: print() # add new line to continue next print
+        
         # Save and return the best solution found and the elapsed time
-        self.S = S
-        return S, elapsed_time
+        self.S = bestS
+        return bestS, elapsed_time
 
     # Static methods -----------------------------------------------------------
 
@@ -2074,15 +2083,6 @@ class Railway:
             for a in self.Aj[j]:
                 when_free[a] = start_time + self.pi[j] + self.tau[a]
 
-        # Get the decision variables values from the set of starting times S
-        # y, x, h, w, v = self.get_vars_from_times(S)
-
-        # # Check the feasibility of the solution and return
-        # if self.check_feasibility(y, x, h, w, v):
-        #     return S
-        # else:
-        #     raise ValueError("Initial solution is not feasible")
-
         return S
 
     # Generate a neighbor solution to a given one
@@ -2163,6 +2163,3 @@ class Railway:
                 f,
             )
         print(f"Problem parameters saved successfully to {filename}")
-
-    # TODO: PLOTTING: Add method to display the results of the optimization / solutions 
-    # or other stuff like arcs vs jobs, adjacency matrix, histogram counts of jobs on arcs...
