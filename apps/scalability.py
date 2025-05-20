@@ -6,8 +6,8 @@ import pandas as pd
 # Define problem parameters
 P = 2000
 K = 3
-timelimit = 120
-heuristics_timelimit = 60
+timelimit = 300
+heuristics_timelimit = 120
 problems = {
     # ID: (N, J, T),
     1: (10, 10, 10),
@@ -39,13 +39,13 @@ problems = {
     27: (40, 80, 100),
 }
 
-# Starat a dummy model just to trigger license information notice message
+# Start a dummy model just to trigger license information notice message
 dummy_model = Railway(10, 10, 10, P, K)
 del dummy_model
 print()
 
 # Create a csv file for scalability results if it doesn't exist yet
-RESULTFILE = f"apps/results3.csv"
+RESULTFILE = f"apps/results_new.csv"
 columns=[
     'ID',
     'model',
@@ -92,7 +92,7 @@ for ID, (N, J, T) in problems.items():
 
 
     # Name of the file to load
-    FILENAME = f"datasets3/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
+    FILENAME = f"datasets/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
 
 
     # Model 0: "as-is" Gurobi model with no heuristics or cuts
@@ -184,14 +184,14 @@ for ID, (N, J, T) in problems.items():
     # Model 2: Full model plus valid inequalities and cutting planes
     model2 = Railway.load(FILENAME)
     model2.set_model2(timelimit, False)
-    S, SAtime = model2.simulated_annealing(
-        T=5e3,
-        c=0.99,
-        L=1,
-        min_T=1,
-        max_time=heuristics_timelimit
-    )
-    model2.set_solution(S)
+    # S, SAtime = model2.simulated_annealing(
+    #     T=5e3,
+    #     c=0.99,
+    #     L=1,
+    #     min_T=1,
+    #     max_time=heuristics_timelimit
+    # )
+    model2.set_solution(S) # <--- use heuristic solution from model1 (save time)
     model2.set_constraints()
     model2.set_objective()
     model2.set_valid_inequalities()
@@ -231,7 +231,7 @@ for ID, (N, J, T) in problems.items():
 
 
     # Append results to the dataframe
-    df.loc[len(df)] = row0
+    # df.loc[len(df)] = row0
     df.loc[len(df)] = row1
     df.loc[len(df)] = row2
 
@@ -239,6 +239,6 @@ for ID, (N, J, T) in problems.items():
     df.to_csv(RESULTFILE, index=False)
 
     # Delete the models for next iteration
-    del model0
+    # del model0
     del model1
     del model2
