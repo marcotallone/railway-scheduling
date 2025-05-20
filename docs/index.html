@@ -1111,16 +1111,61 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
 						\tag{B1}
 						\]
-						with:<br>
-						<ul>
+						<!-- with:<br> -->
+						<!-- <ul>
 							<li> $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$ </li>	
 							<li> $Q'_j = [t - \pi_j + \Delta, t] \cap T$ </li>
 							<li> $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$ <i><br>(i.e. maximum total processing time for other jobs on the same arc as job $j$)</i></li>
-						</ul>
+						</ul> -->
+
 					</div>
+                    <div class="multicolumn">
+
+                        <div class="cbox"
+                                style="margin: 0px 15px 0px 15px;
+                                        padding: 15px;
+                                        font-size: 0.8em;
+                                        text-align: center;
+                                    "
+                        >
+                            $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$
+                        </div>
+
+                        <div class="cbox"
+                                style="margin: 0px 15px 0px 15px;
+                                                padding: 15px;
+                                                font-size: 0.8em;
+                                        text-align: center;
+                                            "
+                        >
+                        $Q'_j = [t - \pi_j + \Delta, t] \cap T$
+                        </div>
+
+                        <div class="cbox"
+                                style="margin: 0px 15px 0px 15px;
+                                                padding: 15px;
+                                                font-size: 0.8em;
+                                        text-align: center;
+                                            "
+                        >
+                        $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$
+                        </div>
+
+
+                    </div>
+					<div class="slide-text" data-id="valid-inequalities-text2" style="margin-top: 20px;">
+						Non-overlapping jobs inequality:
+						\[
+						y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
+						\]
+						\[
+						\tag{B2}
+						\]
+					</div>
+
 				</div>
 			</section>
-			<section data-transition="slide" data-auto-animate>
+			<!-- <section data-transition="slide" data-auto-animate>
 				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
 				<div class="slide-body" data-id="valid-inequalities-body">
 					<div class="slide-text" data-id="valid-inequalities-text2">
@@ -1133,7 +1178,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\]
 					</div>
 				</div>
-			</section>
+			</section> -->
 
 			<!-- Slide 9 -->
 			<section data-transition="slide">
@@ -1145,22 +1190,50 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 					<b>Simulated Annealing</b> has been used to find a good initial solution for the MILP model.
 					</p>
 
-	<pre style="width: 70%;"><code><script type="text/template">
-	function simulated_annealing(S0, T0, c):
-		S <- S0
-		T <- T0
-		while STOP_CRITERION do:
-			Snew <- get_neighbor(S)
-			Δf <- f(S) - f(Snew)
-			if Δf >= 0:
-				S <- Snew
-			else:
-				S <- Snew with probability exp(-Δf/T)
-			end
-		end
-		T <- c * T
-		return S
-	</script></code></pre>
+                    <div class="multicolumn">
+
+                        <div style="flex: 1">
+
+<pre style="width: 100%;"><code><script type="text/template">
+function simulated_annealing(S0, T0, c):
+    S <- S0
+    T <- T0
+    while STOP_CRITERION do:
+        Snew <- get_neighbor(S)
+        Δf <- f(S) - f(Snew)
+        if Δf >= 0:
+            S <- Snew
+        else:
+            S <- Snew with probability exp(-Δf/T)
+        end
+    end
+    T <- c * T
+    return S
+</script></code></pre>
+
+                        </div>
+
+
+                        <div style="flex: 2">
+
+                            <iframe
+                                src="images/SAiterations.html"
+                                style="
+                                    width: 100%;
+                                    height: 100%;
+                                    margin: 0 auto;
+                                    border:0;
+                                "
+                                frameborder="0"
+                                scrolling="no"
+                            >
+                            </iframe>
+
+                        </div>
+
+
+
+                    </div>
 
 				</div>
 
@@ -1174,13 +1247,15 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 					<b>Initial solution</b>: schedule jobs from the one with most arcs to ones with less arcs
 					<br>
 					<b>Example</b>: Job $5$ $\rightarrow$ Job $2$ $\rightarrow$ Job $7$ $\rightarrow$ Job $10$ $\rightarrow$ Job $3$ $\rightarrow$ $\dots$
+					<br>
+					<b>Objective</b>: $18499.47$
 					</p>
 
                     <iframe
                         src="images/initial.html"
                         style="
                             width: 70%;
-                            height: 80%;
+                            height: 70%;
                             margin: 0 auto;
                             border:0;
                         "
@@ -1200,13 +1275,15 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 					<b>Neighbor solution</b>: reschedule a single job by moving it to a different time slot
 					<br>
 					<b>Example</b>: Reschedule job $7$ to a feasible time slot
+					<br>
+					<b>Objective</b>: $18560.96$
 					</p>
 
                     <iframe
                         src="images/neighbor.html"
                         style="
                             width: 70%;
-                            height: 80%;
+                            height: 70%;
                             margin: 0 auto;
                             border:0;
                         "
