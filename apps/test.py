@@ -18,7 +18,6 @@ verbose = False # set 'True' if you wish to see Gurobi verbose output
 # Name of the file to load
 FILENAME = f"datasets/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
 
-
 # (Optional: willingly you can delete the next 3 lines...)
 # Start a dummy model just to trigger license information notice message
 dummy_model = Railway(10, 10, 10, P, K)
