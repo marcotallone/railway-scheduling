@@ -138,6 +138,8 @@ section {
 
 .back-button {
 	display: inline-block;
+    position: relative;
+    bottom: 50px;
 	padding: 5px 10px;
 	font-size: 1em;
 	color: var(--secondary);

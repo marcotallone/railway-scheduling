@@ -984,7 +984,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 				<div class="slide-body">
 					<!-- 12 and 13 -->
 					<div class="slide-text">
-						Values of variables associated to arcs never included in any job can be considered as fixed
+						Values of variables associated to <b style="color: red;">arcs never included</b> in any job can be considered as fixed
 						\[
 						x_{at} = 1, \quad \forall a \in \{a \in \mathcal{A} \mid J_a = \emptyset\}, \forall t \in T
 						\tag{12}
@@ -1004,8 +1004,8 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 
 				<div class="slide-body">
 					<!-- 14 -->
-					<div class="slide-text">
-						Consider $K$ routes from $o$ to $d$ at time $t$ that all pass through arc $a$, which is also included in an event request $E_t$.<br>
+					<!-- <div class="slide-text">
+						Consider $K$ routes from $o$ to $d$ at time $t$ that <b style="color: #ff7800;">all pass through arc $a$</b>, which is also included in an event request $E_t$.<br>
 						If $\beta_{odt} \phi_{odt} &gt; \Lambda_{at}$ (<i>capacity of alternative services</i>) for such arc, we must ensure the availability of the arc to avoid an infeasible solution
 						\[
 						x_{at} = 1, \quad \forall (a,t) \in \{
@@ -1014,6 +1014,32 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						\}
 						\tag{14}
 						\]
+					</div> -->
+
+					<div class="multicolumn">
+
+						<div style="flex: 1">
+							<div class="vertically-spaced-text">
+								<div style="text-align: left;">
+                                Consider $K$ routes from $o$ to $d$ at time $t$ that <b style="color: #ff7800;">all pass through arc $a$</b>, which is also included in an event request $E_t$.<br>
+                                If $\beta_{odt} \phi_{odt} &gt; \Lambda_{at}$ (<i>capacity of alternative services</i>) for such arc, we must ensure the availability of the arc to avoid an infeasible solution
+                                \[
+                                x_{at} = 1, \quad \forall (a,t) \in \{
+                                \substack{(a,t) \in \mathcal{A} \times T \mid \exists s \in E_t \text{ s.t. } a \in s \\
+                                \land\ \exists (o,d) \in N \times N \text{ s.t. } a \in R_{odi} \forall i \in \{1,\dots,K\} \\ \land\ \beta_{odt} \phi_{odt} &gt; \Lambda_{st}}
+                                \}
+                                \]
+                                \[
+                                \tag{14}
+                                \]
+								</div>
+							</div>
+						</div>
+
+						<div style="flex: 1">
+							<img src="images/constraint14.svg" width="60%" />
+						</div>
+
 					</div>
 
 				</div>
@@ -1102,13 +1128,14 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 
 			<!-- Slide 9 -->
 			<section data-transition="slide" data-auto-animate>
+                <a id="valid-inequalities-link"></a>
 				<h1 class="slide-title" data-id="valid-inequalities-title">Valid Inequalities</h1>
 				<div class="slide-body" data-id="valid-inequalities-body">
 					<!-- B1 and B2 -->
 					<div class="slide-text" data-id="valid-inequalities-text1">
-						<b>Sousa and Wolsey</b> inequality from the "<i>Single Machine Scheduling</i>" problem:
+						<b>Sousa and Wolsey</b> inequality from the "<i>Single Machine Scheduling</i>" problem <a href="#appendix1">[Appendix 1]</a>:
 						\[
-						\sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
+						\sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_{j'}} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
 						\tag{B1}
 						\]
 						<!-- with:<br> -->
@@ -1128,7 +1155,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
                                         text-align: center;
                                     "
                         >
-                            $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$
+                            $Q_j = [t - p_j +1, t+ \Delta -1] \cap T$
                         </div>
 
                         <div class="cbox"
@@ -1138,7 +1165,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
                                         text-align: center;
                                             "
                         >
-                        $Q'_j = [t - \pi_j + \Delta, t] \cap T$
+                        $Q'_{j'} = [t - p_{j'} + \Delta, t] \cap T$
                         </div>
 
                         <div class="cbox"
@@ -1151,10 +1178,9 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
                         $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$
                         </div>
 
-
                     </div>
 					<div class="slide-text" data-id="valid-inequalities-text2" style="margin-top: 20px;">
-						Non-overlapping jobs inequality:
+						Non-overlapping jobs inequality <a href="#appendix2">[Appendix 2]</a>:
 						\[
 						y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
 						\]
@@ -2333,47 +2359,176 @@ function simulated_annealing(S0, T0, c):
 
 
 		<!-- Section: Appendix -----------------.--------------------------->
-		<!-- <section data-name="Appendix 1" data-sm="false"> -->
-		<!-- 	<a id="appendix1"></a> -->
-		<!-- 	<h1 class="slide-title">Appendix $1$: Dense Formulation matrices</h1> -->
-		<!---->
-		<!-- 	<div class="slide-body"> -->
-		<!---->
-		<!-- 		\[ -->
-		<!-- 		\begin{aligned} -->
-		<!-- 		\mathcal{A} &= \begin{bmatrix} -->
-		<!-- 		\mathbb{I}\\ -->
-		<!-- 		\mathbf{A}_{d,k}\\ -->
-		<!-- 		\mathbf{A}_{d,k+1} \mathbf{A}_{d,k}\\ -->
-		<!-- 		\vdots\\ -->
-		<!-- 		\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k} -->
-		<!-- 		\end{bmatrix}\\  -->
-		<!-- 		\mathcal{B} &= \begin{bmatrix} -->
-		<!-- 		\mathbf{0} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\ -->
-		<!-- 		\mathbf{B}_{d,k} & \mathbf{0} & \ldots & \mathbf{0} & \mathbf{0}\\ -->
-		<!-- 		\mathbf{A}_{d,k+1} \mathbf{B}_{d,k} & \mathbf{B}_{d,k+1} & \ldots & \mathbf{0} & \mathbf{0}\\ -->
-		<!-- 		\vdots & \vdots & \ddots & \vdots\\ -->
-		<!-- 		\mathbf{A}_{d,k+N-2} \ldots \mathbf{A}_{d,k} \mathbf{B}_{d,k} & \ldots & \ldots & -->
-		<!-- 		\mathbf{B}_{d,k+N-2} & \mathbf{0} -->
-		<!-- 		\end{bmatrix}\\ -->
-		<!-- 		\text{and}\quad \mathcal{D} &= \begin{bmatrix} -->
-		<!-- 		\mathbf{0}\\ -->
-		<!-- 		\mathbf{d}_k\\ -->
-		<!-- 		\mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{d}_{k+1}\\ -->
-		<!-- 		\mathbf{A}_{d,k+2} \mathbf{A}_{d,k+1} \mathbf{d}_k + \mathbf{A}_{d,k+2} -->
-		<!-- 		\mathbf{d}_{k+1} + \mathbf{d}_{k+2}\\ -->
-		<!-- 		\vdots -->
-		<!-- 		\end{bmatrix} -->
-		<!-- 		\end{aligned} -->
-		<!-- 		\] -->
-		<!---->
-		<!-- 	<div> -->
-		<!-- 		<a href="#dense-and-sparse-link" class="back-button">Back to <b>Dense & Sparse -->
-		<!-- 				Formulations</b></a> -->
-		<!-- 	</div> -->
-		<!---->
-		<!-- 	</div> -->
-		<!-- </section> -->
+		<section data-name="Appendix 1" data-sm="false">
+            <section data-name="Appendix 1" data-sm="false">
+                <a id="appendix1"></a>
+                <h1 class="slide-title">Appendix 1: Valid Inequality (B1)</h1>
+            
+                <div class="slide-body">
+            
+                    <div class="slide-text">
+                        <b>Sousa and Wolsey</b> inequality from the "<i>Single Machine Scheduling</i>" problem:
+                        \[
+                        \sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_{j'}} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
+                        \tag{B1}
+                        \]
+                    </div>
+                    <div class="multicolumn">
+
+                        <div class="cbox"
+                                style="margin: 0px 15px 0px 15px;
+                                        padding: 15px;
+                                        font-size: 0.8em;
+                                        text-align: center;
+                                    "
+                        >
+                            $Q_j = [t - p_j +1, t+ \Delta -1] \cap T$
+                        </div>
+
+                        <div class="cbox"
+                                style="margin: 0px 15px 0px 15px;
+                                                padding: 15px;
+                                                font-size: 0.8em;
+                                        text-align: center;
+                                            "
+                        >
+                        $Q'_{j'} = [t - p_{j'} + \Delta, t] \cap T$
+                        </div>
+
+                        <div class="cbox"
+                                style="margin: 0px 15px 0px 15px;
+                                                padding: 15px;
+                                                font-size: 0.8em;
+                                        text-align: center;
+                                            "
+                        >
+                        $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$
+                        </div>
+
+                    </div>
+                    <div class="slide-text" style="margin-top: 20px;">
+                        with $p_j = \pi_j + \tau_a$ the total processing time of job $j$ considering also the pause time $\tau_a$.
+                    </div>
+                        
+                </div>
+
+                <div>
+                    <a href="#valid-inequalities-link" class="back-button">Back to <b>Valid Inequalities</b></a>
+                </div>
+
+            </section>
+            <section data-name="Appendix 1" data-sm="false">
+                <a id="appendix1"></a>
+                <h1 class="slide-title">Appendix 1: Valid Inequality (B1)</h1>
+            
+                <div class="slide-body">
+            
+                    <div class="multicolumn">
+
+                        <div style="flex: 1;">
+                            <div class="slide-text">
+                                <br>
+                                <b>Example</b>: Consider $t=5$, $\tau_a = 1$ and two jobs with
+                                $\pi_1 = 3$ and $\pi_2 = 2$.<br>
+                                Hence:<br style="margin-bottom: 5px;">
+                                $p_1 = \pi_1 + \tau_a = 4$, $\; p_2 = \pi_2 + \tau_a = 3$<br style="margin-bottom: 10px;">
+                                Then, setting $j = 1 \Rightarrow \Delta = \{2, 3\}$.<br>
+                                Considering $\Delta = 2$ first we get:
+                                \[
+                                Q_1 = \{2, 3, 4, 5, 6\}
+                                \quad \text{and} \quad
+                                Q'_2 = \{4, 5\}
+                                \]
+                                So $(B1)$ becomes:
+                                \[
+                                \sum_{t' \in \{2, 3, 4, 5, 6\}} y_{1t'} + \sum_{t' \in \{4, 5\}} y_{2t'} \leq 1
+                                \]
+                            </div>
+                        </div>
+
+                        <div style="flex: 1;">
+                            <br>
+                            <img src="images/validB1-delta2.svg" />
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <!-- <div>
+                    <a href="#valid-inequalities-link" class="back-button">Back to <b>Valid Inequalities</b></a>
+                </div> -->
+
+            </section>
+            <section data-name="Appendix 1" data-sm="false">
+                <a id="appendix1"></a>
+                <h1 class="slide-title">Appendix 1: Valid Inequality (B1)</h1>
+            
+                <div class="slide-body">
+            
+                    <div class="multicolumn">
+
+                        <div style="flex: 1;">
+                            <div class="slide-text">
+                                <br>
+                                Then considering $\Delta = 3$ we get:
+                                \[
+                                Q_1 = \{2, 3, 4, 5, 6, 7\}
+                                \quad \text{and} \quad
+                                Q'_2 = \{5\}
+                                \]
+                                So $(B1)$ becomes:
+                                \[
+                                \sum_{t' \in \{2, 3, 4, 5, 6, 7\}} y_{1t'} + y_{2,5} \leq 1
+                                \]
+                            </div>
+                        </div>
+
+                        <div style="flex: 1;">
+                            <br>
+                            <img src="images/validB1-delta3.svg" />
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <!-- <div>
+                    <a href="#valid-inequalities-link" class="back-button">Back to <b>Valid Inequalities</b></a>
+                </div> -->
+
+            </section>
+
+        </section>
+		<section data-name="Appendix 2" data-sm="false">
+            <section data-name="Appendix 2" data-sm="false">
+                <a id="appendix2"></a>
+                <h1 class="slide-title">Appendix 2: Valid Inequality (B2)</h1>
+            
+                <div class="slide-body">
+
+                    <div class="slide-text" style="margin-top: 20px;">
+						Non-overlapping jobs inequality:
+						\[
+						y_{jt} + y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j, j' \in J_a, \forall t, t' \in T \mid j \neq j' \land t' \in (t - \pi_{j'} - \tau_a, t + \pi_j + \tau_a) \cap T
+						\]
+						\[
+						\tag{B2}
+						\]
+					</div>
+
+                    <div>
+                        <img src="images/validB2.svg" />
+                    </div>
+                </div>
+
+                <div>
+                    <a href="#valid-inequalities-link" class="back-button">Back to <b>Valid Inequalities</b></a>
+                </div>
+
+            </section>
+
+        </section>
 
 		<!-- End of slides -->
 		</div>
