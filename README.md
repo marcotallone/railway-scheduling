@@ -438,13 +438,13 @@ To further reduce the search space and the computational cost of the MILP model,
 - **Sousa and Wolsey** inequality:
 
   $$
-  \sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_j} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
+  \sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_{j'}} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
   \tag{B1}
   $$
 
   with:
-  - $Q_j = [t - \pi_j +1, t+ \Delta -1] \cap T$
-  - $Q'_j = [t - \pi_j + \Delta, t] \cap T$
+  - $Q_j = [t - \pi_j - \tau_a +1, t+ \Delta -1] \cap T$
+  - $Q'_{j'} = [t - \pi_{j'} - \tau_a + \Delta, t] \cap T$
   - $\Delta_{max} = \underset{\substack{j' \in J_a \\ j' \neq j}}{\max} (\pi_{j'} + \tau_a)$
     *(i.e. maximum total processing time for the other jobs on the same arc as job $j$)*
 
