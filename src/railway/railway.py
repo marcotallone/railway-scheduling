@@ -734,16 +734,14 @@ class Railway:
         """Set the objective function for the railway scheduling problem."""
 
         # Objective function                                                    (1)
-        self.model.setObjective(
-            (quicksum(
-                quicksum(
-                    (self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d]))
-                    for t in self.T
-                )
-                for o, d in self.OD
-            )),
-            gb.GRB.MINIMIZE
+        objective = quicksum(
+            quicksum(
+                self.phi[o, d, t] * (self.v[o, d, t] - self.Omega[o, d])
+                for t in self.T
+            )
+            for o, d in self.OD
         )
+        self.model.setObjective(objective, gb.GRB.MINIMIZE)
 
     # Set variables starting values
     def set_start(self, y_start, x_start, h_start, w_start, v_start):
@@ -839,26 +837,35 @@ class Railway:
         def Delta(self, j, a):
             p_times = [ self.pi[jp] + self.tau[a] for jp in self.Ja[a] if jp != j ]
             delta_max = max(2, *p_times) if p_times else 2
-            delta_set = range(2, delta_max + 1)
+            delta_set = range(2, delta_max) # + 1)
             return delta_set
+
+        # Define the time range Qj for (B1)
+        def Qj(self, t, j, a, delta):
+            pj = self.pi[j] + self.tau[a]
+            return range(
+                max(1, t - pj + 1),
+                min(t + delta - 1, self.Tend) + 1
+            )
+        
+        # Define the time range Q'j' for (B1)
+        def Qjp(self, t, j, a, delta):
+            pj = self.pi[j] + self.tau[a]
+            # NOTE: Only if pj >= delta
+            return range(
+                max(1, t - pj + delta),
+                min(t, self.Tend) + 1
+            )
         
         # Sousa and Wolsey single machine scheduling valid inequalities     (B1)
         self.model.addConstrs(
             (
-                quicksum(
-                    self.y[j,tp] 
-                    for tp in range(                                    # Qj
-                        max(1, t - self.pi[j] + 1),
-                        min(t + delta - 1, self.Tend + 1)
-                    )
-                )
+                quicksum(self.y[j,tp] for tp in Qj(self, t, j, a, delta))   # Qj
                 + quicksum(
                     quicksum(
                         self.y[jp,tp]
-                        for tp in range(                                # Q'l
-                            max(1, t - self.pi[jp] + delta),
-                            min(t + 1, self.Tend + 1)
-                        )
+                        for tp in Qjp(self, t, jp, a, delta)                # Q'j'
+                        if (self.pi[jp] + self.tau[a] >= delta)
                     ) for jp in self.Ja[a] if jp != j
                 )
                 <= 1
@@ -909,24 +916,27 @@ class Railway:
         """
         
         # Set cutting planes for optimization 
-        self.model.params.BQPCuts = -1
-        self.model.params.CliqueCuts = -1
-        self.model.params.CoverCuts = -1
-        self.model.params.FlowCoverCuts = -1
-        self.model.params.FlowPathCuts = -1
-        self.model.params.GomoryPasses = -1
-        self.model.params.GUBCoverCuts = -1
-        self.model.params.ImpliedCuts = -1
-        self.model.params.LiftProjectCuts = -1
-        self.model.params.MIRCuts = -1
-        self.model.params.ModKCuts = -1
-        self.model.params.NetworkCuts = -1
-        self.model.params.RelaxLiftCuts = -1
-        self.model.params.StrongCGCuts = -1
-        self.model.params.ZeroHalfCuts = -1
+        self.model.setParam('BQPCuts', -1)
+        self.model.setParam('CliqueCuts', -1)
+        self.model.setParam('CoverCuts', -1)
+        self.model.setParam('FlowCoverCuts', -1)
+        self.model.setParam('FlowPathCuts', -1)
+        self.model.setParam('GomoryPasses', -1)
+        self.model.setParam('GUBCoverCuts', -1)
+        self.model.setParam('ImpliedCuts', -1)
+        self.model.setParam('LiftProjectCuts', -1)
+        self.model.setParam('MIRCuts', -1)
+        self.model.setParam('ModKCuts', -1)
+        self.model.setParam('NetworkCuts', -1)
+        self.model.setParam('RelaxLiftCuts', -1)
+        self.model.setParam('StrongCGCuts', -1)
+        self.model.setParam('ZeroHalfCuts', -1)
 
     # Set Model0 configuration options
     def set_model0(self, timelimit=None, verbose=True):
+        """Set options for Model0 configuration:
+        base GUrobi model with no heuristics and no valid inequalities.
+        """
         if not verbose: self.model.setParam('OutputFlag', 0)
         if timelimit is not None: self.model.setParam('TimeLimit', timelimit)
         self.model.setParam('LPWarmStart', 0)
@@ -941,6 +951,9 @@ class Railway:
 
     # Set Model1 configuration options
     def set_model1(self, timelimit=None, verbose=True):
+        """Set options for Model1 configuration:
+        initial solution given from simulated annealing heuristic.
+        """
         if not verbose: self.model.setParam('OutputFlag', 0)
         if timelimit is not None: self.model.setParam('TimeLimit', timelimit)
         self.model.setParam('PoolSolutions', 1)
@@ -954,6 +967,10 @@ class Railway:
 
     # Set Model2 configuration options
     def set_model2(self, timelimit=None, verbose=True):
+        """Set options for Model2 configuration:
+        initial solution given from simulated annealing heuristic and
+        additional valid inequalities and cutting planes.
+        """
         if not verbose: self.model.setParam('OutputFlag', 0)
         if timelimit is not None: self.model.setParam('TimeLimit', timelimit)
         self.model.setParam('PoolSolutions', 1)
@@ -1497,7 +1514,7 @@ class Railway:
 
             # DEBUG
             if debug:
-                print(f'\rtime: {elapsed_time:5.1f} s, iter: {iter:5d}, T: {T:7.2f}, obj: {f:7.0f}, best obj: {f_best:7.0f}', end='', flush=True)
+                print(f'\rTime: {elapsed_time:5.1f} s, Iteration: {iter:5d}, T: {T:7.2f}, Current Obj.: {f:7.0f}, Best Obj.: {f_best:7.0f}\t ', end='', flush=True)
 
         if debug: print() # add new line to continue next print
         
@@ -1918,7 +1935,7 @@ class Railway:
     #
     # e.g. C = [ ((1, 2), (2, 3)),
     # 			 ((3, 4), (4, 5), (5, 6)) ]
-    # XXX: when creating C ensure that no job needs a combination of arcs
+    # NOTE: when creating C ensure that no job needs a combination of arcs
     # that are in the same list of C otherwise the problem is infeasible...
 
     # Random generator method: E (set of event tracks at each time t)
@@ -1959,12 +1976,14 @@ class Railway:
             self.E[t] = E_tmp
 
     # Random generator method: R (set of routes from o to d)
-    def __generate_R(self):
+    def __generate_R(self, yen=False):
         self.R = {}
         for o, d in self.OD:
             # Compute the K shortest paths from o to d
-            # shortest_paths = self.YenKSP(graph=self.graph, source=o, sink=d, K=self.K)
-            shortest_paths = self.randomKSP(source=o, sink=d, K=self.K)
+            if yen: 
+                shortest_paths = self.YenKSP(graph=self.graph, source=o, sink=d, K=self.K)
+            else:
+                shortest_paths = self.randomKSP(source=o, sink=d, K=self.K)
 
             # Store the paths in the R dictionary
             for i, path in enumerate(shortest_paths, start=1):
