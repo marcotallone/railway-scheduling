@@ -1335,6 +1335,7 @@ function simulated_annealing(S0, T0, c):
 
 			<!-- Slide 10 -->
 			<section data-transition="slide">
+                <a id="solutions-link"></a>
 				<h1 class="slide-title">Solution Strategies</h1>
 
 				<div class="slide-body">
@@ -1383,7 +1384,7 @@ function simulated_annealing(S0, T0, c):
 						<i>Full model</i><br>
 						Simulated annealing heuristic<br>
 						Valid inequalities<br>
-						Addition of cutting planes
+						Addition of <a href="#appendix3">cutting planes [A3]</a>
 						</div>
 
 
@@ -1730,18 +1731,27 @@ function simulated_annealing(S0, T0, c):
 
 				<div class="slide-body">
 
-                    <iframe
-                        src="images/time-evolution-gap.html"
-                        style="
-                            width: 90%;
-                            height: 85%;
-                            margin: 0 auto;
-                            border:0;
-                        "
-                        frameborder="0"
-                        scrolling="no"
-                    >
-                    </iframe>
+                    <div class="multicolumn">
+
+                        <div style="flex: 1;">
+                            <iframe
+                                src="images/time-evolution-gap.html"
+                                style="
+                                    width: 90%;
+                                    height: 100%;
+                                    margin: 0 auto;
+                                    border:0;
+                                "
+                                frameborder="0"
+                                scrolling="no"
+                            >
+                            </iframe>
+                        </div>
+                        <div style="flex: 1;">
+                            <img src="images/original5.svg" width="90%"/>
+                        </div>
+                        
+                    </div>
 
 				</div>
 
@@ -1988,6 +1998,71 @@ function simulated_annealing(S0, T0, c):
                 </div>
 
             </section>
+
+        </section>
+		<section data-name="Appendix 3" data-sm="false">
+                <a id="appendix3"></a>
+                <h1 class="slide-title">Appendix 3: Cutting Planes</h1>
+            
+                <div class="slide-body">
+
+                    <!-- <div class="slide-text" style="margin-top: 20px;">
+                        Cutting planes used in Model $2$:
+                        <ul class="list">
+                            <li>Boolean quadric polytope cuts</li>
+                            <li>Clique cuts</li>
+                            <li>Cover cuts</li>
+                            <li>Flow cover cuts</li>
+                            <li>Flow path cuts</li>
+                            <li>Gomori cuts</li>
+                            <li>GUB cuts</li>
+                            <li>Implied bounds cuts</li>
+                            <li>Lift-and-project cuts</li>
+                            <li>MIR cuts</li>
+                            <li>Mod-k cuts</li>
+                            <li>Network cuts</li>
+                            <li>Relax-and-lift cuts</li>
+                            <li>Strong-CG cuts</li>
+                            <li>$\{0, \frac{1}{2}\}$ cuts</li>
+                        </ul>
+					</div> -->
+
+                    <div class="multicolumn">
+
+                        <div class="slide-text">
+                            <ul>
+                                <li>Boolean quadric polytope cuts</li>
+                                <li>Clique cuts</li>
+                                <li>Cover cuts</li>
+                                <li>Flow cover cuts</li>
+                                <li>Flow path cuts</li>
+                                <li>Gomori cuts</li>
+                                <li>GUB cuts</li>
+                                <li>Implied bounds cuts</li>
+                            </ul>
+                        </div>
+
+                        <div class="slide-text">
+                            <ul>
+                                <li>Lift-and-project cuts</li>
+                                <li>MIR cuts</li>
+                                <li>Mod-k cuts</li>
+                                <li>Network cuts</li>
+                                <li>Relax-and-lift cuts</li>
+                                <li>Strong-CG cuts</li>
+                                <li>$\{0, \frac{1}{2}\}$ cuts</li>
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div>
+                    <a href="#solutions-link" class="back-button">Back to <b>Solution Strategies</b></a>
+                </div>
 
         </section>
 
