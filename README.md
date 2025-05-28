@@ -26,8 +26,7 @@
     <br />
     <table>
       <tr>
-        <td><a
-href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</strong></a></td>
+        <td><a href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</strong></a></td>
         <!-- <td><a href="./presentation/presentation.pdf"><strong>PDF Presentation</strong></a></td> -->
         <td><a href="https://github.com/marcotallone/railway-scheduling/issues"><strong>Report bug</strong></a></td>
         <td><a href="https://github.com/marcotallone/railway-scheduling/issues"><strong>Request Feature</strong></a></td>
@@ -45,9 +44,10 @@ href="https://marcotallone.github.io/railway-scheduling/"><strong>Presentation</
             &nbsp;1. <a href="#author-info">Author Info</a><br>
             &nbsp;2. <a href="#about-the-project">About The Project</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#quick-overview">Quick Overview</a><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#quick-overview">Quick Set-Up</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#built-with">Built With</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#project-structure">Project Structure</a><br>
-            &nbsp;3. <a href="#getting-started">Getting Started</a><br>
+            &nbsp;3. <a href="#getting-started">Getting Started / Installation</a><br>
             &nbsp;4. <a href="#usage-examples">Usage Examples</a><br>
             &nbsp;5. <a href="#model-description">Model Description</a><br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a href="#problem-description">Problem Description</a><br>
@@ -98,6 +98,31 @@ Each model has been tested on small istances of the problem and a scalability an
 Futher information about the models mathematical formulation and implementation, the scheduling problem istances and the results obtained can be found in the
 [Model Description](#model-description) and in the [Results and Scalability Analysis](#results-and-scalability-analysis) sections below or in the [presentation](https://marcotallone.github.io/railway-scheduling/) provided in this repository.
 
+### Quick Set-Up
+
+Follow the instructions below to set up the project on your local machine:
+
+1. Create a `conda` environment using the provided `yaml` file and activate it:
+
+    ```bash
+    conda env create -f mathopt-conda.yaml
+    conda activate mathopt
+    ```
+
+2. Install the `railway` module using `pip` **from the root folder of the project**:
+
+    ```bash
+    pip install -e .
+    ```
+
+3. Import and use the `Railway` class in your Python scripts or Jupyter Notebooks:
+
+    ```python
+    from railway import Railway
+    ```
+
+For further details, please continue reading the sections below.
+
 ### Project Structure
 
 The project is structured as follows:
@@ -135,7 +160,7 @@ The project is structured as follows:
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Getting Started / Installation
 
 ### Requirements
 
@@ -143,16 +168,17 @@ The project is developed in `Python` and uses the [`Gurobi` solver](https://www.
 
 - `gurobipy`, version `12.0.0`: the official `Gurobi` Python API, which requires to have an active `Gurobi` license and the solver installed on the machine. An [academic license](https://www.gurobi.com/academia/academic-program-and-licenses/) was used to develop the project.
 
-The following **optional** Python libraries are needed in order to run the `Jupiter Notebooks` in the [notebooks/](./notebooks) folder:
+Aside from common Python modules, the following **optional** Python libraries are needed in order to run some of the `Jupiter Notebooks` in the [notebooks/](./notebooks) folder:
 
 - `tqdm`, version `4.67.0`
 - `holoviews`, version `1.20.0`
 - `hvplot`, version `0..11.1`
 - `bokeh`, version `3.6.1`
+- `plotly`, version `6.0.1`
 - `jupiter_bokeh`
 
 All the necessary libraries can be easily installed using the `pip` package manager.\
-Additionally a [conda environment `yaml` file](./mathopt-conda.yaml) containing all the necessary libraries for the project is provided in the root folder. To create the environment you need to have installed a working `conda` version and then create the environment with the following command:
+Additionally, a [conda environment `yaml` file](./mathopt-conda.yaml) containing all the necessary libraries for the project is provided in the root folder. To create the environment you need to have installed a working `conda` version and then create the environment with the following command:
 
 ```bash
 conda env create -f mathopt-conda.yaml
@@ -184,7 +210,7 @@ from railway import Railway
 <!-- USAGE EXAMPLES -->
 ## Usage Examples
 
-The [`notebooks/`](./notebooks) folder contains a set of Jupiter Notebooks that show how to use the implemented models to solve the scheduling problem. In particular, the folder contains $3$ notebooks ([`model0.ipynb`](./notebooks/model0.ipynb), [`model1.ipynb`](./notebooks/model1.ipynb) and [`model2.ipynb`](./notebooks/model2.ipynb)) showing how to instantiate the $3$ models presented below using the implemented `Railway` class and its methods, while the [`model_formulation.ipynb`](./notebooks/model_formulation.ipynb) notebook provides a detailed description of the mathematical formulation of the models. The content of the latter is not used in practice but shows in details how each element of the mathematical formulation is implemented in practice in the final module.\
+The [`notebooks/`](./notebooks) folder contains a set of Jupiter Notebooks that show how to use the implemented models to solve the scheduling problem. In particular, the folder contains $3$ notebooks ([`model0.ipynb`](./notebooks/model0.ipynb), [`model1.ipynb`](./notebooks/model1.ipynb) and [`model2.ipynb`](./notebooks/model2.ipynb)) showing how to instantiate the $3$ models presented in the paper using the implemented `Railway` class and its methods, while the [`model_formulation.ipynb`](./notebooks/model_formulation.ipynb) notebook provides a detailed description of the mathematical formulation of the models. The content of the latter is not used in practice but shows in details how each element of the mathematical formulation is implemented in practice in the final module.\
 Furthermore, in the [`apps/`](./apps) folder contains the following Python scripts showing practical usage examples of the models:
 
 - [`generate.py`](./apps/generate.py): a script that generates random istances of the scheduling problem for given parameters and saves them in the [`datasets/`](./datasets) folder as JSON files.
@@ -254,13 +280,13 @@ $$
 \Lambda_{st} = \sum_{a \in s} \Lambda_{at},\quad \forall s \in E, \forall t \in T
 $$
 
-Finally, it's assumed that, when travelling from origin $o$ to destination $d$, passengers can consider up to $K \in \mathbb{N}$ possible alternative routes aiming for the one that minimizes the total travel time. Therefore, the set $R$ contains, for each origin-destination pair $(o,d) \in N \times N \mid o \neq d$, the $K$ shortest paths connecting the origin and the destination. These can be easily computed using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) once the topology of the network is known (implemented in the `YenKSP()` method of the `Railway` class).\
+Finally, it's assumed that, when travelling from origin $o$ to destination $d$, passengers can consider up to $K \in \mathbb{N}$ possible alternative routes aiming for the one that minimizes the total travel time. Therefore, the set $R$ contains, for each origin-destination pair $(o,d) \in N \times N \mid o \neq d$, the $K$ shortest paths connecting the origin and the destination. These can be easily computed using [Yen's algorithm](https://en.wikipedia.org/wiki/Yen%27s_algorithm) once the topology of the network is known (implemented in the `YenKSP()` method of the `Railway` class) or by randomly generating them (*in such case they won't necessairly be the shortest, but they can be interpreted as the "preferred paths" of the passengers*).\
 Further assumptions made for this model are listed below:
 
 - there is no precedence relation between jobs, i.e. jobs can be scheduled in any order
 - each job has equal urgency
 - jobs cannot be interrupted once started
-- all passengers travelling between the same origin-destination pair at any given time choose the same route, i.e. the shortest path connecting the origin and the destination
+- all passengers travelling between the same origin-destination pair at any given time choose the same route, i.e. the shortest (*or the preferred*) path connecting the origin and the destination
 - outside event requests, the capacity of alternative services is always sufficient to avoid overcrowding
 
 ### Decision Variables
@@ -435,7 +461,7 @@ The described procedure is the one implemented in the `get_vars_from_times(S)` m
 
 To further reduce the search space and the computational cost of the MILP model, it's possible to set the following valid inequalities via the `set_valid_inequalities()` method implemented. These inequalities come from the ``Single Machine Scheduling'' problem:
 
-- **Sousa and Wolsey** inequality:
+- **Sousa and Wolsey** inequality for the "Single Machine Scheduling" problem [<a href="#ref3">3</a>]:
 
   $$
   \sum_{t' \in Q_j} y_{jt'} + \sum_{\substack{j' \in J_a \\ j' \neq j}} \sum_{t' \in Q'_{j'}} y_{j't'} \leq 1, \quad \forall a \in \mathcal{A}, \forall j \in J_a, \forall t \in T, \forall \Delta \in \{2,\dots,\Delta_{max}\}
@@ -494,7 +520,8 @@ In particular, the implemented methods allows to generate an instance of the pro
 <!-- RESULTS -->
 ## Results and Scalability Analysis
 
-The following tables resport the detailed results of the scalability study of the models on randomly generated instances of the scheduling problem with different parameters.\ For more information about the instances parameters used in this study, please refer to the original paper [<a href="#ref1">1</a>] or to the [presentation slides](...).
+The following tables report the detailed results of the scalability study of the models on randomly generated instances of the scheduling problem with different parameters.\
+For more information about the instances parameters used in this study, please refer to the original paper [<a href="#ref1">1</a>] or to the [presentation slides](https://github.com/marcotallone/railway-scheduling).
 
 - **Model 0**
 
@@ -643,8 +670,28 @@ https://doi.org/10.1016/j.dam.2012.05.027.
 (https://www.sciencedirect.com/science/article/pii/S0166218X12002338)
 Abstract: We consider the problem of scheduling a set of maintenance jobs on the arcs of a network so that the total flow over the planning time horizon is maximized. A maintenance job causes an arc outage for its duration, potentially reducing the capacity of the network. The problem can be expected to have applications across a range of network infrastructures critical to modern life. For example, utilities such as water, sewerage and electricity all flow over networks. Products are manufactured and transported via supply chain networks. Such networks need regular, planned maintenance in order to continue to function. However the coordinated timing of maintenance jobs can have a major impact on the network capacity lost due to maintenance. Here we describe the background to the problem, define it, prove it is strongly NP-hard, and derive four local search-based heuristic methods. These methods integrate exact maximum flow solutions within a local search framework. The availability of both primal and dual solvers, and dual information from the maximum flow solver, is exploited to gain efficiency in the algorithms. The performance of the heuristics is evaluated on both randomly generated instances, and on instances derived from real-world data. These are compared with a state-of-the-art integer programming solver.
 Keywords: Network flows; Scheduling; Maintenance planning; Local search; Hybrid algorithms -->
-<!-- <a id="ref2"></a>
-[2] Natashia Boland, Thomas Kalinowski, Hamish Waterer, Lanbo Zheng, *"Scheduling arc maintenance jobs in a network to maximize total flow over time"*, Discrete Applied Mathematics, Volume 163, Part 1, 2014, Pages 34-52, ISSN 0166-218X, [https://doi.org/10.1016/j.dam.2012.05.027](https://www.sciencedirect.com/science/article/pii/S0166218X12002338) -->
+<a id="ref2"></a>
+[2] Natashia Boland, Thomas Kalinowski, Hamish Waterer, Lanbo Zheng, *"Scheduling arc maintenance jobs in a network to maximize total flow over time"*, Discrete Applied Mathematics, Volume 163, Part 1, 2014, Pages 34-52, ISSN 0166-218X, [https://doi.org/10.1016/j.dam.2012.05.027](https://www.sciencedirect.com/science/article/pii/S0166218X12002338)
+
+<!-- TY  - JOUR
+AU  - Sousa, Jorge P.
+AU  - Wolsey, Laurence A.
+PY  - 1992
+DA  - 1992/02/01
+TI  - A time indexed formulation of non-preemptive single machine scheduling problems
+JO  - Mathematical Programming
+SP  - 353
+EP  - 367
+VL  - 54
+IS  - 1
+AB  - We consider the formulation of non-preemptive single machine scheduling problems using time-indexed variables. This approach leads to very large models, but gives better lower bounds than other mixed integer programming formulations. We derive a variety of valid inequalities, and show the role of constraint aggregation and the knapsack problem with generalised upper bound constraints as a way of generating such inequalities. A cutting plane/branch-and-bound algorithm based on these inequalities has been implemented. Computational experience on small problems with 20/30 jobs and various constraints and objective functions is presented.
+SN  - 1436-4646
+UR  - https://doi.org/10.1007/BF01586059
+DO  - 10.1007/BF01586059
+ID  - Sousa1992
+ER  -  -->
+<a id="ref3"></a>
+[3] J.P. Sousa, L.A. Wolsey, *"A time indexed formulation of non-preemptive single machine scheduling problems"*, Mathematical Programming, Volume 54, Issue 1, February 1992, Pages 353-367, ISSN 1436-4646, [https://doi.org/10.1007/BF01586059](https://doi.org/10.1007/BF01586059)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
