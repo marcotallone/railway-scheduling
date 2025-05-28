@@ -8,15 +8,15 @@ from railway import *
 # Define problem parameters
 N = 10      # Number of stations
 J = 10      # Number of jobs
-T = 10      # Number of time periods
-P = 2000    # Average number of passengers
+T = 50      # Number of time periods
+P = 1000    # Average number of passengers
 K = 3       # Number of alternative routes
 timelimit = 60
 SAtimelimit = 30
 verbose = False # set 'True' if you wish to see Gurobi verbose output
 
 # Name of the file to load
-FILENAME = f"datasets/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
+FILENAME = f"datasets_nova/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
 
 # (Optional: willingly you can delete the next 3 lines...)
 # Start a dummy model just to trigger license information notice message
