@@ -4,10 +4,10 @@ import pandas as pd
 # Load model
 
 # Define problem parameters
-P = 2000
+P = 1000
 K = 3
 timelimit = 300
-heuristics_timelimit = 120
+heuristics_timelimit = 300
 problems = {
     # ID: (N, J, T),
     1: (10, 10, 10),
@@ -27,16 +27,16 @@ problems = {
     15: (20, 40, 100),
     16: (20, 80, 10),
     17: (20, 80, 50),
-    # 18: (20, 80, 100),
+    18: (20, 80, 100),
     19: (40, 10, 10),
     20: (40, 10, 50),
-    # 21: (40, 10, 100),
+    21: (40, 10, 100),
     22: (40, 40, 10),
-    # 23: (40, 40, 50),
-    # 24: (40, 40, 100),
+    23: (40, 40, 50),
+    24: (40, 40, 100),
     25: (40, 80, 10),
-    # 26: (40, 80, 50),
-    # 27: (40, 80, 100),
+    26: (40, 80, 50),
+    27: (40, 80, 100),
 }
 
 # Start a dummy model just to trigger license information notice message
@@ -95,50 +95,50 @@ for ID, (N, J, T) in problems.items():
     FILENAME = f"datasets/railway_N{N}_T{T}_J{J}_P{P}_K{K}.json"
 
 
-    # # Model 0: "as-is" Gurobi model with no heuristics or cuts
-    # model0 = Railway.load(FILENAME)
-    # model0.set_model0(timelimit, False)
-    # model0.set_constraints()
-    # model0.set_objective()
-    # results0 = model0.optimize()
-    # row0 = {
-    #     'ID': ID,
-    #     'model': 0,
-    #     'N': N,
-    #     'J': J,
-    #     'T': T,
-    #     'P': P,
-    #     'K': K,
-    #     'status': model0.get_status(),
-    #     'runtime': results0['runtime'],
-    #     'heuristics_time': 0,
-    #     'total_time': results0['runtime'],
-    #     'gap': results0['gap'],
-    #     'objective': results0['obj'],
-    #     'nodes': results0['nodes'],
-    #     'iterations': results0['iterations'],
-    #     'timelimit': timelimit,
-    #     'heuristics_limit': heuristics_timelimit
-    # }
+    # Model 0: "as-is" Gurobi model with no heuristics or cuts
+    model0 = Railway.load(FILENAME)
+    model0.set_model0(timelimit, False)
+    model0.set_constraints()
+    model0.set_objective()
+    results0 = model0.optimize()
+    row0 = {
+        'ID': ID,
+        'model': 0,
+        'N': N,
+        'J': J,
+        'T': T,
+        'P': P,
+        'K': K,
+        'status': model0.get_status(),
+        'runtime': results0['runtime'],
+        'heuristics_time': 0,
+        'total_time': results0['runtime'],
+        'gap': results0['gap'],
+        'objective': results0['obj'],
+        'nodes': results0['nodes'],
+        'iterations': results0['iterations'],
+        'timelimit': timelimit,
+        'heuristics_limit': heuristics_timelimit
+    }
 
-    # print(
-    #     f"   {0}".ljust(6),
-    #     f"| {ID}".ljust(4),
-    #     f"| {model0.get_status()}".ljust(13),
-    #     f"| {results0['runtime']:.2f}".ljust(10),
-    #     f"| {0:.2f}".ljust(12),
-    #     f"| {results0['runtime']:.2f}".ljust(10),
-    #     f"| {100*results0['gap']:.2f}%".ljust(10),
-    #     f"| {results0['obj']:.2e}".ljust(12),
-    #     f"| {int(results0['nodes']):d}".ljust(10),
-    # )
+    print(
+        f"   {0}".ljust(6),
+        f"| {ID}".ljust(4),
+        f"| {model0.get_status()}".ljust(13),
+        f"| {results0['runtime']:.2f}".ljust(10),
+        f"| {0:.2f}".ljust(12),
+        f"| {results0['runtime']:.2f}".ljust(10),
+        f"| {100*results0['gap']:.2f}%".ljust(10),
+        f"| {results0['obj']:.2e}".ljust(12),
+        f"| {int(results0['nodes']):d}".ljust(10),
+    )
 
 
     # Model 1: model with simulated annealing heuristic
     model1 = Railway.load(FILENAME)
     model1.set_model1(timelimit, False)
     S, SAtime = model1.simulated_annealing(
-        T=5e3,
+        T=5e4,
         c=0.99,
         L=1,
         min_T=1,
@@ -185,7 +185,7 @@ for ID, (N, J, T) in problems.items():
     model2 = Railway.load(FILENAME)
     model2.set_model2(timelimit, False)
     # S, SAtime = model2.simulated_annealing(
-    #     T=5e3,
+    #     T=5e4,
     #     c=0.99,
     #     L=1,
     #     min_T=1,
@@ -231,7 +231,7 @@ for ID, (N, J, T) in problems.items():
 
 
     # Append results to the dataframe
-    # df.loc[len(df)] = row0
+    df.loc[len(df)] = row0
     df.loc[len(df)] = row1
     df.loc[len(df)] = row2
 
@@ -239,6 +239,6 @@ for ID, (N, J, T) in problems.items():
     df.to_csv(RESULTFILE, index=False)
 
     # Delete the models for next iteration
-    # del model0
+    del model0
     del model1
     del model2
