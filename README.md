@@ -164,7 +164,7 @@ The project is structured as follows:
 
 ### Requirements
 
-The project is developed in `Python` and uses the [`Gurobi` solver](https://www.gurobi.com/) for the optimisation problems, hence the installation of the following library is needed:
+The project is developed in `Python` (version `3.11.5`) and uses the [`Gurobi` solver](https://www.gurobi.com/) for the optimisation problems, hence the installation of the following library is needed:
 
 - `gurobipy`, version `12.0.0`: the official `Gurobi` Python API, which requires to have an active `Gurobi` license and the solver installed on the machine. An [academic license](https://www.gurobi.com/academia/academic-program-and-licenses/) was used to develop the project.
 
