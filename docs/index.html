@@ -45,6 +45,26 @@
 			<div class="main-title-body" data-id="title-container">
 				<h1>Scheduling of Railway Maintainance Projects</h1>
 
+                <!-- Paper citation -->
+                 <div class="multicolumn" style="background-color: var(--light); width: 40%">
+                    <!-- <div style="flex: 1; align-items: right; text-align: right; margin-right: 20px;">
+                        <img src="./images/paper-icon.svg" height="100px">
+                    </div> -->
+                    <div style="flex: 1; align-items: right; text-align: right; margin-right: 20px;">
+                        <a href="https://www.sciencedirect.com/science/article/abs/pii/S0305054824000522" target="_blank">
+                            <img src="./images/paper-icon.svg" height="100px" style="box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);">
+                        </a>
+                    </div>
+                    <div style="flex: 5;">
+                        <p style="font-size: 0.5em; text-align: left;">
+                            Y.R. de Weert, K. Gkiotsalitis, E.C. van Berkum,<br>
+                            <i><b>Improving the scheduling of railway maintenance projects by minimizing</b></i><br>
+                            <i><b>passenger delays subject to event requests of railway operators</b></i>,<br>
+                            Computers & Operations Research, Volume 165, 2024
+                        </p>
+                    </div>
+                 </div>
+
 				<!-- Subtitle -->
 				<p style="font-size: 0.8em;">
 					Exam Project<br> 
@@ -682,7 +702,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 					<div class="slide-text">
 						Since jobs on the same arc cannot overlap in time the following constriant is needed:
 						\[
-						\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{T_{end}} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A}
+						\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{t} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A}
 						\tag{7}
 						\]
 					</div>
@@ -730,7 +750,7 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 				<div class="slide-body">
 
 					<!-- 10 and 11 -->
-					<div class="slide-text">
+					<!-- <div class="slide-text">
 						Accordingly, the following two constraints provide a lower and an upper bound for the travel time from origin $o$ to destination $d$ at time $t$:
 						\[
 						v_{odt} \geq \sum_{a \in R_{odi}} w_{at} - M (1 - h_{odti}), \quad \forall i \in \{1,\dots,K\}, \forall (o,d) \in N \times N, \forall t \in T
@@ -740,7 +760,33 @@ The set $R$ contains, for each origin-destination pair $(o,d) \in N \times N
 						v_{odt} \leq \sum_{a \in R_{odi}} w_{at}, \quad \forall i \in \{1,\dots,K\}, \forall (o,d) \in N \times N, \forall t \in T
 						\tag{11}
 						\]
-					</div>
+					</div> -->
+
+                    <div class="multicolumn">
+
+						<div style="flex: 1">
+							<div class="vertically-spaced-text">
+								<div style="text-align: left;">
+                                    Accordingly, the following two constraints provide a lower and an upper bound for the travel time from origin $o$ to destination $d$ at time $t$:
+                                    \[
+                                    \forall i \in \{1,\dots,K\}, \forall (o,d) \in N \times N, \forall t \in T
+                                    \]
+                                    \[
+                                    v_{odt} \geq \sum_{a \in R_{odi}} w_{at} - M (1 - h_{odti})
+                                    \tag{10}
+                                    \]
+                                    \[
+                                    v_{odt} \leq \sum_{a \in R_{odi}} w_{at}
+                                    \tag{11}
+                                    \]
+								</div>
+							</div>
+						</div>
+                        <div style="flex: 1;">
+                            <img src="images/constranit10.svg" height="90%" />
+                        </div>
+
+                    </div>
 
 				</div>
 

@@ -40,6 +40,8 @@ section {
 	align-items: center;
 	height: 100vh;
 }
+.main-title-body b {font-style: bold;}
+.main-title-body i {font-style: italic;}
 
 .main-title-logos {
 	display: flex;
