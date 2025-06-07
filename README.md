@@ -351,7 +351,7 @@ $$
 Since jobs on the same arc cannot overlap in time the following constriant is needed:
 
 $$
-\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{T_{end}} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A}
+\sum_{j \in J_a} \sum_{t'=\max(1, t-\pi_j-\tau_a)}^{t} y_{jt'} \leq 1, \quad \forall t \in T, \forall a \in \mathcal{A}
 \tag{7}
 $$
 
